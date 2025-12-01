@@ -17,8 +17,6 @@ return new class extends Migration
             $table->string('reference', 100)->nullable()->unique();
             $table->uuid('structure_uuid');
             $table->uuid('action_plan_uuid');
-            $table->uuid('contract_type_uuid');
-            $table->uuid('procurement_mode_uuid');
             $table->uuid('project_owner_uuid');
             $table->uuid('delegated_project_owner_uuid');
             $table->uuid('region_uuid')->nullable();
@@ -64,8 +62,6 @@ return new class extends Migration
 
             $table->foreign('structure_uuid')->references('uuid')->on('structures')->onDelete('restrict');
             $table->foreign('action_plan_uuid')->references('uuid')->on('action_plans')->onDelete('restrict');
-            $table->foreign('contract_type_uuid')->references('uuid')->on('contract_types')->onDelete('restrict');
-            $table->foreign('procurement_mode_uuid')->references('uuid')->on('procurement_modes')->onDelete('restrict');
             $table->foreign('project_owner_uuid')->references('uuid')->on('project_owners')->onDelete('restrict');
             $table->foreign('delegated_project_owner_uuid')->references('uuid')->on('delegated_project_owners')->onDelete('restrict');
             $table->foreign('program_uuid')->references('uuid')->on('programs')->onDelete('restrict');

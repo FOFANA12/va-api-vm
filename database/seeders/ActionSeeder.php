@@ -31,8 +31,6 @@ class ActionSeeder extends Seeder
         $structure = $department->children()->first();
 
         $actionPlan = ActionPlan::first();
-        $contractType = ContractType::first();
-        $procurementMode = ProcurementMode::first();
         $projectOwner = ProjectOwner::first();
         $delegatedOwner = DelegatedProjectOwner::first();
         $region = Region::first();
@@ -105,8 +103,6 @@ class ActionSeeder extends Seeder
             $action =  Action::create([
                 'structure_uuid' => $structure?->uuid,
                 'action_plan_uuid' => $actionPlan?->uuid,
-                'contract_type_uuid' => $contractType?->uuid,
-                'procurement_mode_uuid' => $procurementMode?->uuid,
                 'project_owner_uuid' => $projectOwner?->uuid,
                 'delegated_project_owner_uuid' => $delegatedOwner?->uuid,
                 'region_uuid' => $region?->uuid,

@@ -13,7 +13,6 @@ use App\Models\ActionStatus as ModelsActionStatus;
 use App\Models\Activity;
 use App\Models\Attachment;
 use App\Models\Beneficiary;
-use App\Models\ContractType;
 use App\Support\Currency;
 use App\Models\DelegatedProjectOwner;
 use App\Models\Department;
@@ -126,16 +125,6 @@ class ActionRepository
             ->select('uuid', 'name', 'structure_uuid')
             ->get();
 
-        $contractTypes = ContractType::with(['procurementModes' => function ($query) {
-            $query->select('uuid', 'name', 'status', 'contract_type_uuid')
-                ->where('status', true)
-                ->orderBy('name');
-        }])->where('status', true)
-            ->orderBy('id', 'desc')
-            ->select('uuid', 'name')
-            ->get();
-
-
         $projectOwners = ProjectOwner::where('status', true)
             ->orderBy('id', 'desc')
             ->select('uuid', 'name', 'structure_uuid')
@@ -235,7 +224,6 @@ class ActionRepository
         return [
             'structures' => $structures,
             'action_plans' => $actionPlans,
-            'contract_types' => $contractTypes,
             'project_owners' => $projectOwners,
             'delegated_project_owners' => $delegatedProjectOwners,
             'regions' => $regions,
@@ -266,8 +254,6 @@ class ActionRepository
             $request->merge([
                 'structure_uuid' => $request->input('structure'),
                 'action_plan_uuid' => $request->input('action_plan'),
-                'contract_type_uuid' => $request->input('contract_type'),
-                'procurement_mode_uuid' => $request->input('procurement_mode'),
                 'project_owner_uuid' => $request->input('project_owner'),
                 'delegated_project_owner_uuid' => $request->input('delegated_project_owner'),
 
@@ -296,8 +282,6 @@ class ActionRepository
                 'generate_document_type',
                 'structure_uuid',
                 'action_plan_uuid',
-                'contract_type_uuid',
-                'procurement_mode_uuid',
                 'project_owner_uuid',
                 'delegated_project_owner_uuid',
                 'currency',
@@ -399,8 +383,6 @@ class ActionRepository
             $action->load([
                 'structure',
                 'actionPlan',
-                'contractType',
-                'procurementMode',
                 'projectOwner',
                 'delegatedProjectOwner',
                 'region',
@@ -432,8 +414,6 @@ class ActionRepository
         return ['action' => new ActionResource($action->load([
             'structure',
             'actionPlan',
-            'contractType',
-            'procurementMode',
             'projectOwner',
             'delegatedProjectOwner',
             'region',
@@ -459,8 +439,6 @@ class ActionRepository
             $request->merge([
                 'structure_uuid' => $request->input('structure'),
                 'action_plan_uuid' => $request->input('action_plan'),
-                'contract_type_uuid' => $request->input('contract_type'),
-                'procurement_mode_uuid' => $request->input('procurement_mode'),
                 'project_owner_uuid' => $request->input('project_owner'),
                 'delegated_project_owner_uuid' => $request->input('delegated_project_owner'),
 
@@ -486,8 +464,6 @@ class ActionRepository
                 'generate_document_type',
                 'structure_uuid',
                 'action_plan_uuid',
-                'contract_type_uuid',
-                'procurement_mode_uuid',
                 'project_owner_uuid',
                 'delegated_project_owner_uuid',
                 'currency',
@@ -544,8 +520,6 @@ class ActionRepository
             $action->load([
                 'structure',
                 'actionPlan',
-                'contractType',
-                'procurementMode',
                 'projectOwner',
                 'delegatedProjectOwner',
                 'region',

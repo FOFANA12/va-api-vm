@@ -4,12 +4,10 @@ namespace App\Http\Requests;
 
 use App\Models\ActionPlan;
 use App\Models\Activity;
-use App\Models\ContractType;
 use App\Models\DelegatedProjectOwner;
 use App\Models\Department;
 use App\Models\FundingSource;
 use App\Models\Municipality;
-use App\Models\ProcurementMode;
 use App\Models\Program;
 use App\Models\Project;
 use App\Models\ProjectOwner;
@@ -49,8 +47,6 @@ class ActionRequest extends FormRequest
 
             'structure' => 'bail|required|exists:' . Structure::tableName() . ',uuid',
             'action_plan' => 'bail|required|exists:' . ActionPlan::tableName() . ',uuid',
-            'contract_type' => 'bail|required|exists:' . ContractType::tableName() . ',uuid',
-            'procurement_mode' => 'bail|required|exists:' . ProcurementMode::tableName() . ',uuid',
             'project_owner' => 'bail|required|exists:' . ProjectOwner::tableName() . ',uuid',
             'delegated_project_owner' => 'bail|required|exists:' . DelegatedProjectOwner::tableName() . ',uuid',
 
@@ -83,8 +79,6 @@ class ActionRequest extends FormRequest
 
             'structure' => __('app/action.request.structure'),
             'action_plan' => __('app/action.request.action_plan'),
-            'contract_type' => __('app/action.request.contract_type'),
-            'procurement_mode' => __('app/action.request.procurement_mode'),
             'project_owner' => __('app/action.request.project_owner'),
             'delegated_project_owner' => __('app/action.request.delegated_project_owner'),
 
