@@ -1,0 +1,315 @@
+<?php
+
+namespace Database\Seeders;
+
+use App\Models\Role;
+use App\Models\Permission;
+use Illuminate\Database\Seeder;
+
+class RoleSeeder extends Seeder
+{
+    public function run(): void
+    {
+        Role::whereNotNull('id')->delete();
+
+        $permissions = [
+
+            // Strategic maps
+            ['name' => 'ACCESS_STRATEGIC_MAPS', 'category' => 'Carte stratégique', 'description' => 'Accès au module'],
+            ['name' => 'CREATE_STRATEGIC_MAP', 'category' => 'Carte stratégique', 'description' => 'Créer une carte'],
+            ['name' => 'READ_ALL_STRATEGIC_MAPS', 'category' => 'Carte stratégique', 'description' => 'Voir toutes les cartes'],
+            ['name' => 'READ_SINGLE_STRATEGIC_MAP', 'category' => 'Carte stratégique', 'description' => 'Voir une carte'],
+            ['name' => 'UPDATE_STRATEGIC_MAP', 'category' => 'Carte stratégique', 'description' => 'Modifier une carte'],
+            ['name' => 'DELETE_STRATEGIC_MAP', 'category' => 'Carte stratégique', 'description' => 'Supprimer une carte'],
+
+            // Priority matrix
+            ['name' => 'ACCESS_PRIORITY_MATRIX', 'category' => 'Matrice de priorité', 'description' => 'Accès au module'],
+            ['name' => 'CREATE_PRIORITY_MATRIX', 'category' => 'Matrice de priorité', 'description' => 'Créer une matrice'],
+            ['name' => 'READ_PRIORITY_MATRIX', 'category' => 'Matrice de priorité', 'description' => 'Voir les matrices'],
+            ['name' => 'UPDATE_PRIORITY_MATRIX', 'category' => 'Matrice de priorité', 'description' => 'Modifier une matrice'],
+            ['name' => 'DELETE_PRIORITY_MATRIX', 'category' => 'Matrice de priorité', 'description' => 'Supprimer une matrice'],
+
+            // Stakeholders
+            ['name' => 'ACCESS_STAKEHOLDERS', 'category' => 'Partie prenante', 'description' => 'Accès au module'],
+            ['name' => 'CREATE_STAKEHOLDER', 'category' => 'Partie prenante', 'description' => 'Créer une partie prenante'],
+            ['name' => 'READ_STAKEHOLDERS', 'category' => 'Partie prenante', 'description' => 'Voir les parties prenante'],
+            ['name' => 'UPDATE_STAKEHOLDER', 'category' => 'Partie prenante', 'description' => 'Modifier une partie prenante'],
+            ['name' => 'DELETE_STAKEHOLDER', 'category' => 'Partie prenante', 'description' => 'Supprimer une partie prenante'],
+
+            // Strategic levers
+            ['name' => 'ACCESS_STRATEGIC_LEVERS', 'category' => 'Levier stratégique', 'description' => 'Accès au module'],
+            ['name' => 'CREATE_STRATEGIC_LEVER',  'category' => 'Levier stratégique', 'description' => 'Créer un levier'],
+            ['name' => 'READ_STRATEGIC_LEVERS',   'category' => 'Levier stratégique', 'description' => 'Voir les leviers'],
+            ['name' => 'UPDATE_STRATEGIC_LEVER',  'category' => 'Levier stratégique', 'description' => 'Modifier un levier'],
+            ['name' => 'DELETE_STRATEGIC_LEVER',  'category' => 'Levier stratégique', 'description' => 'Supprimer un levier'],
+
+            //Strategic axes
+            ['name' => 'ACCESS_STRATEGIC_AXES', 'category' => 'Axe stratégique', 'description' => 'Accès au module'],
+            ['name' => 'CREATE_STRATEGIC_AXIS', 'category' => 'Axe stratégique', 'description' => 'Créer un axe'],
+            ['name' => 'READ_STRATEGIC_AXES', 'category' => 'Axe stratégique', 'description' => 'Voir les axes'],
+            ['name' => 'UPDATE_STRATEGIC_AXIS', 'category' => 'Axe stratégique', 'description' => 'Modifier un axe'],
+            ['name' => 'DELETE_STRATEGIC_AXIS', 'category' => 'Axe stratégique', 'description' => 'Supprimer un axe'],
+
+            // Strategic objective
+            ['name' => 'ACCESS_STRATEGIC_OBJECTIVES', 'category' => 'Objectif stratégique', 'description' => 'Accès au module'],
+            ['name' => 'CREATE_STRATEGIC_OBJECTIVE', 'category' => 'Objectif stratégique', 'description' => 'Créer un objectif'],
+            ['name' => 'READ_STRATEGIC_OBJECTIVES', 'category' => 'Objectif stratégique', 'description' => 'Voir les objectifs'],
+            ['name' => 'UPDATE_STRATEGIC_OBJECTIVE', 'category' => 'Objectif stratégique', 'description' => 'Modifier un objectif'],
+            ['name' => 'DELETE_STRATEGIC_OBJECTIVE', 'category' => 'Objectif stratégique', 'description' => 'Supprimer un objectif'],
+
+            // Indicators
+            ['name' => 'ACCESS_INDICATORS', 'category' => 'Indicateur', 'description' => 'Accès au module'],
+            ['name' => 'CREATE_INDICATOR', 'category' => 'Indicateur', 'description' => 'Créer un indicateur'],
+            ['name' => 'READ_INDICATORS', 'category' => 'Indicateur', 'description' => 'Voir les indicateurs'],
+            ['name' => 'UPDATE_INDICATOR', 'category' => 'Indicateur', 'description' => 'Modifier un indicateur'],
+            ['name' => 'DELETE_INDICATOR', 'category' => 'Indicateur', 'description' => 'Supprimer un indicateur'],
+
+            // Action plans
+            ['name' => 'ACCESS_ACTION_PLANS', 'category' => 'Plan d\'action', 'description' => 'Accès au module'],
+            ['name' => 'CREATE_ACTION_PLAN', 'category' => 'Plan d\'action', 'description' => 'Créer un plan'],
+            ['name' => 'READ_ACTION_PLANS', 'category' => 'Plan d\'action', 'description' => 'Voir les plans'],
+            ['name' => 'UPDATE_ACTION_PLAN', 'category' => 'Plan d\'action', 'description' => 'Modifier un plan'],
+            ['name' => 'DELETE_ACTION_PLAN', 'category' => 'Plan d\'action', 'description' => 'Supprimer un plan'],
+
+            // Actions
+            ['name' => 'ACCESS_ACTIONS', 'category' => 'Action', 'description' => 'Accès au module'],
+            ['name' => 'CREATE_ACTION', 'category' => 'Action', 'description' => 'Créer une action'],
+            ['name' => 'READ_ACTIONS', 'category' => 'Action', 'description' => 'Voir les actions'],
+            ['name' => 'UPDATE_ACTION', 'category' => 'Action', 'description' => 'Modifier une action'],
+            ['name' => 'DELETE_ACTION', 'category' => 'Action', 'description' => 'Supprimer une action'],
+
+
+            // Suppliers
+            ['name' => 'ACCESS_SUPPLIERS', 'category' => 'Fournisseur', 'description' => 'Accès au module'],
+            ['name' => 'CREATE_SUPPLIER', 'category' => 'Fournisseur', 'description' => 'Créer un fournisseur'],
+            ['name' => 'READ_SUPPLIERS', 'category' => 'Fournisseur', 'description' => 'Voir les fournisseurs'],
+            ['name' => 'UPDATE_SUPPLIER', 'category' => 'Fournisseur', 'description' => 'Modifier un fournisseur'],
+            ['name' => 'DELETE_SUPPLIER', 'category' => 'Fournisseur', 'description' => 'Supprimer un fournisseur'],
+
+            // Fund receipts
+            ['name' => 'ACCESS_FUND_RECEIPTS', 'category' => 'Encaissement', 'description' => 'Accès au module'],
+            ['name' => 'CREATE_FUND_RECEIPT', 'category' => 'Encaissement', 'description' => 'Créer un encaissement'],
+            ['name' => 'READ_FUND_RECEIPTS', 'category' => 'Encaissement', 'description' => 'Voir les encaissements'],
+            ['name' => 'UPDATE_FUND_RECEIPT', 'category' => 'Encaissement', 'description' => 'Modifier un encaissement'],
+            ['name' => 'DELETE_FUND_RECEIPT', 'category' => 'Encaissement', 'description' => 'Supprimer un encaissement'],
+
+            // Fund disbursements
+            ['name' => 'ACCESS_FUND_DISBURSEMENTS', 'category' => 'Décaissement', 'description' => 'Accès au module'],
+            ['name' => 'CREATE_FUND_DISBURSEMENT', 'category' => 'Décaissement', 'description' => 'Créer un décaissement'],
+            ['name' => 'READ_FUND_DISBURSEMENTS', 'category' => 'Décaissement', 'description' => 'Voir les décaissements'],
+            ['name' => 'UPDATE_FUND_DISBURSEMENT', 'category' => 'Décaissement', 'description' => 'Modifier un décaissement'],
+            ['name' => 'DELETE_FUND_DISBURSEMENT', 'category' => 'Décaissement', 'description' => 'Supprimer un décaissement'],
+
+            // Structures
+            ['name' => 'ACCESS_STRUCTURES', 'category' => 'Structure', 'description' => 'Accès au module'],
+            ['name' => 'CREATE_STRUCTURE', 'category' => 'Structure', 'description' => 'Créer une structure'],
+            ['name' => 'READ_STRUCTURES', 'category' => 'Structure', 'description' => 'Voir les structures'],
+            ['name' => 'UPDATE_STRUCTURE', 'category' => 'Structure', 'description' => 'Modifier une structure'],
+            ['name' => 'DELETE_STRUCTURE', 'category' => 'Structure', 'description' => 'Supprimer une structure'],
+
+            // Employees (Personnel)
+            ['name' => 'ACCESS_EMPLOYEES', 'category' => 'Personnel', 'description' => 'Accès au module'],
+            ['name' => 'CREATE_EMPLOYEE', 'category' => 'Personnel', 'description' => 'Créer un personnel'],
+            ['name' => 'READ_EMPLOYEES', 'category' => 'Personnel', 'description' => 'Voir le personnel'],
+            ['name' => 'UPDATE_EMPLOYEE', 'category' => 'Personnel', 'description' => 'Modifier le personnel'],
+            ['name' => 'DELETE_EMPLOYEE', 'category' => 'Personnel', 'description' => 'Supprimer le personnel'],
+
+            // Programs
+            ['name' => 'ACCESS_PROGRAMS', 'category' => 'Programme', 'description' => 'Accès au module'],
+            ['name' => 'CREATE_PROGRAM', 'category' => 'Programme', 'description' => 'Créer un programme'],
+            ['name' => 'READ_PROGRAMS', 'category' => 'Programme', 'description' => 'Voir les programmes'],
+            ['name' => 'UPDATE_PROGRAM', 'category' => 'Programme', 'description' => 'Modifier un programme'],
+            ['name' => 'DELETE_PROGRAM', 'category' => 'Programme', 'description' => 'Supprimer un programme'],
+
+            // Projects
+            ['name' => 'ACCESS_PROJECTS', 'category' => 'Projet', 'description' => 'Accès au module'],
+            ['name' => 'CREATE_PROJECT', 'category' => 'Projet', 'description' => 'Créer un projet'],
+            ['name' => 'READ_PROJECTS', 'category' => 'Projet', 'description' => 'Voir les projets'],
+            ['name' => 'UPDATE_PROJECT', 'category' => 'Projet', 'description' => 'Modifier un projet'],
+            ['name' => 'DELETE_PROJECT', 'category' => 'Projet', 'description' => 'Supprimer un projet'],
+
+            // Activities
+            ['name' => 'ACCESS_ACTIVITIES', 'category' => 'Activité', 'description' => 'Accès au module'],
+            ['name' => 'CREATE_ACTIVITY', 'category' => 'Activité', 'description' => 'Créer une activité'],
+            ['name' => 'READ_ACTIVITIES', 'category' => 'Activité', 'description' => 'Voir les activités'],
+            ['name' => 'UPDATE_ACTIVITY', 'category' => 'Activité', 'description' => 'Modifier une activité'],
+            ['name' => 'DELETE_ACTIVITY', 'category' => 'Activité', 'description' => 'Supprimer une activité'],
+
+            // Reporting
+            ['name' => 'ACCESS_REPORTING', 'category' => 'Reporting', 'description' => 'Accès au module'],
+
+            // System Logs
+            ['name' => 'ACCESS_LOGS', 'category' => 'Logs système', 'description' => 'Accès au module'],
+
+            // Currencies
+            ['name' => 'ACCESS_CURRENCIES', 'category' => 'Devise', 'description' => 'Accès au module'],
+            ['name' => 'CREATE_CURRENCY', 'category' => 'Devise', 'description' => 'Créer une devise'],
+            ['name' => 'READ_CURRENCIES', 'category' => 'Devise', 'description' => 'Voir les devises'],
+            ['name' => 'UPDATE_CURRENCY', 'category' => 'Devise', 'description' => 'Modifier une devise'],
+            ['name' => 'DELETE_CURRENCY', 'category' => 'Devise', 'description' => 'Supprimer une devise'],
+
+            // Default phases
+            ['name' => 'ACCESS_DEFAULT_PHASES', 'category' => 'Phase par défaut', 'description' => 'Accès au module'],
+            ['name' => 'CREATE_DEFAULT_PHASE', 'category' => 'Phase par défaut', 'description' => 'Créer une phase'],
+            ['name' => 'READ_DEFAULT_PHASES', 'category' => 'Phase par défaut', 'description' => 'Voir les phases'],
+            ['name' => 'UPDATE_DEFAULT_PHASE', 'category' => 'Phase par défaut', 'description' => 'Modifier une phase'],
+            ['name' => 'DELETE_DEFAULT_PHASE', 'category' => 'Phase par défaut', 'description' => 'Supprimer une phase'],
+
+            // File types
+            ['name' => 'ACCESS_FILE_TYPES', 'category' => 'Type de fichier', 'description' => 'Accès au module'],
+            ['name' => 'CREATE_FILE_TYPE', 'category' => 'Type de fichier', 'description' => 'Créer un type'],
+            ['name' => 'READ_FILE_TYPES', 'category' => 'Type de fichier', 'description' => 'Voir les types'],
+            ['name' => 'UPDATE_FILE_TYPE', 'category' => 'Type de fichier', 'description' => 'Modifier un type'],
+            ['name' => 'DELETE_FILE_TYPE', 'category' => 'Type de fichier', 'description' => 'Supprimer un type'],
+
+            // Contract types
+            ['name' => 'ACCESS_CONTRACT_TYPES', 'category' => 'Type de marché', 'description' => 'Accès au module'],
+            ['name' => 'CREATE_CONTRACT_TYPE', 'category' => 'Type de marché', 'description' => 'Créer un type'],
+            ['name' => 'READ_CONTRACT_TYPES', 'category' => 'Type de marché', 'description' => 'Voir les types'],
+            ['name' => 'UPDATE_CONTRACT_TYPE', 'category' => 'Type de marché', 'description' => 'Modifier un type'],
+            ['name' => 'DELETE_CONTRACT_TYPE', 'category' => 'Type de marché', 'description' => 'Supprimer un type'],
+
+            // Procurement modes
+            ['name' => 'ACCESS_PROCUREMENT_MODES', 'category' => 'Mode de sélection', 'description' => 'Accès au module'],
+            ['name' => 'CREATE_PROCUREMENT_MODE', 'category' => 'Mode de sélection', 'description' => 'Créer un mode de sélection'],
+            ['name' => 'READ_PROCUREMENT_MODES', 'category' => 'Mode de sélection', 'description' => 'Voir les modes de sélection'],
+            ['name' => 'UPDATE_PROCUREMENT_MODE', 'category' => 'Mode de sélection', 'description' => 'Modifier un mode de sélection'],
+            ['name' => 'DELETE_PROCUREMENT_MODE', 'category' => 'Mode de sélection', 'description' => 'Supprimer un mode de sélection'],
+
+            // Project owners
+            ['name' => 'ACCESS_PROJECT_OWNERS', 'category' => 'Maître d\'ouvrage', 'description' => 'Accès au module'],
+            ['name' => 'CREATE_PROJECT_OWNER', 'category' => 'Maître d\'ouvrage', 'description' => 'Créer un maître d\'ouvrage'],
+            ['name' => 'READ_PROJECT_OWNERS', 'category' => 'Maître d\'ouvrage', 'description' => 'Voir les maîtres d\'ouvrage'],
+            ['name' => 'UPDATE_PROJECT_OWNER', 'category' => 'Maître d\'ouvrage', 'description' => 'Modifier un maître d\'ouvrage'],
+            ['name' => 'DELETE_PROJECT_OWNER', 'category' => 'Maître d\'ouvrage', 'description' => 'Supprimer un maître d\'ouvrage'],
+
+            // Delegated project owners
+            ['name' => 'ACCESS_DELEGATED_PROJECT_OWNERS', 'category' => 'Maître d\'ouvrage délégué', 'description' => 'Accès au module'],
+            ['name' => 'CREATE_DELEGATED_PROJECT_OWNER', 'category' => 'Maître d\'ouvrage délégué', 'description' => 'Créer un maître d\'ouvrage délégué'],
+            ['name' => 'READ_DELEGATED_PROJECT_OWNERS', 'category' => 'Maître d\'ouvrage délégué', 'description' => 'Voir les maîtres d\'ouvrage délégués'],
+            ['name' => 'UPDATE_DELEGATED_PROJECT_OWNER', 'category' => 'Maître d\'ouvrage délégué', 'description' => 'Modifier un maître d\'ouvrage délégué'],
+            ['name' => 'DELETE_DELEGATED_PROJECT_OWNER', 'category' => 'Maître d\'ouvrage délégué', 'description' => 'Supprimer un maître d\'ouvrage délégué'],
+
+            // Funding sources
+            ['name' => 'ACCESS_FUNDING_SOURCES', 'category' => 'Source de financement', 'description' => 'Accès au module'],
+            ['name' => 'CREATE_FUNDING_SOURCE', 'category' => 'Source de financement', 'description' => 'Créer une source'],
+            ['name' => 'READ_FUNDING_SOURCES', 'category' => 'Source de financement', 'description' => 'Voir les sources'],
+            ['name' => 'UPDATE_FUNDING_SOURCE', 'category' => 'Source de financement', 'description' => 'Modifier une source'],
+            ['name' => 'DELETE_FUNDING_SOURCE', 'category' => 'Source de financement', 'description' => 'Supprimer une source'],
+
+            // Regions
+            ['name' => 'ACCESS_REGIONS', 'category' => 'Région', 'description' => 'Accès au module'],
+            ['name' => 'CREATE_REGION', 'category' => 'Région', 'description' => 'Créer une région'],
+            ['name' => 'READ_REGIONS', 'category' => 'Région', 'description' => 'Voir les régions'],
+            ['name' => 'UPDATE_REGION', 'category' => 'Région', 'description' => 'Modifier une région'],
+            ['name' => 'DELETE_REGION', 'category' => 'Région', 'description' => 'Supprimer une région'],
+
+            // Departments
+            ['name' => 'ACCESS_DEPARTMENTS', 'category' => 'Département', 'description' => 'Accès au module'],
+            ['name' => 'CREATE_DEPARTMENT', 'category' => 'Département', 'description' => 'Créer un département'],
+            ['name' => 'READ_DEPARTMENTS', 'category' => 'Département', 'description' => 'Voir les départements'],
+            ['name' => 'UPDATE_DEPARTMENT', 'category' => 'Département', 'description' => 'Modifier un département'],
+            ['name' => 'DELETE_DEPARTMENT', 'category' => 'Département', 'description' => 'Supprimer un département'],
+
+            // Municipalities
+            ['name' => 'ACCESS_MUNICIPALITIES', 'category' => 'Commune', 'description' => 'Accès au module'],
+            ['name' => 'CREATE_MUNICIPALITY', 'category' => 'Commune', 'description' => 'Créer une commune'],
+            ['name' => 'READ_MUNICIPALITIES', 'category' => 'Commune', 'description' => 'Voir les communes'],
+            ['name' => 'UPDATE_MUNICIPALITY', 'category' => 'Commune', 'description' => 'Modifier une commune'],
+            ['name' => 'DELETE_MUNICIPALITY', 'category' => 'Commune', 'description' => 'Supprimer une commune'],
+
+            // Beneficiaries
+            ['name' => 'ACCESS_BENEFICIARIES', 'category' => 'Bénéficiaire', 'description' => 'Accès au module'],
+            ['name' => 'CREATE_BENEFICIARY', 'category' => 'Bénéficiaire', 'description' => 'Créer un bénéficiaire'],
+            ['name' => 'READ_BENEFICIARIES', 'category' => 'Bénéficiaire', 'description' => 'Voir les bénéficiaires'],
+            ['name' => 'UPDATE_BENEFICIARY', 'category' => 'Bénéficiaire', 'description' => 'Modifier un bénéficiaire'],
+            ['name' => 'DELETE_BENEFICIARY', 'category' => 'Bénéficiaire', 'description' => 'Supprimer un bénéficiaire'],
+
+            // Payment modes
+            ['name' => 'ACCESS_PAYMENT_MODES', 'category' => 'Mode de paiement', 'description' => 'Accès au module'],
+            ['name' => 'CREATE_PAYMENT_MODE', 'category' => 'Mode de paiement', 'description' => 'Créer un mode de paiement'],
+            ['name' => 'READ_PAYMENT_MODES', 'category' => 'Mode de paiement', 'description' => 'Voir les modes de paiement'],
+            ['name' => 'UPDATE_PAYMENT_MODE', 'category' => 'Mode de paiement', 'description' => 'Modifier un mode de paiement'],
+            ['name' => 'DELETE_PAYMENT_MODE', 'category' => 'Mode de paiement', 'description' => 'Supprimer un mode de paiement'],
+
+            // Budget types
+            ['name' => 'ACCESS_BUDGET_TYPES', 'category' => 'Type de budgets', 'description' => 'Accès au module'],
+            ['name' => 'CREATE_BUDGET_TYPE', 'category' => 'Type de budgets', 'description' => 'Créer un type de budget'],
+            ['name' => 'READ_BUDGET_TYPES', 'category' => 'Type de budgets', 'description' => 'Voir les types de budgets'],
+            ['name' => 'UPDATE_BUDGET_TYPE', 'category' => 'Type de budgets', 'description' => 'Modifier un type de budget'],
+            ['name' => 'DELETE_BUDGET_TYPE', 'category' => 'Type de budgets', 'description' => 'Supprimer un type de budget'],
+
+            // Expense types
+            ['name' => 'ACCESS_EXPENSE_TYPES', 'category' => 'Type de dépenses', 'description' => 'Accès au module'],
+            ['name' => 'CREATE_EXPENSE_TYPE', 'category' => 'Type de dépenses', 'description' => 'Créer un type de dépense'],
+            ['name' => 'READ_EXPENSE_TYPES', 'category' => 'Type de dépenses', 'description' => 'Voir les types de dépenses'],
+            ['name' => 'UPDATE_EXPENSE_TYPE', 'category' => 'Type de dépenses', 'description' => 'Modifier un type de dépense'],
+            ['name' => 'DELETE_EXPENSE_TYPE', 'category' => 'Type de dépenses', 'description' => 'Supprimer un type de dépense'],
+
+            // Indicator categories
+            ['name' => 'ACCESS_INDICATOR_CATEGORIES', 'category' => 'Catégorie d\'indicateur', 'description' => 'Accès au module'],
+            ['name' => 'CREATE_INDICATOR_CATEGORY', 'category' => 'Catégorie d\'indicateur', 'description' => 'Créer une catégorie'],
+            ['name' => 'READ_INDICATOR_CATEGORIES', 'category' => 'Catégorie d\'indicateur', 'description' => 'Voir les catégories'],
+            ['name' => 'UPDATE_INDICATOR_CATEGORY', 'category' => 'Catégorie d\'indicateur', 'description' => 'Modifier une catégorie'],
+            ['name' => 'DELETE_INDICATOR_CATEGORY', 'category' => 'Catégorie d\'indicateur', 'description' => 'Supprimer une catégorie'],
+
+            // Users
+            ['name' => 'ACCESS_USERS', 'category' => 'Utilisateur', 'description' => 'Accès au module'],
+            ['name' => 'CREATE_USER', 'category' => 'Utilisateur', 'description' => 'Créer un utilisateur'],
+            ['name' => 'READ_USERS', 'category' => 'Utilisateur', 'description' => 'Voir les utilisateurs'],
+            ['name' => 'UPDATE_USER', 'category' => 'Utilisateur', 'description' => 'Modifier un utilisateur'],
+            ['name' => 'DELETE_USER', 'category' => 'Utilisateur', 'description' => 'Supprimer un utilisateur'],
+
+            // Roles and permissions
+            ['name' => 'ACCESS_ROLES', 'category' => 'Rôle et permission', 'description' => 'Accès au module'],
+            ['name' => 'CREATE_ROLE', 'category' => 'Rôle et permission', 'description' => 'Créer un rôle'],
+            ['name' => 'READ_ROLES', 'category' => 'Rôle et permission', 'description' => 'Voir les rôles'],
+            ['name' => 'UPDATE_ROLE', 'category' => 'Rôle et permission', 'description' => 'Modifier un rôle'],
+            ['name' => 'DELETE_ROLE', 'category' => 'Rôle et permission', 'description' => 'Supprimer un rôle'],
+
+        ];
+
+        foreach ($permissions as $perm) {
+            Permission::updateOrCreate(
+                ['name' => $perm['name']],
+                [
+                    'category' => $perm['category'],
+                    'description' => $perm['description']
+                ]
+            );
+        }
+
+        $admin = Role::create([
+            'name' => 'Administrateur',
+        ]);
+
+        $admin->permissions()->sync(Permission::pluck('id')->toArray());
+
+        $simpleUser = Role::create([
+            'name' => 'Utilisateur simple',
+        ]);
+
+        $allowedPermissions = Permission::whereNotIn('category', [
+            'Devises',
+            'Phases par défaut',
+            'Types de fichiers',
+            'Types de marchés',
+            'Modes de sélection',
+            'Maîtres d\'ouvrage',
+            'Maîtres d\'ouvrage délégués',
+            'Sources de financement',
+            'Régions',
+            'Départements',
+            'Communes',
+            'Bénéficiaires',
+            'Modes de paiement',
+            'Types de budgets',
+            'Types de dépenses',
+            'Catégories d\'indicateurs',
+            'Utilisateurs',
+            'Rôles et permissions',
+        ])->pluck('id')->toArray();
+
+        $simpleUser->permissions()->sync($allowedPermissions);
+    }
+}
