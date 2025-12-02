@@ -35,11 +35,11 @@ class UserSeeder extends Seeder
             'role_uuid' => $adminRole?->uuid,
         ]);
 
-        $defaultStructure = Structure::where('abbreviation', 'MDN')->first();
+        $defaultStructure = Structure::where('abbreviation', 'STATE-ROOT')->first();
 
         if (!$defaultStructure) {
             $defaultStructure = Structure::factory()->create([
-                'abbreviation' => 'MDN',
+                'abbreviation' => 'STATE-ROOT',
                 'name' => 'Ministère de la Défense Nationale',
             ]);
         }
@@ -61,7 +61,7 @@ class UserSeeder extends Seeder
             'can_logged_in' => true,
         ]);
 
-        $structureUuids = Structure::where('abbreviation', '!=', 'MDN')->pluck('uuid');
+        $structureUuids = Structure::where('abbreviation', '!=', 'STATE-ROOT')->pluck('uuid');
 
         $users = User::factory()
             ->count(30)

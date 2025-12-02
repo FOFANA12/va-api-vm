@@ -114,26 +114,34 @@ class RoleSeeder extends Seeder
             ['name' => 'UPDATE_EMPLOYEE', 'category' => 'Personnel', 'description' => 'Modifier le personnel'],
             ['name' => 'DELETE_EMPLOYEE', 'category' => 'Personnel', 'description' => 'Supprimer le personnel'],
 
-            // Programs
-            ['name' => 'ACCESS_PROGRAMS', 'category' => 'Programme', 'description' => 'Accès au module'],
-            ['name' => 'CREATE_PROGRAM', 'category' => 'Programme', 'description' => 'Créer un programme'],
-            ['name' => 'READ_PROGRAMS', 'category' => 'Programme', 'description' => 'Voir les programmes'],
-            ['name' => 'UPDATE_PROGRAM', 'category' => 'Programme', 'description' => 'Modifier un programme'],
-            ['name' => 'DELETE_PROGRAM', 'category' => 'Programme', 'description' => 'Supprimer un programme'],
 
-            // Projects
-            ['name' => 'ACCESS_PROJECTS', 'category' => 'Projet', 'description' => 'Accès au module'],
-            ['name' => 'CREATE_PROJECT', 'category' => 'Projet', 'description' => 'Créer un projet'],
-            ['name' => 'READ_PROJECTS', 'category' => 'Projet', 'description' => 'Voir les projets'],
-            ['name' => 'UPDATE_PROJECT', 'category' => 'Projet', 'description' => 'Modifier un projet'],
-            ['name' => 'DELETE_PROJECT', 'category' => 'Projet', 'description' => 'Supprimer un projet'],
+            // Action domains
+            ['name' => 'ACCESS_ACTION_DOMAINS', 'category' => 'Domaine d\'action', 'description' => 'Accès au module'],
+            ['name' => 'CREATE_ACTION_DOMAIN', 'category' => 'Domaine d\'action', 'description' => 'Créer un domaine d\'action'],
+            ['name' => 'READ_ACTION_DOMAINS', 'category' => 'Domaine d\'action', 'description' => 'Voir les domaines d\'action'],
+            ['name' => 'UPDATE_ACTION_DOMAIN', 'category' => 'Domaine d\'action', 'description' => 'Modifier un domaine d\'action'],
+            ['name' => 'DELETE_ACTION_DOMAIN', 'category' => 'Domaine d\'action', 'description' => 'Supprimer un domaine d\'action'],
 
-            // Activities
-            ['name' => 'ACCESS_ACTIVITIES', 'category' => 'Activité', 'description' => 'Accès au module'],
-            ['name' => 'CREATE_ACTIVITY', 'category' => 'Activité', 'description' => 'Créer une activité'],
-            ['name' => 'READ_ACTIVITIES', 'category' => 'Activité', 'description' => 'Voir les activités'],
-            ['name' => 'UPDATE_ACTIVITY', 'category' => 'Activité', 'description' => 'Modifier une activité'],
-            ['name' => 'DELETE_ACTIVITY', 'category' => 'Activité', 'description' => 'Supprimer une activité'],
+            // Strategic domains
+            ['name' => 'ACCESS_STRATEGIC_DOMAINS', 'category' => 'Domaine stratégique', 'description' => 'Accès au module'],
+            ['name' => 'CREATE_STRATEGIC_DOMAIN', 'category' => 'Domaine stratégique', 'description' => 'Créer un domaine stratégique'],
+            ['name' => 'READ_STRATEGIC_DOMAINS', 'category' => 'Domaine stratégique', 'description' => 'Voir les domaines stratégiques'],
+            ['name' => 'UPDATE_STRATEGIC_DOMAIN', 'category' => 'Domaine stratégique', 'description' => 'Modifier un domaine stratégique'],
+            ['name' => 'DELETE_STRATEGIC_DOMAIN', 'category' => 'Domaine stratégique', 'description' => 'Supprimer un domaine stratégique'],
+
+            // Capability domains
+            ['name' => 'ACCESS_CAPABILITY_DOMAINS', 'category' => 'Domaine capacitaire', 'description' => 'Accès au module'],
+            ['name' => 'CREATE_CAPABILITY_DOMAIN', 'category' => 'Domaine capacitaire', 'description' => 'Créer un domaine capacitaire'],
+            ['name' => 'READ_CAPABILITY_DOMAINS', 'category' => 'Domaine capacitaire', 'description' => 'Voir les domaines capacitaires'],
+            ['name' => 'UPDATE_CAPABILITY_DOMAIN', 'category' => 'Domaine capacitaire', 'description' => 'Modifier un domaine capacitaire'],
+            ['name' => 'DELETE_CAPABILITY_DOMAIN', 'category' => 'Domaine capacitaire', 'description' => 'Supprimer un domaine capacitaire'],
+
+            // Elementary levels
+            ['name' => 'ACCESS_ELEMENTARY_LEVELS', 'category' => 'Niveau élémentaire', 'description' => 'Accès au module'],
+            ['name' => 'CREATE_ELEMENTARY_LEVEL', 'category' => 'Niveau élémentaire', 'description' => 'Créer un niveau élémentaire'],
+            ['name' => 'READ_ELEMENTARY_LEVELS', 'category' => 'Niveau élémentaire', 'description' => 'Voir les niveaux élémentaires'],
+            ['name' => 'UPDATE_ELEMENTARY_LEVEL', 'category' => 'Niveau élémentaire', 'description' => 'Modifier un niveau élémentaire'],
+            ['name' => 'DELETE_ELEMENTARY_LEVEL', 'category' => 'Niveau élémentaire', 'description' => 'Supprimer un niveau élémentaire'],
 
             // Reporting
             ['name' => 'ACCESS_REPORTING', 'category' => 'Reporting', 'description' => 'Accès au module'],

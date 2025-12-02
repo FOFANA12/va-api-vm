@@ -13,23 +13,31 @@ class StructureType
             'name' => [
                 'fr' => 'State',
                 'en' => 'State',
-                'ar' => 'ولاية',
+                'ar' => 'الدولة',
             ],
         ],
         [
-            'code' => 'DEPARTMENT',
+            'code' => 'STRATEGIC',
             'name' => [
-                'fr' => 'Département',
-                'en' => 'Department',
-                'ar' => 'قسم',
+                'fr' => 'Stratégique',
+                'en' => 'Strategic',
+                'ar' => 'استراتيجي',
             ],
         ],
         [
-            'code' => 'DIRECTION',
+            'code' => 'OPERATIONAL',
             'name' => [
-                'fr' => 'Direction',
-                'en' => 'Directorate',
-                'ar' => 'إدارة',
+                'fr' => 'Opérationnel',
+                'en' => 'Operational',
+                'ar' => 'تشغيلي',
+            ],
+        ],
+        [
+            'code' => 'VIRTUAL',
+            'name' => [
+                'fr' => 'Virtuel',
+                'en' => 'Virtual',
+                'ar' => 'افتراضي',
             ],
         ],
     ];

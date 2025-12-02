@@ -87,7 +87,7 @@ class ActionPlanRepository
     {
         $structures = Structure::query()
             ->where('status', true)
-            ->whereIn('type', ['DIRECTION'])
+            ->whereIn('type', ['OPERATIONAL'])
             ->orderBy('id', 'desc')
             ->select('uuid', 'name', 'type')
             ->get();

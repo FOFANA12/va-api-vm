@@ -16,7 +16,7 @@ class SupplierSeeder extends Seeder
         $firstAction = Action::first();
 
         if (!$firstAction) {
-            $this->command->warn('⚠️ Aucun enregistrement trouvé dans la table actions. Le seeder SupplierSeeder n’a rien créé.');
+            $this->command->warn('⚠️ Aucun enregistrement trouvé dans la table actions. Le seeder SupplierSeeder n\'a rien créé.');
             return;
         }
 

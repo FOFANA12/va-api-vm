@@ -22,7 +22,7 @@ class DecisionSeeder extends Seeder
             [
                 'reference' => 'MEFP_AXER _OBJ215_DECIS19',
                 'title' => 'Validation de l’objectif stratégique',
-                'description' => 'Décision concernant l’avancement du projet stratégique.',
+                'description' => 'Décision concernant l\'avancement du projet stratégique.',
                 'decidable_type' => StrategicObjective::class,
                 'decidable_id' => $objective?->id,
                 'status' => 'announced',

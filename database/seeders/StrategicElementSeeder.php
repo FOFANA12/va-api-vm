@@ -16,7 +16,7 @@ class StrategicElementSeeder extends Seeder
         StrategicElement::whereNotNull('id')->delete();
 
         $stateMap = StrategicMap::whereHas('structure', fn($q) => $q->where('type', 'STATE'))->first();
-        $departmentMap = StrategicMap::whereHas('structure', fn($q) => $q->where('type', 'DEPARTMENT'))->first();
+        $structure = StrategicMap::whereHas('structure', fn($q) => $q->where('type', 'STRATEGIC'))->first();
 
         $levers = [
             [
@@ -95,8 +95,8 @@ class StrategicElementSeeder extends Seeder
                     'description' => $axe['desc'],
                     'order' => $order++,
                     'status' => true,
-                    'strategic_map_uuid' => $departmentMap->uuid,
-                    'structure_uuid' => $departmentMap->structure_uuid,
+                    'strategic_map_uuid' => $structure->uuid,
+                    'structure_uuid' => $structure->structure_uuid,
                     'parent_element_uuid' => $lever->uuid,
                     'parent_structure_uuid' => $lever->structure_uuid,
                     'parent_map_uuid' => $lever->strategic_map_uuid,

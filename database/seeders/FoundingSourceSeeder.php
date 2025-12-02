@@ -24,7 +24,7 @@ class FoundingSourceSeeder extends Seeder
                 'description' => 'Soutien au développement durable',
             ],
             [
-                'name' => 'Fonds propre de l’État',
+                'name' => 'Fonds propre de l\'État',
                 'description' => 'Financement public national',
             ],
             [
@@ -33,11 +33,11 @@ class FoundingSourceSeeder extends Seeder
             ],
             [
                 'name' => 'Programme des Nations Unies pour le Développement (PNUD)',
-                'description' => 'Agence de l’ONU dédiée au développement',
+                'description' => 'Agence de l\'ONU dédiée au développement',
             ],
             [
                 'name' => 'Budget National',
-                'description' => 'Financement interne par l’État',
+                'description' => 'Financement interne par l\'État',
             ],
         ];
 

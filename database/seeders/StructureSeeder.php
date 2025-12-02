@@ -7,63 +7,88 @@ use Illuminate\Database\Seeder;
 
 class StructureSeeder extends Seeder
 {
-    /**
-     * Run the database seeds.
-     */
     public function run(): void
     {
         Structure::whereNotNull('id')->delete();
 
-        $ministry = Structure::create([
-            'abbreviation' => 'MDN',
-            'name' => 'Ministère de la Défense Nationale',
-            'type' => 'STATE'
+        $state = Structure::create([
+            'abbreviation' => 'STATE-ROOT',
+            'name' => 'Autorité Centrale',
+            'type' => 'STATE',
+            'parent_uuid' => null,
         ]);
 
-        $departments = [
+        $strategic = Structure::create([
+            'abbreviation' => 'ADM-CENT',
+            'name' => 'Administration Centrale',
+            'type' => 'STRATEGIC',
+            'parent_uuid' => $state->uuid,
+        ]);
+
+        $unitA = Structure::create([
+            'abbreviation' => 'UGP',
+            'name' => 'Unité de Gestion des Projets',
+            'type' => 'VIRTUAL',
+            'parent_uuid' => $strategic->uuid,
+        ]);
+
+        $unitB = Structure::create([
+            'abbreviation' => 'UAS',
+            'name' => 'Unité d\'Appui et de Support',
+            'type' => 'VIRTUAL',
+            'parent_uuid' => $strategic->uuid,
+        ]);
+
+        $uasOperational = [
+            ['abbr' => 'UAS-OPS1', 'name' => 'Service d\'Assistance Technique'],
+            ['abbr' => 'UAS-OPS2', 'name' => 'Service de Maintenance Systèmes'],
+            ['abbr' => 'UAS-OPS3', 'name' => 'Service Logistique Interne'],
+        ];
+
+        foreach ($uasOperational as $dir) {
+            Structure::create([
+                'abbreviation' => $dir['abbr'],
+                'name' => $dir['name'],
+                'type' => 'OPERATIONAL',
+                'parent_uuid' => $unitB->uuid,
+            ]);
+        }
+
+        $unitAChildren = [
             [
-                'abbr' => 'DLOG',
-                'name' => 'Département de la Logistique',
-                'directions' => [
-                    'Direction des Approvisionnements',
-                    'Direction de Maintenance',
-                    'Direction des Transports',
+                'abbr' => 'GPRJ',
+                'name' => 'Service Gestion des Projets',
+                'sub_virtual' => [
+                    'Cellule Analyse',
+                    'Cellule Suivi-Évaluation',
+                    'Cellule Planification',
                 ]
             ],
             [
-                'abbr' => 'DRH',
-                'name' => 'Département des Ressources Humaines',
-                'directions' => [
-                    'Direction du Recrutement',
-                    'Direction de la Formation',
-                ]
-            ],
-            [
-                'abbr' => 'DOPS',
-                'name' => 'Département des Opérations',
-                'directions' => [
-                    'Direction des Opérations Aériennes',
-                    'Direction des Opérations Terrestres',
-                    'Direction de Coordination Stratégique',
+                'abbr' => 'GPRH',
+                'name' => 'Service Ressources Humaines',
+                'sub_virtual' => [
+                    'Cellule Recrutement',
+                    'Cellule Développement des Compétences',
                 ]
             ],
         ];
 
-        foreach ($departments as $dep) {
+        foreach ($unitAChildren as $child) {
 
-            $department = Structure::create([
-                'abbreviation' => $dep['abbr'],
-                'name' => $dep['name'],
-                'type' => 'DEPARTMENT',
-                'parent_uuid' => $ministry->uuid,
+            $operational = Structure::create([
+                'abbreviation' => $child['abbr'],
+                'name' => $child['name'],
+                'type' => 'OPERATIONAL',
+                'parent_uuid' => $unitA->uuid,
             ]);
 
-            foreach ($dep['directions'] as $index => $directionName) {
+            foreach ($child['sub_virtual'] as $index => $dirName) {
                 Structure::create([
-                    'abbreviation' => $dep['abbr'] . '-DIR' . ($index + 1),
-                    'name' => $directionName,
-                    'type' => 'DIRECTION',
-                    'parent_uuid' => $department->uuid,
+                    'abbreviation' => $child['abbr'] . '-V' . ($index + 1),
+                    'name' => $dirName,
+                    'type' => 'VIRTUAL',
+                    'parent_uuid' => $operational->uuid,
                 ]);
             }
         }
