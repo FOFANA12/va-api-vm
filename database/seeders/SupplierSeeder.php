@@ -2,7 +2,6 @@
 
 namespace Database\Seeders;
 
-use App\Models\Action;
 use App\Models\ContractType;
 use App\Models\Supplier;
 use Illuminate\Database\Seeder;
@@ -16,8 +15,6 @@ class SupplierSeeder extends Seeder
     {
         $contractType = ContractType::first();
 
-        if (!$firstAction) {
-            $this->command->warn('⚠️ Aucun enregistrement trouvé dans la table actions. Le seeder SupplierSeeder n\'a rien créé.');
         if (!$contractType) {
             $this->command->warn('⚠️ Aucun type de contrat trouvé. Le seeder SupplierSeeder n’a rien créé.');
             return;

@@ -5,10 +5,10 @@ declare(strict_types=1);
 return [
 
     'controller' => [
-        'message_success_created' => 'Le programme a été créé avec succès.',
-        'message_success_updated' => 'Le programme a été modifié avec succès.',
-        'message_success_status_updated' => 'Le statut du programme a été mis à jour avec succès.',
-        'message_success_state_updated' => 'L\'état du programme a été mis à jour avec succès.',
+        'message_success_created' => 'Le domaine d\'action a été créé avec succès.',
+        'message_success_updated' => 'Le domaine d\'action a été modifié avec succès.',
+        'message_success_status_updated' => 'Le statut du domaine d\'action a été mis à jour avec succès.',
+        'message_success_state_updated' => 'L\'état du domaine d\'action a été mis à jour avec succès.',
     ],
 
     'request' => [
