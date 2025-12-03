@@ -2,7 +2,7 @@
 
 namespace App\Support;
 
-class ProgramState
+class ActionDomainState
 {
     /**
      * List of possible states with localized names and display colors.

@@ -90,12 +90,12 @@ class ActionDomain extends Model
 
     public function statuses(): HasMany
     {
-        return $this->hasMany(ProgramStatus::class, 'action_domain_uuid', 'uuid');
+        return $this->hasMany(ActionDomainStatus::class, 'action_domain_uuid', 'uuid');
     }
 
     public function states(): HasMany
     {
-        return $this->hasMany(ProgramState::class, 'action_domain_uuid', 'uuid');
+        return $this->hasMany(ActionDomainState::class, 'action_domain_uuid', 'uuid');
     }
 
     public function statusChangedBy(): BelongsTo

@@ -6,10 +6,10 @@ use App\Helpers\ReferenceGenerator;
 use App\Http\Requests\ActionDomainRequest;
 use App\Http\Resources\ActionDomainResource;
 use App\Models\ActionDomain;
+use App\Models\ActionDomainState;
+use App\Models\ActionDomainStatus;
 use App\Models\Beneficiary;
 use App\Models\FundingSource;
-use App\Models\ProgramState;
-use App\Models\ProgramStatus;
 use App\Models\User;
 use App\Support\Currency;
 use Illuminate\Http\Request;
@@ -164,7 +164,7 @@ class ActionDomainRepository
             $actionDomain->refresh();
 
             //Save initial status
-            $status = ProgramStatus::create([
+            $status = ActionDomainStatus::create([
                 'action_domain_uuid' => $actionDomain->uuid,
                 'action_domain_id' => $actionDomain->id,
                 'status_code' => $actionDomain->status,
@@ -174,7 +174,7 @@ class ActionDomainRepository
             ]);
 
             //Save initial state
-            $state = ProgramState::create([
+            $state = ActionDomainState::create([
                 'action_domain_uuid' => $actionDomain->uuid,
                 'action_domain_id' => $actionDomain->id,
                 'state_code' => $actionDomain->state,

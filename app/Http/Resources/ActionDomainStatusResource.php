@@ -3,10 +3,10 @@
 namespace App\Http\Resources;
 
 use App\Helpers\DateTimeFormatter;
-use App\Support\ProgramStatus;
+use App\Support\ActionDomainStatus;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ProgramStatusResource extends JsonResource
+class ActionDomainStatusResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -23,7 +23,7 @@ class ProgramStatusResource extends JsonResource
             'id' => $this->id,
             'uuid' => $this->uuid,
             'action_domain_uuid' => $this->action_domain_uuid,
-            'status' => ProgramStatus::get($this->status_code, app()->getLocale()),
+            'status' => ActionDomainStatus::get($this->status_code, app()->getLocale()),
             'status_date' => DateTimeFormatter::formatDatetime($this->status_date),
             'author' => $author,
         ];

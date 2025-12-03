@@ -4,18 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\ActionDomain;
-use App\Repositories\ProgramStateRepository;
-use App\Support\ProgramState;
+use App\Repositories\ActionDomainStateRepository;
+use App\Support\ActionDomainState;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
-class ProgramStateController extends Controller
+class ActionDomainStateController extends Controller
 {
     private $messageSuccessUpdated;
     private $messageSuccessDeleted;
     private $repository;
 
-    public function __construct(ProgramStateRepository $repository)
+    public function __construct(ActionDomainStateRepository $repository)
     {
         $this->messageSuccessUpdated = __('app/action_domain.controller.message_success_state_updated');
         $this->messageSuccessDeleted = __('app/common.controller.message_success_deleted');
@@ -43,7 +43,7 @@ class ProgramStateController extends Controller
      */
     public function store(Request $request, ActionDomain $actionDomain)
     {
-        $validStates = ProgramState::codes();
+        $validStates = ActionDomainState::codes();
 
         $state = $request->input('state');
 

@@ -14,6 +14,8 @@ use App\Http\Controllers\Auth\ProfileController;
 use App\Http\Controllers\StrategicMapController;
 use App\Http\Controllers\ActionControlController;
 use App\Http\Controllers\ActionDomainController;
+use App\Http\Controllers\ActionDomainStateController;
+use App\Http\Controllers\ActionDomainStatusController;
 use App\Http\Controllers\Settings\UserController;
 use App\Http\Controllers\ActionPlanningController;
 use App\Http\Controllers\DecisionStatusController;
@@ -22,7 +24,6 @@ use App\Http\Controllers\IndicatorControlController;
 use App\Http\Controllers\ActionFundReceiptController;
 use App\Http\Controllers\IndicatorPlanningController;
 use App\Http\Controllers\MatrixPeriodController;
-use App\Http\Controllers\ActivityController;
 use App\Http\Controllers\Settings\CurrencyController;
 use App\Http\Controllers\Auth\ResetPasswordController;
 use App\Http\Controllers\StructureController;
@@ -47,8 +48,6 @@ use App\Http\Controllers\ContractController;
 use App\Http\Controllers\IndicatorStatusController;
 use App\Http\Controllers\Report\ActionPerformanceReportController;
 use App\Http\Controllers\LogActivityController;
-use App\Http\Controllers\ProgramStateController;
-use App\Http\Controllers\ProgramStatusController;
 use App\Http\Controllers\ProjectStateController;
 use App\Http\Controllers\ProjectStatusController;
 use App\Http\Controllers\Report\DahsboardReportController;
@@ -228,7 +227,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::apiResource('action-domains', ActionDomainController::class)->only(['index', 'store', 'show', 'update']);
 
     //Program statuses
-    Route::prefix('program-statuses/{action_domain}')->controller(ProgramStatusController::class)->group(function () {
+    Route::prefix('action-domain-statuses/{action_domain}')->controller(ActionDomainStatusController::class)->group(function () {
         Route::get('/', 'index');
         Route::get('/requirements', 'requirements');
         Route::post('/', 'store');
@@ -236,7 +235,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     //Program states
-    Route::prefix('program-states/{action_domain}')->controller(ProgramStateController::class)->group(function () {
+    Route::prefix('action-domain-states/{action_domain}')->controller(ActionDomainStateController::class)->group(function () {
         Route::get('/', 'index');
         Route::get('/requirements', 'requirements');
         Route::post('/', 'store');

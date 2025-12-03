@@ -2,25 +2,25 @@
 
 namespace App\Repositories;
 
-use App\Http\Resources\ProgramStateResource;
+use App\Http\Resources\ActionDomainStateResource;
 use App\Models\ActionDomain;
-use App\Models\ProgramState as ModelsProgramState;
-use App\Support\ProgramState;
+use App\Models\ActionDomainState as ModelsActionDomainState;
+use App\Support\ActionDomainState;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
-class ProgramStateRepository
+class ActionDomainStateRepository
 {
     /**
      * List all states for a given action domain.
      */
     public function index($actionDomainId)
     {
-        $query = ModelsProgramState::where('action_domain_id', $actionDomainId)
+        $query = ModelsActionDomainState::where('action_domain_id', $actionDomainId)
             ->orderByDesc('created_at');
 
-        return ProgramStateResource::collection($query->get());
+        return ActionDomainStateResource::collection($query->get());
     }
 
     /**
@@ -29,11 +29,11 @@ class ProgramStateRepository
     public function requirements(ActionDomain $actionDomain)
     {
         $current = $actionDomain->state;
-        $next = ProgramState::next($current);
+        $next = ActionDomainState::next($current);
 
         return [
             'states' => collect($next)->map(function ($code) {
-                $state = ProgramState::get($code, app()->getLocale());
+                $state = ActionDomainState::get($code, app()->getLocale());
                 return [
                     'code'  => $state->code,
                     'name'  => $state->label,
@@ -52,7 +52,7 @@ class ProgramStateRepository
         try {
             $stateCode = $request->input('state');
 
-            $state = ModelsProgramState::create([
+            $state = ModelsActionDomainState::create([
                 'action_domain_uuid' => $actionDomain->uuid,
                 'action_domain_id' => $actionDomain->id,
                 'state_code' => $stateCode,
@@ -69,7 +69,7 @@ class ProgramStateRepository
 
             DB::commit();
 
-            return new ProgramStateResource($state);
+            return new ActionDomainStateResource($state);
         } catch (\Throwable $e) {
             DB::rollBack();
             throw $e;
@@ -113,7 +113,7 @@ class ProgramStateRepository
 
             DB::commit();
 
-            return new ProgramStateResource($lastState);
+            return new ActionDomainStateResource($lastState);
         } catch (\Throwable $e) {
             DB::rollBack();
             throw $e;

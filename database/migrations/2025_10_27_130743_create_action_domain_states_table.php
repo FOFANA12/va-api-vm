@@ -11,13 +11,13 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('program_statuses', function (Blueprint $table) {
+        Schema::create('action_domain_states', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid')->unique();
             $table->uuid('action_domain_uuid')->index();
             $table->integer('action_domain_id')->index();
-            $table->string('status_code', 50);
-            $table->timestamp('status_date');
+            $table->string('state_code', 50);
+            $table->timestamp('state_date');
             $table->uuid('created_by')->nullable();
             $table->uuid('updated_by')->nullable();
             $table->timestamps();
@@ -33,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('program_statuses');
+        Schema::dropIfExists('action_domain_states');
     }
 };

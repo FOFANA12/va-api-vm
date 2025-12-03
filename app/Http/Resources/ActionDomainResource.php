@@ -3,9 +3,9 @@
 namespace App\Http\Resources;
 
 use App\Helpers\DateTimeFormatter;
+use App\Support\ActionDomainState;
+use App\Support\ActionDomainStatus;
 use App\Support\Currency;
-use App\Support\ProgramState;
-use App\Support\ProgramStatus;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -42,8 +42,8 @@ class ActionDomainResource extends JsonResource
             'budget' => $this->budget,
             'currency' => $this->currency,
             'responsible' => $this->responsible,
-            'status' => $this->status ? ProgramStatus::get($this->status, $currentLang) : null,
-            'state' => $this->state ? ProgramState::get($this->state, $currentLang) : null,
+            'status' => $this->status ? ActionDomainStatus::get($this->status, $currentLang) : null,
+            'state' => $this->state ? ActionDomainState::get($this->state, $currentLang) : null,
         ];
     }
 
@@ -62,11 +62,11 @@ class ActionDomainResource extends JsonResource
             'currency' => $this->currency,
             'responsible' => $this->responsible_uuid,
 
-            'status' => $this->status ? ProgramStatus::get($this->status, $currentLang) : null,
+            'status' => $this->status ? ActionDomainStatus::get($this->status, $currentLang) : null,
             'status_changed_at' => $this->status_changed_at ? DateTimeFormatter::formatDatetime($this->status_changed_at) : null,
             'status_changed_by' => $this->statusChangedBy?->name,
 
-            'state' => $this->state ? ProgramState::get($this->state, $currentLang) : null,
+            'state' => $this->state ? ActionDomainState::get($this->state, $currentLang) : null,
             'state_changed_at' => $this->state_changed_at ? DateTimeFormatter::formatDatetime($this->state_changed_at) : null,
             'state_changed_by' => $this->stateChangedBy?->name,
 
@@ -107,11 +107,11 @@ class ActionDomainResource extends JsonResource
             'currency' => Currency::getObject($this->currency, $currentLang),
             'responsible' => $this->responsible ? $this->responsible->name : null,
 
-            'status' => $this->status ? ProgramStatus::get($this->status, $currentLang) : null,
+            'status' => $this->status ? ActionDomainStatus::get($this->status, $currentLang) : null,
             'status_changed_at' => $this->status_changed_at ? DateTimeFormatter::formatDatetime($this->status_changed_at) : null,
             'status_changed_by' => $this->statusChangedBy?->name,
 
-            'state' => $this->state ? ProgramState::get($this->state, $currentLang) : null,
+            'state' => $this->state ? ActionDomainState::get($this->state, $currentLang) : null,
             'state_changed_at' => $this->state_changed_at ? DateTimeFormatter::formatDatetime($this->state_changed_at) : null,
             'state_changed_by' => $this->stateChangedBy?->name,
 

@@ -2,26 +2,26 @@
 
 namespace App\Repositories;
 
-use App\Http\Resources\ProgramStatusResource;
+use App\Http\Resources\ActionDomainStatusResource;
 use App\Models\ActionDomain;
-use App\Models\ProgramStatus as ModelsProgramStatus;
-use App\Support\ProgramStatus;
+use App\Models\ActionDomainStatus as ModelsActionDomainStatus;
+use App\Support\ActionDomainStatus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
-class ProgramStatusRepository
+class ActionDomainStatusRepository
 {
     /**
      *  List all statuses for a given program.
      */
     public function index($actionDomainId)
     {
-        $query = ModelsProgramStatus::where('action_domain_id', $actionDomainId)
+        $query = ModelsActionDomainStatus::where('action_domain_id', $actionDomainId)
             ->orderByDesc('created_at');
 
-        return ProgramStatusResource::collection($query->get());
+        return ActionDomainStatusResource::collection($query->get());
     }
 
     /**
@@ -30,11 +30,11 @@ class ProgramStatusRepository
     public function requirements(ActionDomain $actionDomain)
     {
         $current = $actionDomain->status;
-        $next = ProgramStatus::next($current);
+        $next = ActionDomainStatus::next($current);
 
         return [
             'statuses' => collect($next)->map(function ($code) {
-                $status = ProgramStatus::get($code, app()->getLocale());
+                $status = ActionDomainStatus::get($code, app()->getLocale());
                 return [
                     'code'  => $status->code,
                     'name'  => $status->label,
@@ -53,7 +53,7 @@ class ProgramStatusRepository
         try {
             $statusCode = $request->input('status');
 
-            $status = ModelsProgramStatus::create([
+            $status = ModelsActionDomainStatus::create([
                 'action_domain_uuid' => $actionDomain->uuid,
                 'action_domain_id' => $actionDomain->id,
                 'status_code' => $statusCode,
@@ -70,7 +70,7 @@ class ProgramStatusRepository
 
             DB::commit();
 
-            return new ProgramStatusResource($status);
+            return new ActionDomainStatusResource($status);
         } catch (\Throwable $e) {
             DB::rollBack();
             throw $e;
@@ -115,7 +115,7 @@ class ProgramStatusRepository
 
             DB::commit();
 
-            return new ProgramStatusResource($lastStatus);
+            return new ActionDomainStatusResource($lastStatus);
         } catch (\Throwable $e) {
             DB::rollBack();
             throw $e;

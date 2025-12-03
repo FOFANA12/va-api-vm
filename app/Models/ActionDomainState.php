@@ -9,7 +9,7 @@ use App\Traits\HasStaticTableName;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-class ProgramStatus extends Model
+class ActionDomainState extends Model
 {
     use Author, AutoFillable, GeneratesUuid, HasStaticTableName;
 
