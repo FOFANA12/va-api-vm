@@ -25,8 +25,7 @@ class ActionSeeder extends Seeder
     public function run(): void
     {
 
-        $department = Structure::where('type', 'DEPARTMENT')->first();
-        $structure = $department->children()->first();
+        $operational = Structure::where('type', 'OPERATIONAL')->first();
 
         $actionPlan = ActionPlan::first();
         $projectOwner = ProjectOwner::first();
@@ -99,7 +98,7 @@ class ActionSeeder extends Seeder
 
         foreach ($actions as $data) {
             $action =  Action::create([
-                'structure_uuid' => $structure?->uuid,
+                'structure_uuid' => $operational?->uuid,
                 'action_plan_uuid' => $actionPlan?->uuid,
                 'project_owner_uuid' => $projectOwner?->uuid,
                 'delegated_project_owner_uuid' => $delegatedOwner?->uuid,
@@ -128,7 +127,7 @@ class ActionSeeder extends Seeder
             ]);
 
             $action->update([
-                'reference' => ReferenceGenerator::generateActionReference($action->id, $structure->abbreviation),
+                'reference' => ReferenceGenerator::generateActionReference($action->id, $operational->abbreviation),
             ]);
 
             $start = Carbon::parse($data['start_date']);

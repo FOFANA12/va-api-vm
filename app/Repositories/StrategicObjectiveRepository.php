@@ -91,14 +91,14 @@ class StrategicObjectiveRepository
     {
         $ownerStructures = Structure::query()
             ->where('status', true)
-            ->whereIn('type', ['STATE', 'DEPARTMENT'])
+            ->whereIn('type', ['STATE', 'STRATEGIC'])
             ->orderBy('id', 'desc')
             ->select('uuid', 'name', 'type')
             ->get();
 
         $leadStructures = Structure::query()
             ->where('status', true)
-            ->whereIn('type', ['DEPARTMENT', 'DIRECTION'])
+            ->whereIn('type', ['STRATEGIC', 'OPERATIONAL', 'VIRTUAL'])
             ->orderBy('id', 'desc')
             ->select('uuid', 'name', 'type')
             ->get();

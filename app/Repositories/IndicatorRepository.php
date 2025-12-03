@@ -95,7 +95,7 @@ class IndicatorRepository
     {
         $structures = Structure::query()
             ->where('status', true)
-            ->whereIn('type', ['STATE', 'DEPARTMENT'])
+            ->whereIn('type', ['STATE', 'STRATEGIC'])
             ->orderBy('id', 'desc')
             ->select('uuid', 'name', 'type')
             ->get();

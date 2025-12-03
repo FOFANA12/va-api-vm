@@ -59,45 +59,9 @@ class StructureRequest extends FormRequest
             $type = strtoupper($this->input('type'));
             $parentUuid = $this->input('parent');
 
-            $parentRequiredFor = ['DEPARTMENT', 'DIRECTION'];
-
-            if (in_array($type, $parentRequiredFor) && empty($parentUuid)) {
-                $validator->errors()->add('parent', __('app/structure.request.parent_required'));
-                return;
-            }
-
             if ($type === 'STATE' && !empty($parentUuid)) {
                 $validator->errors()->add('parent', __('app/structure.validation.state_no_parent'));
                 return;
-            }
-
-            if (empty($parentUuid)) {
-                return;
-            }
-
-            $parent = Structure::where('uuid', $parentUuid)->first();
-            if (!$parent) {
-                $validator->errors()->add('parent', __('app/structure.validation.parent_not_found'));
-                return;
-            }
-
-            $parentType = strtoupper($parent->type);
-
-            $allowedParents = [
-                'STATE' => null,
-                'DEPARTMENT' => 'STATE',
-                'DIRECTION' => 'DEPARTMENT',
-            ];
-
-            if (isset($allowedParents[$type]) && $allowedParents[$type] !== null && $parentType !== $allowedParents[$type]) {
-                $validator->errors()->add(
-                    'parent',
-                    __('app/structure.validation.invalid_parent_type', [
-                        'child' => $type,
-                        'expected' => $allowedParents[$type],
-                        'given' => $parentType,
-                    ])
-                );
             }
         });
     }

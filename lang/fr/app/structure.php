@@ -11,9 +11,6 @@ return [
         'abbreviation' => 'abréviation',
         'parent' => 'structure parente',
 
-        'parent_required' => 'Une structure de ce type doit avoir une structure parente.',
         'state_no_parent' => 'Une structure de type STATE ne peut pas avoir une structure parente.',
-        'parent_not_found' => 'La structure parente sélectionnée est introuvable.',
-        'invalid_parent_type' => 'Type de parent invalide : une structure de type :child doit être rattachée à une structure de type :expected (actuellement :given).',
     ],
 ];

@@ -16,7 +16,7 @@ class StrategicMapSeeder extends Seeder
         StrategicMap::whereNotNull('id')->delete();
 
         $stateStructure = Structure::where('type', 'STATE')->first();
-        $departmentStructure = Structure::where('type', 'DEPARTMENT')->first();
+        $structure = Structure::where('type', 'STRATEGIC')->first();
 
         $strategicMaps = [
             [
@@ -33,21 +33,21 @@ class StrategicMapSeeder extends Seeder
                 'start_date' => '2025-01-01',
                 'end_date' => '2025-12-31',
                 'status' => true,
-                'structure' => $departmentStructure,
+                'structure' => $structure,
             ],
             [
                 'name' => "Carte stratégique digitale",
                 'description' => "Plan d'action pour la digitalisation et l'innovation technologique.",
                 'start_date' => '2025-03-01',
                 'end_date' => '2026-02-28',
-                'structure' => $departmentStructure,
+                'structure' => $structure,
             ],
             [
                 'name' => "Carte stratégique de performance",
                 'description' => "Suivi et évaluation des objectifs de performance annuelle.",
                 'start_date' => '2025-04-01',
                 'end_date' => '2026-03-31',
-                'structure' => $departmentStructure,
+                'structure' => $structure,
             ],
         ];
 

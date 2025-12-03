@@ -16,6 +16,8 @@ class SupplierSeeder extends Seeder
     {
         $contractType = ContractType::first();
 
+        if (!$firstAction) {
+            $this->command->warn('⚠️ Aucun enregistrement trouvé dans la table actions. Le seeder SupplierSeeder n\'a rien créé.');
         if (!$contractType) {
             $this->command->warn('⚠️ Aucun type de contrat trouvé. Le seeder SupplierSeeder n’a rien créé.');
             return;
