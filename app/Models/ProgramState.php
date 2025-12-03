@@ -13,8 +13,8 @@ class ProgramState extends Model
 {
     use Author, AutoFillable, GeneratesUuid, HasStaticTableName;
 
-    public function program(): BelongsTo
+    public function actionDomain(): BelongsTo
     {
-        return $this->belongsTo(Program::class, 'program_uuid', 'uuid');
+        return $this->belongsTo(ActionDomain::class, 'action_domain_uuid', 'uuid');
     }
 }

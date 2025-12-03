@@ -13,8 +13,8 @@ class ProjectStatus extends Model
 {
    use Author, AutoFillable, GeneratesUuid, HasStaticTableName;
 
-    public function project(): BelongsTo
+    public function strategicDomain(): BelongsTo
     {
-        return $this->belongsTo(Project::class, 'project_uuid', 'uuid');
+        return $this->belongsTo(StrategicDomain::class, 'strategic_domain_uuid', 'uuid');
     }
 }

@@ -14,15 +14,15 @@ return new class extends Migration
         Schema::create('program_statuses', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid')->unique();
-            $table->uuid('program_uuid')->index();
-            $table->integer('program_id')->index();
+            $table->uuid('action_domain_uuid')->index();
+            $table->integer('action_domain_id')->index();
             $table->string('status_code', 50);
             $table->timestamp('status_date');
             $table->uuid('created_by')->nullable();
             $table->uuid('updated_by')->nullable();
             $table->timestamps();
 
-            $table->foreign('program_uuid')->references('uuid')->on('programs')->onDelete('cascade');
+            $table->foreign('action_domain_uuid')->references('uuid')->on('action_domains')->onDelete('cascade');
             $table->foreign('created_by')->references('uuid')->on('users')->onDelete('set null');
             $table->foreign('updated_by')->references('uuid')->on('users')->onDelete('set null');
         });

@@ -22,9 +22,9 @@ return new class extends Migration
             $table->uuid('region_uuid')->nullable();
             $table->uuid('department_uuid')->nullable();
             $table->uuid('municipality_uuid')->nullable();
-            $table->uuid('program_uuid')->nullable();
-            $table->uuid('project_uuid')->nullable();
-            $table->uuid('activity_uuid')->nullable();
+            $table->uuid('action_domain_uuid')->nullable();
+            $table->uuid('strategic_domain_uuid')->nullable();
+            $table->uuid('capability_domain_uuid')->nullable();
             $table->string('name', 100);
             $table->string('priority', 50);
             $table->string('risk_level', 50);
@@ -64,9 +64,9 @@ return new class extends Migration
             $table->foreign('action_plan_uuid')->references('uuid')->on('action_plans')->onDelete('restrict');
             $table->foreign('project_owner_uuid')->references('uuid')->on('project_owners')->onDelete('restrict');
             $table->foreign('delegated_project_owner_uuid')->references('uuid')->on('delegated_project_owners')->onDelete('restrict');
-            $table->foreign('program_uuid')->references('uuid')->on('programs')->onDelete('restrict');
-            $table->foreign('project_uuid')->references('uuid')->on('projects')->onDelete('restrict');
-            $table->foreign('activity_uuid')->references('uuid')->on('activities')->onDelete('restrict');
+            $table->foreign('action_domain_uuid')->references('uuid')->on('action_domains')->onDelete('restrict');
+            $table->foreign('strategic_domain_uuid')->references('uuid')->on('strategic_domains')->onDelete('restrict');
+            $table->foreign('capability_domain_uuid')->references('uuid')->on('capability_domains')->onDelete('restrict');
             $table->foreign('region_uuid')->references('uuid')->on('regions')->onDelete('restrict');
             $table->foreign('department_uuid')->references('uuid')->on('departments')->onDelete('restrict');
             $table->foreign('municipality_uuid')->references('uuid')->on('municipalities')->onDelete('restrict');

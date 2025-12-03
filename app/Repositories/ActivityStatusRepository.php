@@ -3,8 +3,8 @@
 namespace App\Repositories;
 
 use App\Http\Resources\ActivityStatusResource;
-use App\Models\Activity;
 use App\Models\ActivityStatus as ModelsActivityStatus;
+use App\Models\CapabilityDomain;
 use App\Support\ActivityStatus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,9 +16,9 @@ class ActivityStatusRepository
     /**
      *  List all statuses for a given activity.
      */
-    public function index($activityId)
+    public function index($capabilityDomainId)
     {
-        $query = ModelsActivityStatus::where('activity_id', $activityId)
+        $query = ModelsActivityStatus::where('capability_domain_id', $capabilityDomainId)
             ->orderByDesc('created_at');
 
         return ActivityStatusResource::collection($query->get());
@@ -27,9 +27,9 @@ class ActivityStatusRepository
     /**
      * Retrieve available activity statuses with localized labels.
      */
-    public function requirements(Activity $activity)
+    public function requirements(CapabilityDomain $capabilityDomain)
     {
-        $current = $activity->status;
+        $current = $capabilityDomain->status;
         $next = ActivityStatus::next($current);
 
         return [
@@ -47,22 +47,22 @@ class ActivityStatusRepository
     /**
      * Create (record) a new project status.
      */
-    public function store(Request $request, Activity $activity)
+    public function store(Request $request, CapabilityDomain $capabilityDomain)
     {
         DB::beginTransaction();
         try {
             $statusCode = $request->input('status');
 
             $status = ModelsActivityStatus::create([
-                'activity_uuid' => $activity->uuid,
-                'activity_id' => $activity->id,
+                'capability_domain_uuid' => $capabilityDomain->uuid,
+                'capability_domain_id' => $capabilityDomain->id,
                 'status_code' => $statusCode,
                 'status_date' => now(),
                 'created_by' => Auth::user()?->uuid,
                 'updated_by' => Auth::user()?->uuid,
             ]);
 
-            $activity->update([
+            $capabilityDomain->update([
                 'status' => $status->status_code,
                 'status_changed_at' => $status->status_date,
                 'status_changed_by' => $status->created_by,
@@ -81,7 +81,7 @@ class ActivityStatusRepository
     /**
      * Delete multiple activity statuses.
      */
-    public function destroy(Request $request, Activity $activity)
+    public function destroy(Request $request, CapabilityDomain $capabilityDomain)
     {
         $ids = $request->input('ids');
 
@@ -91,22 +91,22 @@ class ActivityStatusRepository
 
         DB::beginTransaction();
         try {
-            $deleted = $activity->statuses()->whereIn('id', $ids)->delete();
+            $deleted = $capabilityDomain->statuses()->whereIn('id', $ids)->delete();
 
             if ($deleted === 0) {
                 throw new \RuntimeException(__('app/common.destroy.no_items_deleted'));
             }
 
-            $lastStatus = $activity->statuses()->latest('created_at')->first();
+            $lastStatus = $capabilityDomain->statuses()->latest('created_at')->first();
 
             if ($lastStatus) {
-                $activity->update([
+                $capabilityDomain->update([
                     'status' => $lastStatus->status_code,
                     'status_changed_at' => $lastStatus->status_date,
                     'status_changed_by' => $lastStatus->updated_by ?? $lastStatus->created_by,
                 ]);
             } else {
-                $activity->update([
+                $capabilityDomain->update([
                     'status' => null,
                     'status_changed_at' => null,
                     'status_changed_by' => null,

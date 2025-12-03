@@ -12,11 +12,11 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('activity_beneficiaries', function (Blueprint $table) {
-            $table->uuid('activity_uuid');
+            $table->uuid('capability_domain_uuid');
             $table->uuid('beneficiary_uuid');
 
-            $table->primary(['activity_uuid', 'beneficiary_uuid']);
-            $table->foreign('activity_uuid')->references('uuid')->on('activities')->onDelete('cascade');
+            $table->primary(['capability_domain_uuid', 'beneficiary_uuid']);
+            $table->foreign('capability_domain_uuid')->references('uuid')->on('capability_domains')->onDelete('cascade');
             $table->foreign('beneficiary_uuid')->references('uuid')->on('beneficiaries')->onDelete('cascade');
         });
     }

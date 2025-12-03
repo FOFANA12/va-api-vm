@@ -3,8 +3,8 @@
 namespace App\Repositories;
 
 use App\Http\Resources\ActivityStateResource;
-use App\Models\Activity;
 use App\Models\ActivityState as ModelsActivityState;
+use App\Models\CapabilityDomain;
 use App\Support\ActivityState;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -15,9 +15,9 @@ class ActivityStateRepository
     /**
      * List all states for a given activity.
      */
-    public function index($activityId)
+    public function index($capabilityDomainId)
     {
-        $query = ModelsActivityState::where('activity_id', $activityId)
+        $query = ModelsActivityState::where('capability_domain_id', $capabilityDomainId)
             ->orderByDesc('created_at');
 
         return ActivityStateResource::collection($query->get());
@@ -26,9 +26,9 @@ class ActivityStateRepository
     /**
      * Retrieve available activity states with localized labels.
      */
-    public function requirements(Activity $activity)
+    public function requirements(CapabilityDomain $capabilityDomain)
     {
-        $current = $activity->state;
+        $current = $capabilityDomain->state;
         $next = ActivityState::next($current);
 
         return [
@@ -46,22 +46,22 @@ class ActivityStateRepository
     /**
      * Create (record) a new activity state.
      */
-    public function store(Request $request, Activity $activity)
+    public function store(Request $request, CapabilityDomain $capabilityDomain)
     {
         DB::beginTransaction();
         try {
             $stateCode = $request->input('state');
 
             $state = ModelsActivityState::create([
-                'activity_uuid' => $activity->uuid,
-                'activity_id' => $activity->id,
+                'capability_domain_uuid' => $capabilityDomain->uuid,
+                'capability_domain_id' => $capabilityDomain->id,
                 'state_code' => $stateCode,
                 'state_date' => now(),
                 'created_by' => Auth::user()?->uuid,
                 'updated_by' => Auth::user()?->uuid,
             ]);
 
-            $activity->update([
+            $capabilityDomain->update([
                 'state' => $state->state_code,
                 'state_changed_at' => $state->state_date,
                 'state_changed_by' => $state->created_by,
@@ -79,7 +79,7 @@ class ActivityStateRepository
     /**
      * Delete multiple activity states.
      */
-    public function destroy(Request $request, Activity $activity)
+    public function destroy(Request $request, CapabilityDomain $capabilityDomain)
     {
         $ids = $request->input('ids');
 
@@ -89,22 +89,22 @@ class ActivityStateRepository
 
         DB::beginTransaction();
         try {
-            $deleted = $activity->states()->whereIn('id', $ids)->delete();
+            $deleted = $capabilityDomain->states()->whereIn('id', $ids)->delete();
 
             if ($deleted === 0) {
                 throw new \RuntimeException(__('app/common.destroy.no_items_deleted'));
             }
 
-            $lastState = $activity->states()->latest('created_at')->first();
+            $lastState = $capabilityDomain->states()->latest('created_at')->first();
 
             if ($lastState) {
-                $activity->update([
+                $capabilityDomain->update([
                     'state' => $lastState->state_code,
                     'state_changed_at' => $lastState->state_date,
                     'state_changed_by' => $lastState->updated_by ?? $lastState->created_by,
                 ]);
             } else {
-                $activity->update([
+                $capabilityDomain->update([
                     'state' => null,
                     'state_changed_at' => null,
                     'state_changed_by' => null,

@@ -3,8 +3,8 @@
 namespace App\Repositories;
 
 use App\Http\Resources\ProjectStatusResource;
-use App\Models\Project;
 use App\Models\ProjectStatus as ModelsProjectStatus;
+use App\Models\StrategicDomain;
 use App\Support\ProjectStatus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -16,9 +16,9 @@ class ProjectStatusRepository
     /**
      *  List all statuses for a given project.
      */
-    public function index($projectId)
+    public function index($strategicDomainId)
     {
-        $query = ModelsProjectStatus::where('project_id', $projectId)
+        $query = ModelsProjectStatus::where('strategic_domain_id', $strategicDomainId)
             ->orderByDesc('created_at');
 
         return ProjectStatusResource::collection($query->get());
@@ -27,9 +27,9 @@ class ProjectStatusRepository
     /**
      * Retrieve available project statuses with localized labels.
      */
-    public function requirements(Project $project)
+    public function requirements(StrategicDomain $strategicDomain)
     {
-        $current = $project->status;
+        $current = $strategicDomain->status;
         $next = ProjectStatus::next($current);
 
         return [
@@ -47,22 +47,22 @@ class ProjectStatusRepository
     /**
      * Create (record) a new project status.
      */
-    public function store(Request $request, Project $project)
+    public function store(Request $request, StrategicDomain $strategicDomain)
     {
         DB::beginTransaction();
         try {
             $statusCode = $request->input('status');
 
             $status = ModelsProjectStatus::create([
-                'project_uuid' => $project->uuid,
-                'project_id' => $project->id,
+                'strategic_domain_uuid' => $strategicDomain->uuid,
+                'strategic_domain_id' => $strategicDomain->id,
                 'status_code' => $statusCode,
                 'status_date' => now(),
                 'created_by' => Auth::user()?->uuid,
                 'updated_by' => Auth::user()?->uuid,
             ]);
 
-            $project->update([
+            $strategicDomain->update([
                 'status' => $status->status_code,
                 'status_changed_at' => $status->status_date,
                 'status_changed_by' => $status->created_by,
@@ -81,7 +81,7 @@ class ProjectStatusRepository
     /**
      * Delete multiple project statuses.
      */
-    public function destroy(Request $request, Project $project)
+    public function destroy(Request $request, StrategicDomain $strategicDomain)
     {
         $ids = $request->input('ids');
 
@@ -91,22 +91,22 @@ class ProjectStatusRepository
 
         DB::beginTransaction();
         try {
-            $deleted = $project->statuses()->whereIn('id', $ids)->delete();
+            $deleted = $strategicDomain->statuses()->whereIn('id', $ids)->delete();
 
             if ($deleted === 0) {
                 throw new \RuntimeException(__('app/common.destroy.no_items_deleted'));
             }
 
-            $lastStatus = $project->statuses()->latest('created_at')->first();
+            $lastStatus = $strategicDomain->statuses()->latest('created_at')->first();
 
             if ($lastStatus) {
-                $project->update([
+                $strategicDomain->update([
                     'status' => $lastStatus->status_code,
                     'status_changed_at' => $lastStatus->status_date,
                     'status_changed_by' => $lastStatus->updated_by ?? $lastStatus->created_by,
                 ]);
             } else {
-                $project->update([
+                $strategicDomain->update([
                     'status' => null,
                     'status_changed_at' => null,
                     'status_changed_by' => null,

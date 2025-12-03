@@ -22,7 +22,7 @@ class ProgramStatusResource extends JsonResource
         return [
             'id' => $this->id,
             'uuid' => $this->uuid,
-            'program_uuid' => $this->program_uuid,
+            'action_domain_uuid' => $this->action_domain_uuid,
             'status' => ProgramStatus::get($this->status_code, app()->getLocale()),
             'status_date' => DateTimeFormatter::formatDatetime($this->status_date),
             'author' => $author,

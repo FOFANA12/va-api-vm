@@ -22,7 +22,7 @@ class ActivityStateResource extends JsonResource
         return [
             'id' => $this->id,
             'uuid' => $this->uuid,
-            'activity_uuid' => $this->activity_uuid,
+            'capability_domain_uuid' => $this->capability_domain_uuid,
             'state' => ActivityState::get($this->state_code, app()->getLocale()),
             'state_date' => DateTimeFormatter::formatDatetime($this->state_date),
             'author' => $author,

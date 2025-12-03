@@ -3,30 +3,30 @@
 namespace App\Repositories;
 
 use App\Helpers\ReferenceGenerator;
-use App\Http\Requests\ActivityRequest;
-use App\Http\Resources\ActivityResource;
-use App\Models\Activity;
-use App\Models\ActivityState;
-use App\Models\ActivityStatus;
+use App\Http\Requests\ActionDomainRequest;
+use App\Http\Resources\ActionDomainResource;
+use App\Models\ActionDomain;
 use App\Models\Beneficiary;
-use App\Support\Currency;
 use App\Models\FundingSource;
-use App\Models\Project;
+use App\Models\ProgramState;
+use App\Models\ProgramStatus;
 use App\Models\User;
+use App\Support\Currency;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
-class ActivityRepository
+class ActionDomainRepository
 {
     /**
-     * List activities with pagination, filters, sorting.
+     * List action domains with pagination, filters, sorting.
      */
     public function index(Request $request)
     {
-        $searchable = ['activities.name', 'project', 'activities.reference', 'responsible'];
-        $sortable = ['name', 'project', 'reference', 'status', 'state', 'responsible', 'budget', 'start_date', 'end_date'];
+        $searchable = ['action_domains.name', 'action_domains.reference', 'responsible'];
+        $sortable = ['name', 'reference', 'status', 'state', 'responsible', 'budget', 'start_date', 'end_date'];
+
 
         $searchTerm = $request->input('searchTerm');
         $sortByInput = $request->input('sortBy');
@@ -36,31 +36,27 @@ class ActivityRepository
         $sortOrder = in_array($sortOrderInput, ['asc', 'desc']) ? $sortOrderInput : 'desc';
         $sortBy = in_array($sortByInput, $sortable) ? $sortByInput : 'id';
 
-        $query = Activity::select(
-            'activities.id',
-            'activities.uuid',
-            'activities.reference',
-            'activities.name',
-            'activities.start_date',
-            'activities.end_date',
-            'activities.budget',
-            'activities.status',
-            'activities.state',
-            'activities.responsible_uuid',
-            'activities.currency',
+        $query = ActionDomain::select(
+            'action_domains.id',
+            'action_domains.uuid',
+            'action_domains.reference',
+            'action_domains.name',
+            'action_domains.start_date',
+            'action_domains.end_date',
+            'action_domains.budget',
+            'action_domains.status',
+            'action_domains.state',
+            'action_domains.responsible_uuid',
+            'action_domains.currency',
             'responsibles.name as responsible',
-            'projects.name as project'
         )
-            ->leftJoin('users as responsibles', 'activities.responsible_uuid', '=', 'responsibles.uuid')
-            ->join('projects', 'activities.project_uuid', '=', 'projects.uuid');
+            ->leftJoin('users as responsibles', 'action_domains.responsible_uuid', '=', 'responsibles.uuid');
 
         if (!empty($searchTerm)) {
             $query->where(function ($q) use ($searchTerm, $searchable) {
                 foreach ($searchable as $column) {
                     if ($column === 'responsible') {
                         $q->orWhere('responsibles.name', 'LIKE', '%' . strtolower($searchTerm) . '%');
-                    } else  if ($column === 'project') {
-                        $q->orWhere('projects.name', 'LIKE', '%' . strtolower($searchTerm) . '%');
                     } else {
                         $q->orWhere($column, 'LIKE', '%' . strtolower($searchTerm) . '%');
                     }
@@ -70,10 +66,8 @@ class ActivityRepository
 
         if ($sortBy === 'responsible') {
             $query->orderBy('responsibles.name', $sortOrder);
-        } else if ($sortBy === 'project') {
-            $query->orderBy('projects.name', $sortOrder);
         } else {
-            $query->orderBy($sortBy, $sortOrder);
+            $query->orderBy("action_domains.$sortBy", $sortOrder);
         }
 
         return $perPage && (int) $perPage > 0
@@ -82,7 +76,7 @@ class ActivityRepository
     }
 
     /**
-     * Load requirements data for forms.
+     * Load requirements data
      */
     public function requirements()
     {
@@ -90,11 +84,6 @@ class ActivityRepository
 
         $responsibles = User::whereHas('employee')->select('uuid', 'name')
             ->where('status', true)->orderBy('id', 'desc')
-            ->get();
-
-        $projects = Project::select('uuid', 'name')
-            ->where('status', '!=', 'done')
-            ->orderBy('id', 'desc')
             ->get();
 
         $beneficiaries = Beneficiary::where('status', true)
@@ -107,33 +96,29 @@ class ActivityRepository
             ->select('uuid', 'name')
             ->get();
 
-
         return [
             'currency' => $currency,
             'responsibles' => $responsibles,
-            'projects' => $projects,
             'beneficiaries' => $beneficiaries,
             'funding_sources' => $fundingSources,
         ];
     }
-    /**
-     * Store a new activity.
-     */
-    public function store(ActivityRequest $request)
-    {
 
+    /**
+     * Create a new action domain.
+     */
+    public function store(ActionDomainRequest $request)
+    {
         DB::beginTransaction();
         try {
             $request->merge([
-                'project_uuid' => $request->input('project'),
                 'responsible_uuid' => $request->input('responsible'),
-                'created_uuid' => Auth::user()?->uuid,
-                'updated_uuid' => Auth::user()?->uuid,
+                'created_by' => Auth::user()?->uuid,
+                'updated_by' => Auth::user()?->uuid,
             ]);
 
-            $activity = Activity::create($request->only([
+            $actionDomain = ActionDomain::create($request->only([
                 'name',
-                'project_uuid',
                 'start_date',
                 'end_date',
                 'currency',
@@ -143,7 +128,7 @@ class ActivityRepository
                 'impacts',
                 'risks',
                 'created_by',
-                'updated_by',
+                'updated_by'
             ]));
 
             $beneficiaryUuids = collect($request->beneficiaries)
@@ -154,7 +139,7 @@ class ActivityRepository
             $validBeneficiaries = Beneficiary::whereIn('uuid', $beneficiaryUuids)
                 ->pluck('uuid')
                 ->toArray();
-            $activity->beneficiaries()->sync($validBeneficiaries);
+            $actionDomain->beneficiaries()->sync($validBeneficiaries);
 
             $requestedUuids = collect($request->funding_sources)
                 ->pluck('uuid')
@@ -169,37 +154,37 @@ class ActivityRepository
             foreach ($request->funding_sources as $source) {
                 if (in_array($source['uuid'], $validFundingSources)) {
                     $plannedBudget = $source['planned_amount'] ?? 0;
-                    $activity->fundingSources()->attach($source['uuid'], [
+                    $actionDomain->fundingSources()->attach($source['uuid'], [
                         'planned_budget' => $plannedBudget,
                     ]);
                     $totalBudget += $plannedBudget;
                 }
             }
 
-            $activity->refresh();
+            $actionDomain->refresh();
 
             //Save initial status
-            $status = ActivityStatus::create([
-                'activity_uuid' => $activity->uuid,
-                'activity_id' => $activity->id,
-                'status_code' => $activity->status,
+            $status = ProgramStatus::create([
+                'action_domain_uuid' => $actionDomain->uuid,
+                'action_domain_id' => $actionDomain->id,
+                'status_code' => $actionDomain->status,
                 'status_date' => now(),
                 'created_by' => Auth::user()?->uuid,
                 'updated_by' => Auth::user()?->uuid,
             ]);
 
             //Save initial state
-            $state = ActivityState::create([
-                'activity_uuid' => $activity->uuid,
-                'activity_id' => $activity->id,
-                'state_code' => $activity->state,
+            $state = ProgramState::create([
+                'action_domain_uuid' => $actionDomain->uuid,
+                'action_domain_id' => $actionDomain->id,
+                'state_code' => $actionDomain->state,
                 'state_date' => now(),
                 'created_by' => Auth::user()?->uuid,
                 'updated_by' => Auth::user()?->uuid,
             ]);
 
-            $activity->update([
-                'reference' => ReferenceGenerator::generateActivityReference($activity->id),
+            $actionDomain->update([
+                'reference' => ReferenceGenerator::generateProgramReference($actionDomain->id),
                 'budget' => $totalBudget,
                 'status' => $status->status_code,
                 'status_changed_at' => $status->status_date,
@@ -211,9 +196,9 @@ class ActivityRepository
 
             DB::commit();
 
-            $activity->loadMissing(['responsible', 'beneficiaries', 'fundingSources']);
+            $actionDomain->loadMissing(['responsible', 'beneficiaries', 'fundingSources']);
 
-            return (new ActivityResource($activity))->additional([
+            return (new ActionDomainResource($actionDomain))->additional([
                 'mode' => $request->input('mode', 'view')
             ]);
         } catch (\Throwable $e) {
@@ -223,32 +208,33 @@ class ActivityRepository
     }
 
     /**
-     * Show a specific activity.
+     * Show a specific action domain.
      */
-    public function show(Activity $activity)
+    public function show(ActionDomain $actionDomain)
     {
-        return ['activity' => new ActivityResource($activity->loadMissing(['responsible', 'beneficiaries', 'fundingSources']))];
+        return ['action_domain' => new ActionDomainResource($actionDomain->loadMissing(['responsible', 'beneficiaries', 'fundingSources']))];
     }
 
     /**
-     * Update an existing activity.
+     * Update an action domain.
      */
-    public function update(ActivityRequest $request, Activity $activity)
+    public function update(ActionDomainRequest $request, ActionDomain $actionDomain)
     {
         DB::beginTransaction();
         try {
+
             $request->merge([
-                'project_uuid' => $request->input('project'),
                 'responsible_uuid' => $request->input('responsible'),
                 'updated_by' => Auth::user()?->uuid,
             ]);
 
-            $activity->fill($request->only([
+            $actionDomain->fill($request->only([
                 'name',
+                'description',
                 'start_date',
                 'end_date',
+                'budget',
                 'currency',
-                'project_uuid',
                 'responsible_uuid',
                 'description',
                 'prerequisites',
@@ -264,9 +250,9 @@ class ActivityRepository
             $validBeneficiaries = Beneficiary::whereIn('uuid', $beneficiaryUuids)
                 ->pluck('uuid')
                 ->toArray();
-            $activity->beneficiaries()->sync($validBeneficiaries);
+            $actionDomain->beneficiaries()->sync($validBeneficiaries);
 
-            $activity->fundingSources()->detach();
+            $actionDomain->fundingSources()->detach();
 
             $requestedUuids = collect($request->funding_sources)
                 ->pluck('uuid')
@@ -281,7 +267,7 @@ class ActivityRepository
             foreach ($request->funding_sources as $source) {
                 if (in_array($source['uuid'], $validFundingSources)) {
                     $plannedBudget = $source['planned_amount'] ?? 0;
-                    $activity->fundingSources()->attach($source['uuid'], [
+                    $actionDomain->fundingSources()->attach($source['uuid'], [
                         'planned_budget' => $plannedBudget,
                     ]);
                     $totalBudget += $plannedBudget;
@@ -290,10 +276,10 @@ class ActivityRepository
 
             DB::commit();
 
-            $activity->update(['budget' => $totalBudget]);
-            $activity->load(['responsible', 'beneficiaries', 'fundingSources']);
+            $actionDomain->update(['budget' => $totalBudget]);
+            $actionDomain->load(['responsible', 'beneficiaries', 'fundingSources']);
 
-            return (new ActivityResource($activity))->additional([
+            return (new ActionDomainResource($actionDomain))->additional([
                 'mode' => $request->input('mode', 'edit')
             ]);
         } catch (\Throwable $e) {
@@ -303,7 +289,7 @@ class ActivityRepository
     }
 
     /**
-     * Delete one or multiple activities.
+     * Delete multiple action domains.
      */
     public function destroy(Request $request)
     {
@@ -315,11 +301,11 @@ class ActivityRepository
 
         DB::beginTransaction();
         try {
-            $deleted = Activity::whereIn('id', $ids)->delete();
-
+            $deleted = ActionDomain::whereIn('id', $ids)->delete();
             if ($deleted === 0) {
-                throw new RuntimeException(__('app/common.destroy.no_items_deleted'));
+                throw new \RuntimeException(__('app/common.destroy.no_items_deleted'));
             }
+
 
             DB::commit();
         } catch (RuntimeException $e) {
@@ -328,7 +314,7 @@ class ActivityRepository
         } catch (\Exception $e) {
             DB::rollBack();
 
-            if ($e->getCode() === '23000') {
+            if ($e->getCode() === "23000") {
                 throw new \Exception(__('app/common.repository.foreignKey'));
             }
 

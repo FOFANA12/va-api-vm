@@ -4,22 +4,17 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-return new class extends Migration
-{
-    /**
-     * Run the migrations.
-     */
+return new class extends Migration {
     public function up(): void
     {
-        Schema::create('activities', function (Blueprint $table) {
+        Schema::create('action_domains', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid')->unique();
-            $table->uuid('project_uuid')->nullable();
             $table->string('reference', 100)->unique()->nullable();
             $table->string('name', 100)->unique();
             $table->date('start_date')->nullable();
             $table->date('end_date')->nullable();
-            $table->decimal('budget', 14, 2)->nullable();
+            $table->decimal('budget', 14, 2)->default(0);
             $table->string('currency', 10)->default('MRU');
             $table->uuid('responsible_uuid')->nullable();
 
@@ -40,18 +35,14 @@ return new class extends Migration
             $table->uuid('updated_by')->nullable();
             $table->timestamps();
 
-            $table->foreign('project_uuid')->references('uuid')->on('projects')->onDelete('restrict');
             $table->foreign('responsible_uuid')->references('uuid')->on('users')->onDelete('restrict');
             $table->foreign('created_by')->references('uuid')->on('users')->onDelete('set null');
             $table->foreign('updated_by')->references('uuid')->on('users')->onDelete('set null');
         });
     }
 
-    /**
-     * Reverse the migrations.
-     */
     public function down(): void
     {
-        Schema::dropIfExists('activities');
+        Schema::dropIfExists('action_domains');
     }
 };

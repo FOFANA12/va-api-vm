@@ -3,45 +3,44 @@
 namespace Database\Seeders;
 
 use App\Models\Beneficiary;
+use App\Models\CapabilityDomain;
 use App\Models\FundingSource;
-use App\Models\Program;
-use App\Models\Project;
+use App\Models\StrategicDomain;
 use App\Models\User;
 use Illuminate\Database\Seeder;
 
-class ProjectSeeder extends Seeder
+class CapabilityDomainSeeder extends Seeder
 {
     /**
      * Run the database seeds.
      */
     public function run(): void
     {
-
-        $projects = [
+        $capabilityDomains = [
             [
-                'reference' => 'PROJ-00A',
-                'name' => 'Project A',
+                'reference' => 'ACT-001',
+                'name' => 'Formation des agents',
+                'start_date' => '2025-01-15',
+                'end_date' => '2025-01-30',
                 'status' => 'preparation',
-                'start_date' => '2025-01-01',
-                'end_date' => '2025-12-31',
             ],
             [
-                'reference' => 'PROJ-00B',
-                'name' => 'Project B',
-                'status' => 'preparation',
-                'start_date' => '2025-02-01',
-                'end_date' => '2025-11-30',
-            ],
-            [
-                'reference' => 'PROJ-00C',
-                'name' => 'Project C',
-                'status' => 'preparation',
+                'reference' => 'ACT-002',
+                'name' => 'Campagne de sensibilisation',
                 'start_date' => '2025-03-01',
-                'end_date' => '2025-09-30',
+                'end_date' => '2025-03-15',
+                'status' => 'preparation',
+            ],
+            [
+                'reference' => 'ACT-003',
+                'name' => 'Distribution de kits',
+                'start_date' => '2025-05-01',
+                'end_date' => '2025-06-01',
+                'status' => 'preparation',
             ],
         ];
 
-        foreach ($projects as $data) {
+        foreach ($capabilityDomains as $data) {
             $beneficiaries = Beneficiary::query()->inRandomOrder()->limit(rand(2, 3))->get();
 
             $fundingSources = FundingSource::query()->inRandomOrder()->limit(rand(1, 3))->get();
@@ -56,24 +55,25 @@ class ProjectSeeder extends Seeder
             $totalBudget = $fundingData->sum('planned_budget');
 
 
-            $project = Project::create([
+
+            $capabilityDomain = CapabilityDomain::create([
+                'strategic_domain_uuid' => StrategicDomain::query()->inRandomOrder()->value('uuid'),
                 'reference' => $data['reference'],
                 'name' => $data['name'],
                 'start_date' => $data['start_date'],
                 'end_date' => $data['end_date'],
                 'budget' => $totalBudget,
                 'currency' => 'MRU',
-                'responsible_uuid' => User::query()->inRandomOrder()->value('uuid'),
-                'program_uuid' => Program::query()->inRandomOrder()->value('uuid'),
                 'status' => $data['status'],
+                'responsible_uuid' => User::query()->inRandomOrder()->value('uuid'),
             ]);
 
             if ($beneficiaries->isNotEmpty()) {
-                $project->beneficiaries()->attach($beneficiaries->pluck('uuid'));
+                $capabilityDomain->beneficiaries()->attach($beneficiaries->pluck('uuid'));
             }
 
             foreach ($fundingData as $funding) {
-                $project->fundingSources()->attach($funding['funding_source_uuid'], [
+                $capabilityDomain->fundingSources()->attach($funding['funding_source_uuid'], [
                     'planned_budget' => $funding['planned_budget'],
                 ]);
             }

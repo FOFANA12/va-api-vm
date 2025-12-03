@@ -3,16 +3,16 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Http\Requests\ActivityRequest;
-use App\Http\Resources\ActivityResource;
-use App\Models\Activity;
-use App\Repositories\ActivityRepository;
+use App\Http\Requests\CapabilityDomainRequest;
+use App\Http\Resources\CapabilityDomainResource;
+use App\Models\CapabilityDomain;
+use App\Repositories\CapabilityDomainRepository;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Pagination\LengthAwarePaginator;
 
-class ActivityController extends Controller
+class CapabilityDomainController extends Controller
 {
     use ApiResponse;
 
@@ -21,32 +21,32 @@ class ActivityController extends Controller
     private $messageSuccessDeleted;
     private $repository;
 
-    public function __construct(ActivityRepository $repository)
+    public function __construct(CapabilityDomainRepository $repository)
     {
-        $this->messageSuccessCreated = __('app/activity.controller.message_success_created');
-        $this->messageSuccessUpdated = __('app/activity.controller.message_success_updated');
+        $this->messageSuccessCreated = __('app/capability_domain.controller.message_success_created');
+        $this->messageSuccessUpdated = __('app/capability_domain.controller.message_success_updated');
         $this->messageSuccessDeleted = __('app/common.controller.message_success_deleted');
         $this->repository = $repository;
     }
 
     /**
-     * Display a listing of the activities.
+     * Display a listing of the capability domains.
      */
     public function index(Request $request)
     {
         $result = $this->repository->index($request);
 
         if ($result instanceof LengthAwarePaginator) {
-            return $this->respondWithPagination($result, ActivityResource::class)
+            return $this->respondWithPagination($result, CapabilityDomainResource::class)
                         ->setStatusCode(Response::HTTP_OK);
         }
 
-        return $this->respondWithCollection($result, ActivityResource::class)
+        return $this->respondWithCollection($result, CapabilityDomainResource::class)
                     ->setStatusCode(Response::HTTP_OK);
     }
 
     /**
-     * Requirements data for activity form.
+     * Requirements data for capability domain form.
      */
     public function requirements(Request $request)
     {
@@ -55,42 +55,42 @@ class ActivityController extends Controller
     }
 
     /**
-     * Store a newly created activity.
+     * Store a newly created capability domain.
      */
-    public function store(ActivityRequest $request)
+    public function store(CapabilityDomainRequest $request)
     {
-        $activity = $this->repository->store($request);
+        $capabilityDomain = $this->repository->store($request);
 
         return response()->json([
             'message' => $this->messageSuccessCreated,
-            'activity' => $activity
+            'capability_domain' => $capabilityDomain
         ])->setStatusCode(Response::HTTP_CREATED);
     }
 
     /**
-     * Display the specified activity.
+     * Display the specified capability domain.
      */
-    public function show(Activity $activity)
+    public function show(CapabilityDomain $capabilityDomain)
     {
-        return response()->json($this->repository->show($activity))
+        return response()->json($this->repository->show($capabilityDomain))
             ->setStatusCode(Response::HTTP_OK);
     }
 
     /**
-     * Update the specified activity.
+     * Update the specified capability domain.
      */
-    public function update(ActivityRequest $request, Activity $activity)
+    public function update(CapabilityDomainRequest $request, CapabilityDomain $capabilityDomain)
     {
-        $activity = $this->repository->update($request, $activity);
+        $capabilityDomain = $this->repository->update($request, $capabilityDomain);
 
         return response()->json([
             'message' => $this->messageSuccessUpdated,
-            'activity' => $activity
+            'capability_domain' => $capabilityDomain
         ])->setStatusCode(Response::HTTP_OK);
     }
 
     /**
-     * Remove the specified activity(ies).
+     * Remove the specified capability domain(s).
      */
     public function destroy(Request $request)
     {

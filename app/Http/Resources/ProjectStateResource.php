@@ -22,7 +22,7 @@ class ProjectStateResource extends JsonResource
         return [
             'id' => $this->id,
             'uuid' => $this->uuid,
-            'project_uuid' => $this->project_uuid,
+            'strategic_domain_uuid' => $this->strategic_domain_uuid,
             'state' => ProjectState::get($this->state_code, app()->getLocale()),
             'state_date' => DateTimeFormatter::formatDatetime($this->state_date),
             'author' => $author,

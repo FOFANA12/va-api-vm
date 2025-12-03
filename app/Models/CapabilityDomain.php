@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
-class Activity extends Model
+class CapabilityDomain extends Model
 {
     use GeneratesUuid, AutoFillable, HasStaticTableName, Author;
     use LogsActivity;
@@ -23,7 +23,7 @@ class Activity extends Model
         return LogOptions::defaults()
             ->useLogName('activity')
             ->logOnly([
-                'project_uuid',
+                'strategic_domain_uuid',
                 'reference',
                 'name',
                 'description',
@@ -48,9 +48,9 @@ class Activity extends Model
         'budget' => 'float',
     ];
 
-    public function project()
+    public function strategicDomain()
     {
-        return $this->belongsTo(Project::class, 'project_uuid', 'uuid');
+        return $this->belongsTo(StrategicDomain::class, 'strategic_domain_uuid', 'uuid');
     }
 
     public function responsible()
@@ -75,23 +75,23 @@ class Activity extends Model
 
     public function beneficiaries(): BelongsToMany
     {
-        return $this->belongsToMany(Beneficiary::class, 'activity_beneficiaries', 'activity_uuid', 'beneficiary_uuid', 'uuid', 'uuid');
+        return $this->belongsToMany(Beneficiary::class, 'activity_beneficiaries', 'capability_domain_uuid', 'beneficiary_uuid', 'uuid', 'uuid');
     }
 
     public function fundingSources(): BelongsToMany
     {
-        return $this->belongsToMany(FundingSource::class, 'activity_funding_sources', 'activity_uuid', 'funding_source_uuid', 'uuid', 'uuid')
+        return $this->belongsToMany(FundingSource::class, 'activity_funding_sources', 'capability_domain_uuid', 'funding_source_uuid', 'uuid', 'uuid')
             ->withPivot('planned_budget');
     }
 
     public function statuses(): HasMany
     {
-        return $this->hasMany(ActivityStatus::class, 'activity_uuid', 'uuid');
+        return $this->hasMany(ActivityStatus::class, 'capability_domain_uuid', 'uuid');
     }
 
     public function states(): HasMany
     {
-        return $this->hasMany(ActivityState::class, 'activity_uuid', 'uuid');
+        return $this->hasMany(ActivityState::class, 'capability_domain_uuid', 'uuid');
     }
 
     public function statusChangedBy(): BelongsTo

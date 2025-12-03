@@ -8,7 +8,7 @@ use App\Support\ActivityStatus;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ActivityResource extends JsonResource
+class CapabilityDomainResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -35,7 +35,7 @@ class ActivityResource extends JsonResource
         return [
             'id' => $this->id,
             'uuid' => $this->uuid,
-            'project' => $this->project,
+            'strategic_domain' => $this->strategicDomain,
             'reference' => $this->reference,
             'name' => $this->name,
             'start_date' => $startDate,
@@ -60,7 +60,7 @@ class ActivityResource extends JsonResource
             'start_date' => $this->start_date,
             'end_date' => $this->end_date,
             'budget' => $this->budget,
-            'project' => $this->project_uuid,
+            'strategic_domain' => $this->strategic_domain_uuid,
             'currency' => $this->currency,
             'responsible' => $this->responsible_uuid,
 
@@ -108,7 +108,7 @@ class ActivityResource extends JsonResource
             'end_date' => $endDate,
             'budget' => $this->budget,
             'currency' => $this->currency,
-            'project' => $this->project ? $this->project->name : null,
+            'strategic_domain' => $this->strategicDomain ? $this->strategicDomain->name : null,
             'responsible' => $this->responsible ? $this->responsible->name : null,
 
             'status' => $this->status ? ActivityStatus::get($this->status, $currentLang) : null,

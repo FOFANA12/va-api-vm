@@ -11,20 +11,17 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('projects', function (Blueprint $table) {
+        Schema::create('capability_domains', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid')->unique();
+            $table->uuid('strategic_domain_uuid')->nullable();
             $table->string('reference', 100)->unique()->nullable();
             $table->string('name', 100)->unique();
             $table->date('start_date')->nullable();
             $table->date('end_date')->nullable();
-            $table->decimal('budget', 14, 2)->default(0);
-            $table->uuid('program_uuid')->nullable();
+            $table->decimal('budget', 14, 2)->nullable();
             $table->string('currency', 10)->default('MRU');
             $table->uuid('responsible_uuid')->nullable();
-            $table->uuid('created_by')->nullable();
-            $table->uuid('updated_by')->nullable();
-            $table->timestamps();
 
             $table->string('status', 50)->default('preparation')->nullable();
             $table->timestamp('status_changed_at')->nullable();
@@ -39,17 +36,22 @@ return new class extends Migration
             $table->text('impacts')->nullable();
             $table->text('risks')->nullable();
 
-            $table->foreign('program_uuid')->references('uuid')->on('programs')->onDelete('restrict');
+            $table->uuid('created_by')->nullable();
+            $table->uuid('updated_by')->nullable();
+            $table->timestamps();
+
+            $table->foreign('strategic_domain_uuid')->references('uuid')->on('strategic_domains')->onDelete('restrict');
             $table->foreign('responsible_uuid')->references('uuid')->on('users')->onDelete('restrict');
             $table->foreign('created_by')->references('uuid')->on('users')->onDelete('set null');
             $table->foreign('updated_by')->references('uuid')->on('users')->onDelete('set null');
         });
     }
+
     /**
      * Reverse the migrations.
      */
     public function down(): void
     {
-        Schema::dropIfExists('projects');
+        Schema::dropIfExists('capability_domains');
     }
 };

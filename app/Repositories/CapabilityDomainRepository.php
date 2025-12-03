@@ -3,30 +3,30 @@
 namespace App\Repositories;
 
 use App\Helpers\ReferenceGenerator;
-use App\Http\Requests\ProjectRequest;
-use App\Http\Resources\ProjectResource;
+use App\Http\Requests\CapabilityDomainRequest;
+use App\Http\Resources\CapabilityDomainResource;
+use App\Models\ActivityState;
+use App\Models\ActivityStatus;
 use App\Models\Beneficiary;
+use App\Models\CapabilityDomain;
 use App\Support\Currency;
 use App\Models\FundingSource;
-use App\Models\Program;
-use App\Models\Project;
-use App\Models\ProjectState;
-use App\Models\ProjectStatus;
+use App\Models\StrategicDomain;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
-class ProjectRepository
+class CapabilityDomainRepository
 {
     /**
-     * List porjects with pagination, filters, sorting.
+     * List capability domains with pagination, filters, sorting.
      */
     public function index(Request $request)
     {
-        $searchable = ['projects.name', 'program', 'projects.reference', 'responsible'];
-        $sortable = ['name', 'program', 'reference', 'status', 'state', 'responsible', 'budget', 'start_date', 'end_date'];
+        $searchable = ['capability_domains.name', 'strategic_domain', 'capability_domains.reference', 'responsible'];
+        $sortable = ['name', 'strategic_domain', 'reference', 'status', 'state', 'responsible', 'budget', 'start_date', 'end_date'];
 
         $searchTerm = $request->input('searchTerm');
         $sortByInput = $request->input('sortBy');
@@ -36,31 +36,31 @@ class ProjectRepository
         $sortOrder = in_array($sortOrderInput, ['asc', 'desc']) ? $sortOrderInput : 'desc';
         $sortBy = in_array($sortByInput, $sortable) ? $sortByInput : 'id';
 
-        $query = Project::select(
-            'projects.id',
-            'projects.uuid',
-            'projects.reference',
-            'projects.name',
-            'projects.start_date',
-            'projects.end_date',
-            'projects.budget',
-            'projects.status',
-            'projects.state',
-            'projects.responsible_uuid',
-            'projects.currency',
+        $query = CapabilityDomain::select(
+            'capability_domains.id',
+            'capability_domains.uuid',
+            'capability_domains.reference',
+            'capability_domains.name',
+            'capability_domains.start_date',
+            'capability_domains.end_date',
+            'capability_domains.budget',
+            'capability_domains.status',
+            'capability_domains.state',
+            'capability_domains.responsible_uuid',
+            'capability_domains.currency',
             'responsibles.name as responsible',
-            'programs.name as program'
+            'strategic_domains.name as strategicDomain'
         )
-            ->leftJoin('users as responsibles', 'projects.responsible_uuid', '=', 'responsibles.uuid')
-            ->join('programs', 'projects.program_uuid', '=', 'programs.uuid');
+            ->leftJoin('users as responsibles', 'capability_domains.responsible_uuid', '=', 'responsibles.uuid')
+            ->join('strategic_domains', 'capability_domains.strategic_domain_uuid', '=', 'strategic_domains.uuid');
 
         if (!empty($searchTerm)) {
             $query->where(function ($q) use ($searchTerm, $searchable) {
                 foreach ($searchable as $column) {
                     if ($column === 'responsible') {
                         $q->orWhere('responsibles.name', 'LIKE', '%' . strtolower($searchTerm) . '%');
-                    } else  if ($column === 'program') {
-                        $q->orWhere('programs.name', 'LIKE', '%' . strtolower($searchTerm) . '%');
+                    } else  if ($column === 'strategic_domain') {
+                        $q->orWhere('strategic_domains.name', 'LIKE', '%' . strtolower($searchTerm) . '%');
                     } else {
                         $q->orWhere($column, 'LIKE', '%' . strtolower($searchTerm) . '%');
                     }
@@ -70,10 +70,10 @@ class ProjectRepository
 
         if ($sortBy === 'responsible') {
             $query->orderBy('responsibles.name', $sortOrder);
-        } else if ($sortBy === 'program') {
-            $query->orderBy('programs.name', $sortOrder);
+        } else if ($sortBy === 'strategic_domain') {
+            $query->orderBy('strategic_domains.name', $sortOrder);
         } else {
-            $query->orderBy("projects.$sortBy", $sortOrder);
+            $query->orderBy($sortBy, $sortOrder);
         }
 
         return $perPage && (int) $perPage > 0
@@ -82,7 +82,7 @@ class ProjectRepository
     }
 
     /**
-     * Load requirements data
+     * Load requirements data for forms.
      */
     public function requirements()
     {
@@ -92,8 +92,8 @@ class ProjectRepository
             ->where('status', true)->orderBy('id', 'desc')
             ->get();
 
-        $programs = Program::select('uuid', 'name')
-            ->whereNotIn('status', ['closed', 'stopped'])
+        $strategicDomains = StrategicDomain::select('uuid', 'name')
+            ->where('status', '!=', 'done')
             ->orderBy('id', 'desc')
             ->get();
 
@@ -107,32 +107,33 @@ class ProjectRepository
             ->select('uuid', 'name')
             ->get();
 
+
         return [
             'currency' => $currency,
             'responsibles' => $responsibles,
-            'programs' => $programs,
+            'strategic_domains' => $strategicDomains,
             'beneficiaries' => $beneficiaries,
             'funding_sources' => $fundingSources,
         ];
     }
-
     /**
-     * Create a new project.
+     * Store a new capability domain.
      */
-    public function store(ProjectRequest $request)
+    public function store(CapabilityDomainRequest $request)
     {
+
         DB::beginTransaction();
         try {
             $request->merge([
-                'program_uuid' => $request->input('program'),
+                'strategic_domain_uuid' => $request->input('strategic_domain'),
                 'responsible_uuid' => $request->input('responsible'),
-                'created_by' => Auth::user()?->uuid,
-                'updated_by' => Auth::user()?->uuid,
+                'created_uuid' => Auth::user()?->uuid,
+                'updated_uuid' => Auth::user()?->uuid,
             ]);
 
-            $project = Project::create($request->only([
+            $capabilityDomain = CapabilityDomain::create($request->only([
                 'name',
-                'program_uuid',
+                'strategic_domain_uuid',
                 'start_date',
                 'end_date',
                 'currency',
@@ -142,7 +143,7 @@ class ProjectRepository
                 'impacts',
                 'risks',
                 'created_by',
-                'updated_by'
+                'updated_by',
             ]));
 
             $beneficiaryUuids = collect($request->beneficiaries)
@@ -153,7 +154,7 @@ class ProjectRepository
             $validBeneficiaries = Beneficiary::whereIn('uuid', $beneficiaryUuids)
                 ->pluck('uuid')
                 ->toArray();
-            $project->beneficiaries()->sync($validBeneficiaries);
+            $capabilityDomain->beneficiaries()->sync($validBeneficiaries);
 
             $requestedUuids = collect($request->funding_sources)
                 ->pluck('uuid')
@@ -168,37 +169,37 @@ class ProjectRepository
             foreach ($request->funding_sources as $source) {
                 if (in_array($source['uuid'], $validFundingSources)) {
                     $plannedBudget = $source['planned_amount'] ?? 0;
-                    $project->fundingSources()->attach($source['uuid'], [
+                    $capabilityDomain->fundingSources()->attach($source['uuid'], [
                         'planned_budget' => $plannedBudget,
                     ]);
                     $totalBudget += $plannedBudget;
                 }
             }
 
-            $project->refresh();
+            $capabilityDomain->refresh();
 
             //Save initial status
-            $status = ProjectStatus::create([
-                'project_uuid' => $project->uuid,
-                'project_id' => $project->id,
-                'status_code' => $project->status,
+            $status = ActivityStatus::create([
+                'capability_domain_uuid' => $capabilityDomain->uuid,
+                'capability_domain_id' => $capabilityDomain->id,
+                'status_code' => $capabilityDomain->status,
                 'status_date' => now(),
                 'created_by' => Auth::user()?->uuid,
                 'updated_by' => Auth::user()?->uuid,
             ]);
 
             //Save initial state
-            $state = ProjectState::create([
-                'project_uuid' => $project->uuid,
-                'project_id' => $project->id,
-                'state_code' => $project->state,
+            $state = ActivityState::create([
+                'capability_domain_uuid' => $capabilityDomain->uuid,
+                'capability_domain_id' => $capabilityDomain->id,
+                'state_code' => $capabilityDomain->state,
                 'state_date' => now(),
                 'created_by' => Auth::user()?->uuid,
                 'updated_by' => Auth::user()?->uuid,
             ]);
 
-            $project->update([
-                'reference' => ReferenceGenerator::generateProjectReference($project->id),
+            $capabilityDomain->update([
+                'reference' => ReferenceGenerator::generateActivityReference($capabilityDomain->id),
                 'budget' => $totalBudget,
                 'status' => $status->status_code,
                 'status_changed_at' => $status->status_date,
@@ -210,9 +211,9 @@ class ProjectRepository
 
             DB::commit();
 
-            $project->loadMissing(['responsible', 'beneficiaries', 'fundingSources']);
+            $capabilityDomain->loadMissing(['responsible', 'beneficiaries', 'fundingSources']);
 
-            return (new ProjectResource($project))->additional([
+            return (new CapabilityDomainResource($capabilityDomain))->additional([
                 'mode' => $request->input('mode', 'view')
             ]);
         } catch (\Throwable $e) {
@@ -222,32 +223,32 @@ class ProjectRepository
     }
 
     /**
-     * Show a specific project.
+     * Show a specific capability domain.
      */
-    public function show(Project $project)
+    public function show(CapabilityDomain $capabilityDomain)
     {
-        return ['project' => new ProjectResource($project->loadMissing(['responsible', 'beneficiaries', 'fundingSources']))];
+        return ['capability_domain' => new CapabilityDomainResource($capabilityDomain->loadMissing(['responsible', 'beneficiaries', 'fundingSources']))];
     }
 
     /**
-     * Update a project.
+     * Update an existing capability domain.
      */
-    public function update(ProjectRequest $request, Project $project)
+    public function update(CapabilityDomainRequest $request, CapabilityDomain $capabilityDomain)
     {
         DB::beginTransaction();
         try {
             $request->merge([
-                'program_uuid' => $request->input('program'),
+                'strategic_domain_uuid' => $request->input('strategic_domain'),
                 'responsible_uuid' => $request->input('responsible'),
                 'updated_by' => Auth::user()?->uuid,
             ]);
 
-            $project->fill($request->only([
+            $capabilityDomain->fill($request->only([
                 'name',
                 'start_date',
                 'end_date',
                 'currency',
-                'program_uuid',
+                'strategic_domain_uuid',
                 'responsible_uuid',
                 'description',
                 'prerequisites',
@@ -263,9 +264,9 @@ class ProjectRepository
             $validBeneficiaries = Beneficiary::whereIn('uuid', $beneficiaryUuids)
                 ->pluck('uuid')
                 ->toArray();
-            $project->beneficiaries()->sync($validBeneficiaries);
+            $capabilityDomain->beneficiaries()->sync($validBeneficiaries);
 
-            $project->fundingSources()->detach();
+            $capabilityDomain->fundingSources()->detach();
 
             $requestedUuids = collect($request->funding_sources)
                 ->pluck('uuid')
@@ -280,7 +281,7 @@ class ProjectRepository
             foreach ($request->funding_sources as $source) {
                 if (in_array($source['uuid'], $validFundingSources)) {
                     $plannedBudget = $source['planned_amount'] ?? 0;
-                    $project->fundingSources()->attach($source['uuid'], [
+                    $capabilityDomain->fundingSources()->attach($source['uuid'], [
                         'planned_budget' => $plannedBudget,
                     ]);
                     $totalBudget += $plannedBudget;
@@ -289,10 +290,10 @@ class ProjectRepository
 
             DB::commit();
 
-            $project->update(['budget' => $totalBudget]);
-            $project->load(['responsible', 'beneficiaries', 'fundingSources']);
+            $capabilityDomain->update(['budget' => $totalBudget]);
+            $capabilityDomain->load(['responsible', 'beneficiaries', 'fundingSources']);
 
-            return (new ProjectResource($project))->additional([
+            return (new CapabilityDomainResource($capabilityDomain))->additional([
                 'mode' => $request->input('mode', 'edit')
             ]);
         } catch (\Throwable $e) {
@@ -302,7 +303,7 @@ class ProjectRepository
     }
 
     /**
-     * Delete multiple project.
+     * Delete one or multiple capability domain(s).
      */
     public function destroy(Request $request)
     {
@@ -314,9 +315,10 @@ class ProjectRepository
 
         DB::beginTransaction();
         try {
-            $deleted = Project::whereIn('id', $ids)->delete();
+            $deleted = CapabilityDomain::whereIn('id', $ids)->delete();
+
             if ($deleted === 0) {
-                throw new \RuntimeException(__('app/common.destroy.no_items_deleted'));
+                throw new RuntimeException(__('app/common.destroy.no_items_deleted'));
             }
 
             DB::commit();
@@ -326,7 +328,7 @@ class ProjectRepository
         } catch (\Exception $e) {
             DB::rollBack();
 
-            if ($e->getCode() === "23000") {
+            if ($e->getCode() === '23000') {
                 throw new \Exception(__('app/common.repository.foreignKey'));
             }
 

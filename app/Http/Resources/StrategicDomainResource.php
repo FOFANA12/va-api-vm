@@ -3,13 +3,12 @@
 namespace App\Http\Resources;
 
 use App\Helpers\DateTimeFormatter;
-use App\Support\Currency;
-use App\Support\ProgramState;
-use App\Support\ProgramStatus;
+use App\Support\ProjectState;
+use App\Support\ProjectStatus;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ProgramResource extends JsonResource
+class StrategicDomainResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -35,6 +34,7 @@ class ProgramResource extends JsonResource
         return [
             'id' => $this->id,
             'uuid' => $this->uuid,
+            'action_domain' => $this->actionDomain,
             'reference' => $this->reference,
             'name' => $this->name,
             'start_date' => $startDate,
@@ -42,8 +42,8 @@ class ProgramResource extends JsonResource
             'budget' => $this->budget,
             'currency' => $this->currency,
             'responsible' => $this->responsible,
-            'status' => $this->status ? ProgramStatus::get($this->status, $currentLang) : null,
-            'state' => $this->state ? ProgramState::get($this->state, $currentLang) : null,
+            'status' => $this->status ? ProjectStatus::get($this->status, $currentLang) : null,
+            'state' => $this->state ? ProjectState::get($this->state, $currentLang) : null,
         ];
     }
 
@@ -59,14 +59,15 @@ class ProgramResource extends JsonResource
             'start_date' => $this->start_date,
             'end_date' => $this->end_date,
             'budget' => $this->budget,
+            'action_domain' => $this->action_domain_uuid,
             'currency' => $this->currency,
             'responsible' => $this->responsible_uuid,
 
-            'status' => $this->status ? ProgramStatus::get($this->status, $currentLang) : null,
+            'status' => $this->status ? ProjectStatus::get($this->status, $currentLang) : null,
             'status_changed_at' => $this->status_changed_at ? DateTimeFormatter::formatDatetime($this->status_changed_at) : null,
             'status_changed_by' => $this->statusChangedBy?->name,
 
-            'state' => $this->state ? ProgramState::get($this->state, $currentLang) : null,
+            'state' => $this->state ? ProjectState::get($this->state, $currentLang) : null,
             'state_changed_at' => $this->state_changed_at ? DateTimeFormatter::formatDatetime($this->state_changed_at) : null,
             'state_changed_by' => $this->stateChangedBy?->name,
 
@@ -104,14 +105,15 @@ class ProgramResource extends JsonResource
             'start_date' => $startDate,
             'end_date' => $endDate,
             'budget' => $this->budget,
-            'currency' => Currency::getObject($this->currency, $currentLang),
+            'currency' => $this->currency,
+            'action_domain' => $this->actionDomain ? $this->actionDomain->name : null,
             'responsible' => $this->responsible ? $this->responsible->name : null,
 
-            'status' => $this->status ? ProgramStatus::get($this->status, $currentLang) : null,
+            'status' => $this->status ? ProjectStatus::get($this->status, $currentLang) : null,
             'status_changed_at' => $this->status_changed_at ? DateTimeFormatter::formatDatetime($this->status_changed_at) : null,
             'status_changed_by' => $this->statusChangedBy?->name,
 
-            'state' => $this->state ? ProgramState::get($this->state, $currentLang) : null,
+            'state' => $this->state ? ProjectState::get($this->state, $currentLang) : null,
             'state_changed_at' => $this->state_changed_at ? DateTimeFormatter::formatDatetime($this->state_changed_at) : null,
             'state_changed_by' => $this->stateChangedBy?->name,
 

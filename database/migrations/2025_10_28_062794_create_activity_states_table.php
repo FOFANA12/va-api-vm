@@ -14,15 +14,15 @@ return new class extends Migration
         Schema::create('activity_states', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid')->unique();
-            $table->uuid('activity_uuid')->index();
-            $table->integer('activity_id')->index();
+            $table->uuid('capability_domain_uuid')->index();
+            $table->integer('capability_domain_id')->index();
             $table->string('state_code', 50);
             $table->timestamp('state_date');
             $table->uuid('created_by')->nullable();
             $table->uuid('updated_by')->nullable();
             $table->timestamps();
 
-            $table->foreign('activity_uuid')->references('uuid')->on('activities')->onDelete('cascade');
+            $table->foreign('capability_domain_uuid')->references('uuid')->on('capability_domains')->onDelete('cascade');
             $table->foreign('created_by')->references('uuid')->on('users')->onDelete('set null');
             $table->foreign('updated_by')->references('uuid')->on('users')->onDelete('set null');
         });

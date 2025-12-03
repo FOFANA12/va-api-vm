@@ -8,22 +8,22 @@ use App\Http\Resources\ActionResource;
 use App\Jobs\EvaluateActionJob;
 use App\Jobs\UpdateActionTotalsJob;
 use App\Models\Action;
+use App\Models\ActionDomain;
 use App\Models\ActionPlan;
 use App\Models\ActionStatus as ModelsActionStatus;
-use App\Models\Activity;
 use App\Models\Attachment;
 use App\Models\Beneficiary;
+use App\Models\CapabilityDomain;
 use App\Support\Currency;
 use App\Models\DelegatedProjectOwner;
 use App\Models\Department;
 use App\Models\FileType;
 use App\Models\FundingSource;
 use App\Models\Municipality;
-use App\Models\Program;
-use App\Models\Project;
 use App\Models\ProjectOwner;
 use App\Models\Region;
 use App\Models\Stakeholder;
+use App\Models\StrategicDomain;
 use App\Models\Structure;
 use App\Support\GenerateDocumentTypes;
 use App\Support\PriorityLevel;
@@ -158,19 +158,19 @@ class ActionRepository
             ->select('uuid', 'name', 'department_uuid')
             ->get();
 
-        $programs = Program::whereNotIn('status', ['closed', 'stopped'])
+        $actionDomains = ActionDomain::whereNotIn('status', ['closed', 'stopped'])
             ->orderBy('id', 'desc')
             ->select('uuid', 'name')
             ->get();
 
-        $projects = Project::whereNotIn('status', ['closed', 'stopped'])
+        $strategicDomains = StrategicDomain::whereNotIn('status', ['closed', 'stopped'])
             ->orderBy('id', 'desc')
-            ->select('uuid', 'name', 'program_uuid')
+            ->select('uuid', 'name', 'action_domain_uuid')
             ->get();
 
-        $activities = Activity::whereNotIn('status', ['closed', 'stopped'])
+        $capabilityDomains = CapabilityDomain::whereNotIn('status', ['closed', 'stopped'])
             ->orderBy('id', 'desc')
-            ->select('uuid', 'name', 'project_uuid')
+            ->select('uuid', 'name', 'strategic_domain_uuid')
             ->get();
 
 
@@ -229,9 +229,9 @@ class ActionRepository
             'regions' => $regions,
             'departments' => $departments,
             'municipalities' => $municipalities,
-            'programs' => $programs,
-            'projects' => $projects,
-            'activities' => $activities,
+            'action_domains' => $actionDomains,
+            'strategic_domains' => $strategicDomains,
+            'capability_domains' => $capabilityDomains,
             'risk_levels' => $riskLevels,
             'priority_levels' => $priorityLevels,
             'generate_document_types' => $generateDocumentTypes,
@@ -260,9 +260,9 @@ class ActionRepository
                 'region_uuid' => $request->input('region'),
                 'department_uuid' => $request->input('department'),
                 'municipality_uuid' => $request->input('municipality'),
-                'program_uuid' => $request->input('program'),
-                'project_uuid' => $request->input('project'),
-                'activity_uuid' => $request->input('activity'),
+                'action_domain_uuid' => $request->input('action_domain'),
+                'strategic_domain_uuid' => $request->input('strategic_domain'),
+                'capability_domain_uuid' => $request->input('capability_domain'),
 
                 'mode' => $request->input('mode', 'view'),
                 'created_by' => Auth::user()?->uuid,
@@ -288,9 +288,9 @@ class ActionRepository
                 'region_uuid',
                 'department_uuid',
                 'municipality_uuid',
-                'program_uuid',
-                'project_uuid',
-                'activity_uuid',
+                'action_domain_uuid',
+                'strategic_domain_uuid',
+                'capability_domain_uuid',
                 'created_by',
                 'updated_by'
             ]));
@@ -388,9 +388,9 @@ class ActionRepository
                 'region',
                 'department',
                 'municipality',
-                'program',
-                'project',
-                'activity',
+                'actionDomain',
+                'strategicDomain',
+                'capabilityDomain',
                 'beneficiaries',
                 'stakeholders',
                 'fundingSources',
@@ -419,9 +419,9 @@ class ActionRepository
             'region',
             'department',
             'municipality',
-            'program',
-            'project',
-            'activity',
+            'actionDomain',
+            'strategicDomain',
+            'capabilityDomain',
             'beneficiaries',
             'stakeholders',
             'fundingSources',
@@ -445,9 +445,9 @@ class ActionRepository
                 'region_uuid' => $request->input('region'),
                 'department_uuid' => $request->input('department'),
                 'municipality_uuid' => $request->input('municipality'),
-                'program_uuid' => $request->input('program'),
-                'project_uuid' => $request->input('project'),
-                'activity_uuid' => $request->input('activity'),
+                'action_domain_uuid' => $request->input('action_domain'),
+                'strategic_domain_uuid' => $request->input('strategic_domain'),
+                'capability_domain_uuid' => $request->input('capability_domain'),
 
                 'mode' => $request->input('mode', 'edit'),
                 'updated_by' => Auth::user()?->uuid,
@@ -470,9 +470,9 @@ class ActionRepository
                 'region_uuid',
                 'department_uuid',
                 'municipality_uuid',
-                'program_uuid',
-                'project_uuid',
-                'activity_uuid',
+                'action_domain_uuid',
+                'strategic_domain_uuid',
+                'capability_domain_uuid',
                 'updated_by'
             ]));
 
@@ -525,9 +525,9 @@ class ActionRepository
                 'region',
                 'department',
                 'municipality',
-                'program',
-                'project',
-                'activity',
+                'actionDomain',
+                'strategicDomain',
+                'capabilityDomain',
                 'beneficiaries',
                 'stakeholders',
                 'fundingSources',

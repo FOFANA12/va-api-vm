@@ -13,7 +13,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 use Spatie\Activitylog\LogOptions;
 use Spatie\Activitylog\Traits\LogsActivity;
 
-class Program extends Model
+class StrategicDomain extends Model
 {
 
     use  Author, AutoFillable, GeneratesUuid, HasStaticTableName;
@@ -22,28 +22,29 @@ class Program extends Model
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()
-            ->useLogName('program')
+            ->useLogName('project')
             ->logOnly([
                 'reference',
                 'name',
-                'description',
+                'objective',
+                'expected_results',
                 'start_date',
                 'end_date',
                 'budget',
-                'currency_uuid',
                 'status',
+                'action_domain_uuid',
+                'currency_uuid',
                 'responsible_uuid'
             ])
             ->setDescriptionForEvent(fn(string $eventName) => match ($eventName) {
-                'created' => "Program created: #{$this->id}",
-                'updated' => "Program updated: #{$this->id}",
-                'deleted' => "Program deleted: #{$this->id}",
+                'created' => "Project created: #{$this->id}",
+                'updated' => "Project updated: #{$this->id}",
+                'deleted' => "Project deleted: #{$this->id}",
                 default => $eventName,
             })
             ->logOnlyDirty()
             ->dontSubmitEmptyLogs();
     }
-
 
     /**
      * Get the attributes that should be cast.
@@ -62,6 +63,12 @@ class Program extends Model
         return $this->belongsTo(User::class, 'responsible_uuid', 'uuid');
     }
 
+    public function actionDomain(): BelongsTo
+    {
+        return $this->belongsTo(ActionDomain::class, 'action_domain_uuid', 'uuid');
+    }
+
+
     public function region(): BelongsTo
     {
         return $this->belongsTo(Region::class, 'region_uuid', 'uuid');
@@ -72,6 +79,7 @@ class Program extends Model
         return $this->belongsTo(Department::class, 'department_uuid', 'uuid');
     }
 
+
     public function municipality(): BelongsTo
     {
         return $this->belongsTo(Municipality::class, 'municipality_uuid', 'uuid');
@@ -79,23 +87,23 @@ class Program extends Model
 
     public function beneficiaries(): BelongsToMany
     {
-        return $this->belongsToMany(Beneficiary::class, 'program_beneficiaries', 'program_uuid', 'beneficiary_uuid', 'uuid', 'uuid');
+        return $this->belongsToMany(Beneficiary::class, 'project_beneficiaries', 'strategic_domain_uuid', 'beneficiary_uuid', 'uuid', 'uuid');
     }
 
     public function fundingSources(): BelongsToMany
     {
-        return $this->belongsToMany(FundingSource::class, 'program_funding_sources', 'program_uuid', 'funding_source_uuid', 'uuid', 'uuid')
+        return $this->belongsToMany(FundingSource::class, 'project_funding_sources', 'strategic_domain_uuid', 'funding_source_uuid', 'uuid', 'uuid')
             ->withPivot('planned_budget');
     }
 
     public function statuses(): HasMany
     {
-        return $this->hasMany(ProgramStatus::class, 'program_uuid', 'uuid');
+        return $this->hasMany(ProjectStatus::class, 'strategic_domain_uuid', 'uuid');
     }
 
     public function states(): HasMany
     {
-        return $this->hasMany(ProgramState::class, 'program_uuid', 'uuid');
+        return $this->hasMany(ProjectState::class, 'strategic_domain_uuid', 'uuid');
     }
 
     public function statusChangedBy(): BelongsTo

@@ -3,7 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
-use App\Models\Activity;
+use App\Models\CapabilityDomain;
 use App\Repositories\ActivityStatusRepository;
 use App\Support\ActivityStatus;
 use Illuminate\Http\Request;
@@ -17,7 +17,7 @@ class ActivityStatusController extends Controller
 
     public function __construct(ActivityStatusRepository $repository)
     {
-        $this->messageSuccessUpdated = __('app/activity.controller.message_success_status_updated');
+        $this->messageSuccessUpdated = __('app/capability_domain.controller.message_success_status_updated');
         $this->messageSuccessDeleted = __('app/common.controller.message_success_deleted');
         $this->repository = $repository;
     }
@@ -25,37 +25,37 @@ class ActivityStatusController extends Controller
     /**
      * Display a listing of statuses for a given activity.
      */
-    public function index($activityId)
+    public function index($capabilityDomainId)
     {
-        return response()->json($this->repository->index($activityId))->setStatusCode(Response::HTTP_OK);
+        return response()->json($this->repository->index($capabilityDomainId))->setStatusCode(Response::HTTP_OK);
     }
 
     /**
-     * Requirements data for activity.
+     * Requirements data for capability domain.
      */
-    public function requirements(Activity $activity)
+    public function requirements(CapabilityDomain $capabilityDomain)
     {
-        return response()->json($this->repository->requirements($activity))->setStatusCode(Response::HTTP_OK);
+        return response()->json($this->repository->requirements($capabilityDomain))->setStatusCode(Response::HTTP_OK);
     }
 
     /**
-     * Store a newly created activity.
+     * Store a newly created capability domain.
      */
-    public function store(Request $request, Activity $activity)
+    public function store(Request $request, CapabilityDomain $capabilityDomain)
     {
         $validStatuses = ActivityStatus::codes();
 
         $status = $request->input('status');
 
         if (!in_array($status, $validStatuses)) {
-            throw new \Exception(__('app/activity.request.invalid_status'));
+            throw new \Exception(__('app/capability_domain.request.invalid_status'));
         }
 
         if (!$status) {
-            throw new \Exception(__('app/activity.request.status'));
+            throw new \Exception(__('app/capability_domain.request.status'));
         }
 
-        $result = $this->repository->store($request, $activity);
+        $result = $this->repository->store($request, $capabilityDomain);
 
         return response()->json(['message' => $this->messageSuccessUpdated, 'status' =>  $result])->setStatusCode(Response::HTTP_OK);
     }
@@ -63,9 +63,9 @@ class ActivityStatusController extends Controller
     /**
      * Remove the specified project statuses records.
      */
-    public function destroy(Request $request, Activity $activity)
+    public function destroy(Request $request, CapabilityDomain $capabilityDomain)
     {
-        $status = $this->repository->destroy($request, $activity);
+        $status = $this->repository->destroy($request, $capabilityDomain);
 
         return response()->json(['message' => $this->messageSuccessDeleted, 'status' => $status])->setStatusCode(Response::HTTP_OK);
     }

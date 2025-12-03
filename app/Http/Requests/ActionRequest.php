@@ -2,16 +2,16 @@
 
 namespace App\Http\Requests;
 
+use App\Models\ActionDomain;
 use App\Models\ActionPlan;
-use App\Models\Activity;
+use App\Models\CapabilityDomain;
 use App\Models\DelegatedProjectOwner;
 use App\Models\Department;
 use App\Models\FundingSource;
 use App\Models\Municipality;
-use App\Models\Program;
-use App\Models\Project;
 use App\Models\ProjectOwner;
 use App\Models\Region;
+use App\Models\StrategicDomain;
 use App\Models\Structure;
 use App\Support\Currency;
 use App\Support\GenerateDocumentTypes;
@@ -50,9 +50,9 @@ class ActionRequest extends FormRequest
             'project_owner' => 'bail|required|exists:' . ProjectOwner::tableName() . ',uuid',
             'delegated_project_owner' => 'bail|required|exists:' . DelegatedProjectOwner::tableName() . ',uuid',
 
-            'program' => 'bail|nullable|exists:' . Program::tableName() . ',uuid',
-            'project' => 'bail|nullable|exists:' . Project::tableName() . ',uuid',
-            'activity' => 'bail|nullable|exists:' . Activity::tableName() . ',uuid',
+            'actionDomain' => 'bail|nullable|exists:' . ActionDomain::tableName() . ',uuid',
+            'strategic_domain' => 'bail|nullable|exists:' . StrategicDomain::tableName() . ',uuid',
+            'capability_domain' => 'bail|nullable|exists:' . CapabilityDomain::tableName() . ',uuid',
             'region' => 'bail|nullable|exists:' . Region::tableName() . ',uuid',
             'department' => 'bail|nullable|exists:' . Department::tableName() . ',uuid',
             'municipality' => 'bail|nullable|exists:' . Municipality::tableName() . ',uuid',
@@ -82,9 +82,9 @@ class ActionRequest extends FormRequest
             'project_owner' => __('app/action.request.project_owner'),
             'delegated_project_owner' => __('app/action.request.delegated_project_owner'),
 
-            'program' => __('app/action.request.program'),
-            'project' => __('app/action.request.project'),
-            'activity' => __('app/action.request.activity'),
+            'action_domain' => __('app/action.request.action_domain'),
+            'strategic_domain' => __('app/action.request.strategic_domain'),
+            'capability_domain' => __('app/action.request.capability_domain'),
             'region' => __('app/action.request.region'),
             'department' => __('app/action.request.department'),
             'municipality' => __('app/action.request.municipality'),

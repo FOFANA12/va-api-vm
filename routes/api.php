@@ -13,13 +13,12 @@ use App\Http\Controllers\ActionPhaseController;
 use App\Http\Controllers\Auth\ProfileController;
 use App\Http\Controllers\StrategicMapController;
 use App\Http\Controllers\ActionControlController;
+use App\Http\Controllers\ActionDomainController;
 use App\Http\Controllers\Settings\UserController;
 use App\Http\Controllers\ActionPlanningController;
 use App\Http\Controllers\DecisionStatusController;
 use App\Http\Controllers\Settings\RegionController;
 use App\Http\Controllers\IndicatorControlController;
-use App\Http\Controllers\ProgramController;
-use App\Http\Controllers\ProjectController;
 use App\Http\Controllers\ActionFundReceiptController;
 use App\Http\Controllers\IndicatorPlanningController;
 use App\Http\Controllers\MatrixPeriodController;
@@ -43,6 +42,7 @@ use App\Http\Controllers\ActionFundDisbursementController;
 use App\Http\Controllers\ActionStatusController;
 use App\Http\Controllers\ActivityStateController;
 use App\Http\Controllers\ActivityStatusController;
+use App\Http\Controllers\CapabilityDomainController;
 use App\Http\Controllers\ContractController;
 use App\Http\Controllers\IndicatorStatusController;
 use App\Http\Controllers\Report\ActionPerformanceReportController;
@@ -62,6 +62,7 @@ use App\Http\Controllers\Settings\IndicatorCategoryController;
 use App\Http\Controllers\Settings\DelegatedProjectOwnerController;
 use App\Http\Controllers\Settings\FileTypeController;
 use App\Http\Controllers\Settings\RoleController;
+use App\Http\Controllers\StrategicDomainController;
 use App\Http\Controllers\StrategicElementController;
 use App\Http\Controllers\StrategicObjectiveAlignmentController;
 use App\Http\Controllers\SupplierController;
@@ -219,15 +220,15 @@ Route::middleware('auth:sanctum')->group(function () {
     });
     Route::apiResource('structures', StructureController::class)->only(['index', 'store', 'show', 'update']);
 
-    // Programs
-    Route::prefix('programs')->controller(ProgramController::class)->group(function () {
+    // Action domains
+    Route::prefix('action-domains')->controller(ActionDomainController::class)->group(function () {
         Route::get('requirements', 'requirements');
         Route::post('destroy', 'destroy');
     });
-    Route::apiResource('programs', ProgramController::class)->only(['index', 'store', 'show', 'update']);
+    Route::apiResource('action-domains', ActionDomainController::class)->only(['index', 'store', 'show', 'update']);
 
     //Program statuses
-    Route::prefix('program-statuses/{program}')->controller(ProgramStatusController::class)->group(function () {
+    Route::prefix('program-statuses/{action_domain}')->controller(ProgramStatusController::class)->group(function () {
         Route::get('/', 'index');
         Route::get('/requirements', 'requirements');
         Route::post('/', 'store');
@@ -235,22 +236,22 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     //Program states
-    Route::prefix('program-states/{program}')->controller(ProgramStateController::class)->group(function () {
+    Route::prefix('program-states/{action_domain}')->controller(ProgramStateController::class)->group(function () {
         Route::get('/', 'index');
         Route::get('/requirements', 'requirements');
         Route::post('/', 'store');
         Route::post('/destroy', 'destroy');
     });
 
-    // Projects
-    Route::prefix('projects')->controller(ProjectController::class)->group(function () {
+    // strategic domains
+    Route::prefix('strategic-domains')->controller(StrategicDomainController::class)->group(function () {
         Route::get('requirements', 'requirements');
         Route::post('destroy', 'destroy');
     });
-    Route::apiResource('projects', ProjectController::class)->only(['index', 'store', 'show', 'update']);
+    Route::apiResource('strategic-domains', StrategicDomainController::class)->only(['index', 'store', 'show', 'update']);
 
     //Projects statuses
-    Route::prefix('project-statuses/{project}')->controller(ProjectStatusController::class)->group(function () {
+    Route::prefix('project-statuses/{strategic_domain}')->controller(ProjectStatusController::class)->group(function () {
         Route::get('/', 'index');
         Route::get('/requirements', 'requirements');
         Route::post('/', 'store');
@@ -258,22 +259,22 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     //Projects states
-    Route::prefix('project-states/{project}')->controller(ProjectStateController::class)->group(function () {
+    Route::prefix('project-states/{strategic_domain}')->controller(ProjectStateController::class)->group(function () {
         Route::get('/', 'index');
         Route::get('/requirements', 'requirements');
         Route::post('/', 'store');
         Route::post('/destroy', 'destroy');
     });
 
-    // Activities
-    Route::prefix('activities')->controller(ActivityController::class)->group(function () {
+    // capability domains
+    Route::prefix('capability-domains')->controller(CapabilityDomainController::class)->group(function () {
         Route::get('requirements', 'requirements');
         Route::post('destroy', 'destroy');
     });
-    Route::apiResource('activities', ActivityController::class)->only(['index', 'store', 'show', 'update']);
+    Route::apiResource('capability-domains', CapabilityDomainController::class)->only(['index', 'store', 'show', 'update']);
 
     //Activities statuses
-    Route::prefix('activity-statuses/{activity}')->controller(ActivityStatusController::class)->group(function () {
+    Route::prefix('activity-statuses/{capability_domain}')->controller(ActivityStatusController::class)->group(function () {
         Route::get('/', 'index');
         Route::get('/requirements', 'requirements');
         Route::post('/', 'store');
@@ -281,7 +282,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     //Activities states
-    Route::prefix('activity-states/{activity}')->controller(ActivityStateController::class)->group(function () {
+    Route::prefix('activity-states/{capability_domain}')->controller(ActivityStateController::class)->group(function () {
         Route::get('/', 'index');
         Route::get('/requirements', 'requirements');
         Route::post('/', 'store');

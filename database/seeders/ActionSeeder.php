@@ -4,19 +4,17 @@ namespace Database\Seeders;
 
 use App\Helpers\ReferenceGenerator;
 use App\Models\Action;
+use App\Models\ActionDomain;
 use App\Models\ActionPhase;
 use App\Models\Structure;
 use App\Models\ActionPlan;
-use App\Models\ContractType;
-use App\Models\ProcurementMode;
 use App\Models\ProjectOwner;
 use App\Models\DelegatedProjectOwner;
 use App\Models\Region;
 use App\Models\Department;
 use App\Models\Municipality;
-use App\Models\Program;
-use App\Models\Project;
-use App\Models\Activity;
+use App\Models\CapabilityDomain;
+use App\Models\StrategicDomain;
 use App\Models\User;
 use Carbon\Carbon;
 use Illuminate\Database\Seeder;
@@ -36,9 +34,9 @@ class ActionSeeder extends Seeder
         $region = Region::first();
         $department = Department::first();
         $municipality = Municipality::first();
-        $program = Program::first();
-        $project = Project::first();
-        $activity = Activity::first();
+        $actionDomain = ActionDomain::first();
+        $strategicDomain = StrategicDomain::first();
+        $capabilityDomain = CapabilityDomain::first();
         $user = User::first();
         $actions = [
             [
@@ -108,9 +106,9 @@ class ActionSeeder extends Seeder
                 'region_uuid' => $region?->uuid,
                 'department_uuid' => $department?->uuid,
                 'municipality_uuid' => $municipality?->uuid,
-                'program_uuid' => $program?->uuid,
-                'project_uuid' => $project?->uuid,
-                'activity_uuid' => $activity?->uuid,
+                'action_domain_uuid' => $actionDomain?->uuid,
+                'strategic_domain_uuid' => $strategicDomain?->uuid,
+                'capability_domain_uuid' => $capabilityDomain?->uuid,
                 'name' => $data['name'],
                 'priority' => $data['priority'],
                 'risk_level' => $data['risk_level'],

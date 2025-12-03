@@ -12,12 +12,12 @@ return new class extends Migration
     public function up(): void
     {
         Schema::create('project_funding_sources', function (Blueprint $table) {
-            $table->uuid('project_uuid');
+            $table->uuid('strategic_domain_uuid');
             $table->uuid('funding_source_uuid');
             $table->decimal('planned_budget', 14, 2)->default(0);
 
-            $table->primary(['project_uuid', 'funding_source_uuid']);
-            $table->foreign('project_uuid')->references('uuid')->on('projects')->onDelete('cascade');
+            $table->primary(['strategic_domain_uuid', 'funding_source_uuid']);
+            $table->foreign('strategic_domain_uuid')->references('uuid')->on('strategic_domains')->onDelete('cascade');
             $table->foreign('funding_source_uuid')->references('uuid')->on('funding_sources')->onDelete('cascade');
         });
     }

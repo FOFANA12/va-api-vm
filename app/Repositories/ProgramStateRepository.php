@@ -3,7 +3,7 @@
 namespace App\Repositories;
 
 use App\Http\Resources\ProgramStateResource;
-use App\Models\Program;
+use App\Models\ActionDomain;
 use App\Models\ProgramState as ModelsProgramState;
 use App\Support\ProgramState;
 use Illuminate\Http\Request;
@@ -13,22 +13,22 @@ use Illuminate\Support\Facades\DB;
 class ProgramStateRepository
 {
     /**
-     * List all states for a given program.
+     * List all states for a given action domain.
      */
-    public function index($programId)
+    public function index($actionDomainId)
     {
-        $query = ModelsProgramState::where('program_id', $programId)
+        $query = ModelsProgramState::where('action_domain_id', $actionDomainId)
             ->orderByDesc('created_at');
 
         return ProgramStateResource::collection($query->get());
     }
 
     /**
-     * Retrieve available program states with localized labels.
+     * Retrieve available action domain states with localized labels.
      */
-    public function requirements(Program $program)
+    public function requirements(ActionDomain $actionDomain)
     {
-        $current = $program->state;
+        $current = $actionDomain->state;
         $next = ProgramState::next($current);
 
         return [
@@ -46,22 +46,22 @@ class ProgramStateRepository
     /**
      * Create (record) a new program state.
      */
-    public function store(Request $request, Program $program)
+    public function store(Request $request, ActionDomain $actionDomain)
     {
         DB::beginTransaction();
         try {
             $stateCode = $request->input('state');
 
             $state = ModelsProgramState::create([
-                'program_uuid' => $program->uuid,
-                'program_id' => $program->id,
+                'action_domain_uuid' => $actionDomain->uuid,
+                'action_domain_id' => $actionDomain->id,
                 'state_code' => $stateCode,
                 'state_date' => now(),
                 'created_by' => Auth::user()?->uuid,
                 'updated_by' => Auth::user()?->uuid,
             ]);
 
-            $program->update([
+            $actionDomain->update([
                 'state' => $state->state_code,
                 'state_changed_at' => $state->state_date,
                 'state_changed_by' => $state->created_by,
@@ -79,7 +79,7 @@ class ProgramStateRepository
     /**
      * Delete multiple program states.
      */
-    public function destroy(Request $request, Program $program)
+    public function destroy(Request $request, ActionDomain $actionDomain)
     {
         $ids = $request->input('ids');
 
@@ -89,22 +89,22 @@ class ProgramStateRepository
 
         DB::beginTransaction();
         try {
-            $deleted = $program->states()->whereIn('id', $ids)->delete();
+            $deleted = $actionDomain->states()->whereIn('id', $ids)->delete();
 
             if ($deleted === 0) {
                 throw new \RuntimeException(__('app/common.destroy.no_items_deleted'));
             }
 
-            $lastState = $program->states()->latest('created_at')->first();
+            $lastState = $actionDomain->states()->latest('created_at')->first();
 
             if ($lastState) {
-                $program->update([
+                $actionDomain->update([
                     'state' => $lastState->state_code,
                     'state_changed_at' => $lastState->state_date,
                     'state_changed_by' => $lastState->updated_by ?? $lastState->created_by,
                 ]);
             } else {
-                $program->update([
+                $actionDomain->update([
                     'state' => null,
                     'state_changed_at' => null,
                     'state_changed_by' => null,

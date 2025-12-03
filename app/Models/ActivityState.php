@@ -13,8 +13,8 @@ class ActivityState extends Model
 {
     use Author, AutoFillable, GeneratesUuid, HasStaticTableName;
 
-    public function activity(): BelongsTo
+    public function capabilityDomain(): BelongsTo
     {
-        return $this->belongsTo(Activity::class, 'activity_uuid', 'uuid');
+        return $this->belongsTo(CapabilityDomain::class, 'capability_domain', 'uuid');
     }
 }

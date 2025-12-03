@@ -12,7 +12,7 @@ return [
     ],
 
     'request' => [
-        'program' => 'programme',
+        'action_domain' => 'domaine d\'action',
         'name' => 'nom',
         'description' => 'description et objectifs',
         'prerequisites' => 'conditions préalables',

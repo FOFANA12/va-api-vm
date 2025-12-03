@@ -102,19 +102,19 @@ class Action extends Model
         return $this->belongsTo(DelegatedProjectOwner::class, 'delegated_project_owner_uuid', 'uuid');
     }
 
-    public function program(): BelongsTo
+    public function actionDomain(): BelongsTo
     {
-        return $this->belongsTo(Program::class, 'program_uuid', 'uuid');
+        return $this->belongsTo(ActionDomain::class, 'action_domain_uuid', 'uuid');
     }
 
-    public function project(): BelongsTo
+    public function strategicDomain(): BelongsTo
     {
-        return $this->belongsTo(Project::class, 'project_uuid', 'uuid');
+        return $this->belongsTo(StrategicDomain::class, 'strategic_domain_uuid', 'uuid');
     }
 
-    public function activity(): BelongsTo
+    public function capabilityDomain(): BelongsTo
     {
-        return $this->belongsTo(Activity::class, 'activity_uuid', 'uuid');
+        return $this->belongsTo(CapabilityDomain::class, 'capability_domain_uuid', 'uuid');
     }
 
     public function region(): BelongsTo

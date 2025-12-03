@@ -2,14 +2,14 @@
 
 namespace App\Http\Requests;
 
+use App\Models\ActionDomain;
 use App\Models\FundingSource;
-use App\Models\Program;
 use App\Models\User;
 use App\Support\Currency;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
 
-class ProgramRequest extends FormRequest
+class ActionDomainRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -44,13 +44,13 @@ class ProgramRequest extends FormRequest
         ];
 
         if ($this->isMethod('put')) {
-            $program = $this->route('program');
+            $actionDomain = $this->route('action_domain');
             $rules += [
-                'name' => 'bail|required|string|max:100|unique:' . Program::tableName() . ',name,' . $program->id,
+                'name' => 'bail|required|string|max:100|unique:' . ActionDomain::tableName() . ',name,' . $actionDomain->id,
             ];
         } else {
             $rules += [
-                'name' => 'bail|required|string|max:100|unique:' . Program::tableName() . ',name'
+                'name' => 'bail|required|string|max:100|unique:' . ActionDomain::tableName() . ',name'
             ];
         }
         return $rules;
@@ -62,23 +62,23 @@ class ProgramRequest extends FormRequest
     public function attributes(): array
     {
         $attributes = [
-            'name' => __('app/program.request.name'),
-            'start_date' => __('app/program.request.start_date'),
-            'end_date' => __('app/program.request.end_date'),
-            'currency' => __('app/program.request.currency'),
-            'responsible' => __('app/program.request.responsible'),
-            'description' => __('app/program.request.description'),
-            'prerequisites' => __('app/program.request.prerequisites'),
-            'impacts' => __('app/program.request.impacts'),
-            'risks' => __('app/program.request.risks'),
-            'funding_sources' => __('app/program.request.funding_sources.title'),
+            'name' => __('app/action_domain.request.name'),
+            'start_date' => __('app/action_domain.request.start_date'),
+            'end_date' => __('app/action_domain.request.end_date'),
+            'currency' => __('app/action_domain.request.currency'),
+            'responsible' => __('app/action_domain.request.responsible'),
+            'description' => __('app/action_domain.request.description'),
+            'prerequisites' => __('app/action_domain.request.prerequisites'),
+            'impacts' => __('app/action_domain.request.impacts'),
+            'risks' => __('app/action_domain.request.risks'),
+            'funding_sources' => __('app/action_domain.request.funding_sources.title'),
         ];
 
         if (is_array($this->funding_sources)) {
             for ($i = 0; $i < count($this->funding_sources); ++$i) {
                 $attributes += [
-                    'funding_sources.' . $i . '.uuid' => __('app/program.request.funding_sources.uuid') . ' (' . __('app/common.request.line_number', ['line' => ($i + 1)]) . ')',
-                    'funding_sources.' . $i . '.planned_amount' => __('app/program.request.funding_sources.planned_amount') . ' (' . __('app/common.request.line_number', ['line' => ($i + 1)]) . ')',
+                    'funding_sources.' . $i . '.uuid' => __('app/action_domain.request.funding_sources.uuid') . ' (' . __('app/common.request.line_number', ['line' => ($i + 1)]) . ')',
+                    'funding_sources.' . $i . '.planned_amount' => __('app/action_domain.request.funding_sources.planned_amount') . ' (' . __('app/common.request.line_number', ['line' => ($i + 1)]) . ')',
                 ];
             }
         }
