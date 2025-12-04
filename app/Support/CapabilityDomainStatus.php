@@ -2,7 +2,7 @@
 
 namespace App\Support;
 
-class ActivityStatus
+class CapabilityDomainStatus
 {
     /**
      * List of available statuses with their localized names and display colors.
@@ -53,7 +53,7 @@ class ActivityStatus
         'preparation' => ['engaged', 'stopped'],
         'engaged' => ['closed', 'stopped'],
         'stopped' => ['engaged', 'preparation'],
-        'closed' => ['engaged', 'preparation'],   
+        'closed' => ['engaged', 'preparation'],
     ];
 
     /**

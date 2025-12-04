@@ -2,38 +2,38 @@
 
 namespace App\Repositories;
 
-use App\Http\Resources\ActivityStateResource;
-use App\Models\ActivityState as ModelsActivityState;
+use App\Http\Resources\CapabilityDomainStateResource;
+use App\Models\CapabilityDomainState as ModelsCapabilityDomainState;
 use App\Models\CapabilityDomain;
-use App\Support\ActivityState;
+use App\Support\CapabilityDomainState;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
-class ActivityStateRepository
+class CapabilityDomainStateRepository
 {
     /**
-     * List all states for a given activity.
+     * List all states for a given capability domain.
      */
     public function index($capabilityDomainId)
     {
-        $query = ModelsActivityState::where('capability_domain_id', $capabilityDomainId)
+        $query = ModelsCapabilityDomainState::where('capability_domain_id', $capabilityDomainId)
             ->orderByDesc('created_at');
 
-        return ActivityStateResource::collection($query->get());
+        return CapabilityDomainStateResource::collection($query->get());
     }
 
     /**
-     * Retrieve available activity states with localized labels.
+     * Retrieve available capability domain states with localized labels.
      */
     public function requirements(CapabilityDomain $capabilityDomain)
     {
         $current = $capabilityDomain->state;
-        $next = ActivityState::next($current);
+        $next = CapabilityDomainState::next($current);
 
         return [
             'states' => collect($next)->map(function ($code) {
-                $state = ActivityState::get($code, app()->getLocale());
+                $state = CapabilityDomainState::get($code, app()->getLocale());
                 return [
                     'code'  => $state->code,
                     'name'  => $state->label,
@@ -44,7 +44,7 @@ class ActivityStateRepository
     }
 
     /**
-     * Create (record) a new activity state.
+     * Create (record) a new capability domain state.
      */
     public function store(Request $request, CapabilityDomain $capabilityDomain)
     {
@@ -52,7 +52,7 @@ class ActivityStateRepository
         try {
             $stateCode = $request->input('state');
 
-            $state = ModelsActivityState::create([
+            $state = ModelsCapabilityDomainState::create([
                 'capability_domain_uuid' => $capabilityDomain->uuid,
                 'capability_domain_id' => $capabilityDomain->id,
                 'state_code' => $stateCode,
@@ -69,7 +69,7 @@ class ActivityStateRepository
 
             DB::commit();
 
-            return new ActivityStateResource($state);
+            return new CapabilityDomainStateResource($state);
         } catch (\Throwable $e) {
             DB::rollBack();
             throw $e;
@@ -77,7 +77,7 @@ class ActivityStateRepository
     }
 
     /**
-     * Delete multiple activity states.
+     * Delete multiple capability domain states.
      */
     public function destroy(Request $request, CapabilityDomain $capabilityDomain)
     {
@@ -113,7 +113,7 @@ class ActivityStateRepository
 
             DB::commit();
 
-            return new ActivityStateResource($lastState);
+            return new CapabilityDomainStateResource($lastState);
         } catch (\Throwable $e) {
             DB::rollBack();
             throw $e;

@@ -44,6 +44,8 @@ use App\Http\Controllers\ActionStatusController;
 use App\Http\Controllers\ActivityStateController;
 use App\Http\Controllers\ActivityStatusController;
 use App\Http\Controllers\CapabilityDomainController;
+use App\Http\Controllers\CapabilityDomainStateController;
+use App\Http\Controllers\CapabilityDomainStatusController;
 use App\Http\Controllers\ContractController;
 use App\Http\Controllers\IndicatorStatusController;
 use App\Http\Controllers\Report\ActionPerformanceReportController;
@@ -69,7 +71,7 @@ use App\Http\Controllers\StrategicObjectiveAlignmentController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\SupplierEvaluationController;
 use App\Http\Controllers\TaskController;
-
+use App\Repositories\CapabilityDomainStateRepository;
 
 // ==========================
 // AUTHENTICATION ROUTES
@@ -274,16 +276,16 @@ Route::middleware('auth:sanctum')->group(function () {
     });
     Route::apiResource('capability-domains', CapabilityDomainController::class)->only(['index', 'store', 'show', 'update']);
 
-    //Activities statuses
-    Route::prefix('activity-statuses/{capability_domain}')->controller(ActivityStatusController::class)->group(function () {
+    //Capability domains statuses
+    Route::prefix('capability-domain-statuses/{capability_domain}')->controller(CapabilityDomainStatusController::class)->group(function () {
         Route::get('/', 'index');
         Route::get('/requirements', 'requirements');
         Route::post('/', 'store');
         Route::post('/destroy', 'destroy');
     });
 
-    //Activities states
-    Route::prefix('activity-states/{capability_domain}')->controller(ActivityStateController::class)->group(function () {
+    //Capability domains states
+    Route::prefix('capability-domain-states/{capability_domain}')->controller(CapabilityDomainStateController::class)->group(function () {
         Route::get('/', 'index');
         Route::get('/requirements', 'requirements');
         Route::post('/', 'store');

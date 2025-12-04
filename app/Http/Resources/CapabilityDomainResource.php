@@ -3,8 +3,8 @@
 namespace App\Http\Resources;
 
 use App\Helpers\DateTimeFormatter;
-use App\Support\ActivityState;
-use App\Support\ActivityStatus;
+use App\Support\CapabilityDomainState;
+use App\Support\CapabilityDomainStatus;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -43,8 +43,8 @@ class CapabilityDomainResource extends JsonResource
             'budget' => $this->budget,
             'currency' => $this->currency,
             'responsible' => $this->responsible,
-            'status' => $this->status ? ActivityStatus::get($this->status, $currentLang) : null,
-            'state' => $this->state ? ActivityState::get($this->state, $currentLang) : null,
+            'status' => $this->status ? CapabilityDomainStatus::get($this->status, $currentLang) : null,
+            'state' => $this->state ? CapabilityDomainState::get($this->state, $currentLang) : null,
         ];
     }
 
@@ -64,11 +64,11 @@ class CapabilityDomainResource extends JsonResource
             'currency' => $this->currency,
             'responsible' => $this->responsible_uuid,
 
-            'status' => $this->status ? ActivityStatus::get($this->status, $currentLang) : null,
+            'status' => $this->status ? CapabilityDomainStatus::get($this->status, $currentLang) : null,
             'status_changed_at' => $this->status_changed_at ? DateTimeFormatter::formatDatetime($this->status_changed_at) : null,
             'status_changed_by' => $this->statusChangedBy?->name,
 
-            'state' => $this->state ? ActivityState::get($this->state, $currentLang) : null,
+            'state' => $this->state ? CapabilityDomainState::get($this->state, $currentLang) : null,
             'state_changed_at' => $this->state_changed_at ? DateTimeFormatter::formatDatetime($this->state_changed_at) : null,
             'state_changed_by' => $this->stateChangedBy?->name,
 
@@ -111,11 +111,11 @@ class CapabilityDomainResource extends JsonResource
             'strategic_domain' => $this->strategicDomain ? $this->strategicDomain->name : null,
             'responsible' => $this->responsible ? $this->responsible->name : null,
 
-            'status' => $this->status ? ActivityStatus::get($this->status, $currentLang) : null,
+            'status' => $this->status ? CapabilityDomainStatus::get($this->status, $currentLang) : null,
             'status_changed_at' => $this->status_changed_at ? DateTimeFormatter::formatDatetime($this->status_changed_at) : null,
             'status_changed_by' => $this->statusChangedBy?->name,
 
-            'state' => $this->state ? ActivityState::get($this->state, $currentLang) : null,
+            'state' => $this->state ? CapabilityDomainState::get($this->state, $currentLang) : null,
             'state_changed_at' => $this->state_changed_at ? DateTimeFormatter::formatDatetime($this->state_changed_at) : null,
             'state_changed_by' => $this->stateChangedBy?->name,
 

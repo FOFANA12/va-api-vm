@@ -5,10 +5,10 @@ namespace App\Repositories;
 use App\Helpers\ReferenceGenerator;
 use App\Http\Requests\CapabilityDomainRequest;
 use App\Http\Resources\CapabilityDomainResource;
-use App\Models\ActivityState;
-use App\Models\ActivityStatus;
 use App\Models\Beneficiary;
 use App\Models\CapabilityDomain;
+use App\Models\CapabilityDomainState;
+use App\Models\CapabilityDomainStatus;
 use App\Support\Currency;
 use App\Models\FundingSource;
 use App\Models\StrategicDomain;
@@ -52,7 +52,7 @@ class CapabilityDomainRepository
             'strategic_domains.name as strategicDomain'
         )
             ->leftJoin('users as responsibles', 'capability_domains.responsible_uuid', '=', 'responsibles.uuid')
-            ->join('strategic_domains', 'capability_domains.strategic_domain_uuid', '=', 'strategic_domains.uuid');
+            ->leftJoin('strategic_domains', 'capability_domains.strategic_domain_uuid', '=', 'strategic_domains.uuid');
 
         if (!empty($searchTerm)) {
             $query->where(function ($q) use ($searchTerm, $searchable) {
@@ -179,7 +179,7 @@ class CapabilityDomainRepository
             $capabilityDomain->refresh();
 
             //Save initial status
-            $status = ActivityStatus::create([
+            $status = CapabilityDomainStatus::create([
                 'capability_domain_uuid' => $capabilityDomain->uuid,
                 'capability_domain_id' => $capabilityDomain->id,
                 'status_code' => $capabilityDomain->status,
@@ -189,7 +189,7 @@ class CapabilityDomainRepository
             ]);
 
             //Save initial state
-            $state = ActivityState::create([
+            $state = CapabilityDomainState::create([
                 'capability_domain_uuid' => $capabilityDomain->uuid,
                 'capability_domain_id' => $capabilityDomain->id,
                 'state_code' => $capabilityDomain->state,

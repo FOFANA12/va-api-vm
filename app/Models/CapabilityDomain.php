@@ -86,12 +86,12 @@ class CapabilityDomain extends Model
 
     public function statuses(): HasMany
     {
-        return $this->hasMany(ActivityStatus::class, 'capability_domain_uuid', 'uuid');
+        return $this->hasMany(CapabilityDomainStatus::class, 'capability_domain_uuid', 'uuid');
     }
 
     public function states(): HasMany
     {
-        return $this->hasMany(ActivityState::class, 'capability_domain_uuid', 'uuid');
+        return $this->hasMany(CapabilityDomainState::class, 'capability_domain_uuid', 'uuid');
     }
 
     public function statusChangedBy(): BelongsTo

@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('activity_states', function (Blueprint $table) {
+        Schema::create('capability_domain_states', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid')->unique();
             $table->uuid('capability_domain_uuid')->index();
@@ -33,6 +33,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('activity_states');
+        Schema::dropIfExists('capability_domain_states');
     }
 };

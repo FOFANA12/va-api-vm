@@ -5,14 +5,14 @@ declare(strict_types=1);
 return [
 
     'controller' => [
-        'message_success_created' => 'L\'activité a été créée avec succès.',
-        'message_success_updated' => 'L\'activité a été modifiée avec succès.',
-        'message_success_status_updated' => 'Le statut de l\'activité a été mis à jour avec succès.',
-        'message_success_state_updated' => 'L\'état de l\'activité a été mis à jour avec succès.',
+        'message_success_created' => 'Le domaine capacitaire a été créé avec succès.',
+        'message_success_updated' => 'Le domaine capacitaire a été modifié avec succès.',
+        'message_success_status_updated' => 'Le statut du domaine capacitaire a été mis à jour avec succès.',
+        'message_success_state_updated' => 'L\'état du domaine capacitaire a été mis à jour avec succès.',
     ],
 
     'request' => [
-        'project' => 'projet',
+        'strategic_domain' => 'domaine stratégique',
         'name' => 'nom',
         'description' => 'description et objectifs',
         'prerequisites' => 'conditions préalables',

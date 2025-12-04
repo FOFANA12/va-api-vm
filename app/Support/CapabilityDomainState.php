@@ -2,7 +2,7 @@
 
 namespace App\Support;
 
-class ActivityState
+class CapabilityDomainState
 {
     /**
      * List of possible states with localized names and display colors.

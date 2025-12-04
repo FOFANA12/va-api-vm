@@ -2,39 +2,39 @@
 
 namespace App\Repositories;
 
-use App\Http\Resources\ActivityStatusResource;
-use App\Models\ActivityStatus as ModelsActivityStatus;
+use App\Http\Resources\CapabilityDomainStatusResource;
+use App\Models\CapabilityDomainStatus as ModelsCapabilityDomainStatus;
 use App\Models\CapabilityDomain;
-use App\Support\ActivityStatus;
+use App\Support\CapabilityDomainStatus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
-class ActivityStatusRepository
+class CapabilityDomainStatusRepository
 {
     /**
-     *  List all statuses for a given activity.
+     *  List all statuses for a given capability domain.
      */
     public function index($capabilityDomainId)
     {
-        $query = ModelsActivityStatus::where('capability_domain_id', $capabilityDomainId)
+        $query = ModelsCapabilityDomainStatus::where('capability_domain_id', $capabilityDomainId)
             ->orderByDesc('created_at');
 
-        return ActivityStatusResource::collection($query->get());
+        return CapabilityDomainStatusResource::collection($query->get());
     }
 
     /**
-     * Retrieve available activity statuses with localized labels.
+     * Retrieve available capability domain statuses with localized labels.
      */
     public function requirements(CapabilityDomain $capabilityDomain)
     {
         $current = $capabilityDomain->status;
-        $next = ActivityStatus::next($current);
+        $next = CapabilityDomainStatus::next($current);
 
         return [
             'statuses' => collect($next)->map(function ($code) {
-                $status = ActivityStatus::get($code, app()->getLocale());
+                $status = CapabilityDomainStatus::get($code, app()->getLocale());
                 return [
                     'code'  => $status->code,
                     'name'  => $status->label,
@@ -45,7 +45,7 @@ class ActivityStatusRepository
     }
 
     /**
-     * Create (record) a new project status.
+     * Create (record) a new capability domain status.
      */
     public function store(Request $request, CapabilityDomain $capabilityDomain)
     {
@@ -53,7 +53,7 @@ class ActivityStatusRepository
         try {
             $statusCode = $request->input('status');
 
-            $status = ModelsActivityStatus::create([
+            $status = ModelsCapabilityDomainStatus::create([
                 'capability_domain_uuid' => $capabilityDomain->uuid,
                 'capability_domain_id' => $capabilityDomain->id,
                 'status_code' => $statusCode,
@@ -70,7 +70,7 @@ class ActivityStatusRepository
 
             DB::commit();
 
-            return new ActivityStatusResource($status);
+            return new CapabilityDomainStatusResource($status);
         } catch (\Throwable $e) {
             DB::rollBack();
             throw $e;
@@ -79,7 +79,7 @@ class ActivityStatusRepository
 
 
     /**
-     * Delete multiple activity statuses.
+     * Delete multiple capability domain statuses.
      */
     public function destroy(Request $request, CapabilityDomain $capabilityDomain)
     {
@@ -115,7 +115,7 @@ class ActivityStatusRepository
 
             DB::commit();
 
-            return new ActivityStatusResource($lastStatus);
+            return new CapabilityDomainStatusResource($lastStatus);
         } catch (\Throwable $e) {
             DB::rollBack();
             throw $e;

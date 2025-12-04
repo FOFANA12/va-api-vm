@@ -4,18 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\CapabilityDomain;
-use App\Repositories\ActivityStateRepository;
-use App\Support\ActivityState;
+use App\Repositories\CapabilityDomainStateRepository;
+use App\Support\CapabilityDomainState;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
-class ActivityStateController extends Controller
+class CapabilityDomainStateController extends Controller
 {
     private $messageSuccessUpdated;
     private $messageSuccessDeleted;
     private $repository;
 
-    public function __construct(ActivityStateRepository $repository)
+    public function __construct(CapabilityDomainStateRepository $repository)
     {
         $this->messageSuccessUpdated = __('app/capability_domain.controller.message_success_state_updated');
         $this->messageSuccessDeleted = __('app/common.controller.message_success_deleted');
@@ -23,7 +23,7 @@ class ActivityStateController extends Controller
     }
 
     /**
-     * Display a listing of states for a given activity.
+     * Display a listing of states for a given capability domain.
      */
     public function index($capabilityDomainId)
     {
@@ -43,7 +43,7 @@ class ActivityStateController extends Controller
      */
     public function store(Request $request, CapabilityDomain $capabilityDomain)
     {
-        $validStates = ActivityState::codes();
+        $validStates = CapabilityDomainState::codes();
 
         $state = $request->input('state');
 
