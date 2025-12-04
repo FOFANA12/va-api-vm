@@ -13,6 +13,7 @@ use App\Models\ProjectOwner;
 use App\Models\Region;
 use App\Models\StrategicDomain;
 use App\Models\Structure;
+use App\Models\User;
 use App\Support\Currency;
 use App\Support\GenerateDocumentTypes;
 use App\Support\PriorityLevel;
@@ -62,6 +63,9 @@ class ActionRequest extends FormRequest
             'impacts' => 'bail|nullable|string|max:1000',
             'risks' => 'bail|nullable|string|max:1000',
 
+            'responsible_structure' => 'bail|nullable|exists:' . Structure::tableName() . ',uuid',
+            'responsible' => 'bail|nullable|exists:' . User::tableName() . ',uuid',
+
             'funding_sources' => 'bail|nullable|array',
             'funding_sources.*.uuid' => 'bail|required|exists:' . FundingSource::tableName() . ',uuid',
             'funding_sources.*.planned_amount' => 'nullable|numeric|min:0',
@@ -95,6 +99,9 @@ class ActionRequest extends FormRequest
             'risks' => __('app/action.request.risks'),
 
             'funding_sources' => __('app/action.request.funding_sources.title'),
+
+            'responsible_structure' => __('app/action.request.responsible_structure'),
+            'responsible' => __('app/action.request.responsible'),
         ];
 
         if (is_array($this->funding_sources)) {

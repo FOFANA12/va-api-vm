@@ -15,8 +15,6 @@ return [
 
         'structure' => 'structure concernée',
         'action_plan' => 'plan d\'action',
-        'contract_type' => 'type de marché',
-        'procurement_mode' => 'mode de passation',
         'project_owner' => 'maître d\'ouvrage',
         'delegated_project_owner' => 'maître d\'ouvrage délégué',
         'currency' => 'devise',
@@ -27,6 +25,9 @@ return [
         'region' => 'région',
         'department' => 'département',
         'municipality' => 'commune',
+
+        'responsible_structure' => 'structure responsable',
+        'responsible' => 'responsable',
 
         'description' => 'description',
         'prerequisites' => 'conditions préalables',

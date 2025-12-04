@@ -25,6 +25,7 @@ use App\Models\Region;
 use App\Models\Stakeholder;
 use App\Models\StrategicDomain;
 use App\Models\Structure;
+use App\Models\User;
 use App\Support\GenerateDocumentTypes;
 use App\Support\PriorityLevel;
 use App\Support\RiskLevel;
@@ -117,6 +118,22 @@ class ActionRepository
             ->get();
 
         $directionUuids = $structures->pluck('uuid')->toArray();
+
+        $users = User::select('uuid', 'name', 'email')
+            ->where('status', true)
+            ->whereHas('employee')->with([
+                'employee:id,user_uuid,structure_uuid',
+            ])
+            ->orderBy('id', 'desc')
+            ->get()->map(function ($user) {
+                return [
+                    'uuid' => $user->uuid,
+                    'name' => $user->name,
+                    'email' => $user->email,
+                    'structure_uuid' => $user->employee?->structure_uuid,
+                ];
+            });
+
 
         $actionPlans = ActionPlan::query()
             ->where('status', true)
@@ -235,6 +252,7 @@ class ActionRepository
             'risk_levels' => $riskLevels,
             'priority_levels' => $priorityLevels,
             'generate_document_types' => $generateDocumentTypes,
+            'users' => $users,
 
             'beneficiaries' => $beneficiaries,
             'stakeholders' => $stakeholders,
@@ -253,6 +271,9 @@ class ActionRepository
         try {
             $request->merge([
                 'structure_uuid' => $request->input('structure'),
+                'responsible_structure_uuid' => $request->input('responsible_structure'),
+                'responsible_uuid' => $request->input('responsible'),
+
                 'action_plan_uuid' => $request->input('action_plan'),
                 'project_owner_uuid' => $request->input('project_owner'),
                 'delegated_project_owner_uuid' => $request->input('delegated_project_owner'),
@@ -291,6 +312,8 @@ class ActionRepository
                 'action_domain_uuid',
                 'strategic_domain_uuid',
                 'capability_domain_uuid',
+                'responsible_structure_uuid',
+                'responsible_uuid',
                 'created_by',
                 'updated_by'
             ]));
@@ -382,6 +405,8 @@ class ActionRepository
 
             $action->load([
                 'structure',
+                'responsibleStructure',
+                'responsible',
                 'actionPlan',
                 'projectOwner',
                 'delegatedProjectOwner',
@@ -413,6 +438,8 @@ class ActionRepository
     {
         return ['action' => new ActionResource($action->load([
             'structure',
+            'responsibleStructure',
+            'responsible',
             'actionPlan',
             'projectOwner',
             'delegatedProjectOwner',
@@ -438,6 +465,9 @@ class ActionRepository
         try {
             $request->merge([
                 'structure_uuid' => $request->input('structure'),
+                'responsible_structure_uuid' => $request->input('responsible_structure'),
+                'responsible_uuid' => $request->input('responsible'),
+
                 'action_plan_uuid' => $request->input('action_plan'),
                 'project_owner_uuid' => $request->input('project_owner'),
                 'delegated_project_owner_uuid' => $request->input('delegated_project_owner'),
@@ -473,6 +503,8 @@ class ActionRepository
                 'action_domain_uuid',
                 'strategic_domain_uuid',
                 'capability_domain_uuid',
+                'responsible_structure_uuid',
+                'responsible_uuid',
                 'updated_by'
             ]));
 
@@ -519,6 +551,8 @@ class ActionRepository
 
             $action->load([
                 'structure',
+                'responsibleStructure',
+                'responsible',
                 'actionPlan',
                 'projectOwner',
                 'delegatedProjectOwner',

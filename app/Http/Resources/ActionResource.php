@@ -87,6 +87,10 @@ class ActionResource extends JsonResource
             'prerequisites' => $this->prerequisites,
             'impacts' => $this->impacts,
             'risks' => $this->risks,
+
+            'responsible_structure' => $this->responsible_structure_uuid,
+            'responsible' => $this->responsible_uuid,
+
             'beneficiaries' => $this->beneficiaries->map(function ($item) {
                 return [
                     'uuid' => $item->uuid,
@@ -146,6 +150,8 @@ class ActionResource extends JsonResource
             'prerequisites' => $this->prerequisites,
             'impacts' => $this->impacts,
             'risks' => $this->risks,
+            'responsible_structure' => $this->responsibleStructure?->name,
+            'responsible' => $this->responsible?->name,
             'beneficiaries' => $this->beneficiaries->map(fn($item) => ['name' => $item->name]),
             'stakeholders' => $this->stakeholders->map(fn($item) => ['name' => $item->name]),
             'funding_sources' => $this->fundingSources->map(fn($item) => [

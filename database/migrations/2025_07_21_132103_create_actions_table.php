@@ -56,6 +56,9 @@ return new class extends Migration
             $table->boolean('failed')->default(false); // vain
             $table->boolean('alert')->default(false);
 
+            $table->uuid('responsible_structure_uuid')->nullable();
+            $table->uuid('responsible_uuid')->nullable();
+
             $table->uuid('updated_by')->nullable();
             $table->uuid('created_by')->nullable();
             $table->timestamps();
@@ -73,6 +76,9 @@ return new class extends Migration
             $table->foreign('created_by')->references('uuid')->on('users')->onDelete('set null');
             $table->foreign('updated_by')->references('uuid')->on('users')->onDelete('set null');
             $table->foreign('status_changed_by')->references('uuid')->on('users')->onDelete('set null');
+
+            $table->foreign('responsible_structure_uuid')->references('uuid')->on('structures')->onDelete('restrict');
+            $table->foreign('responsible_uuid')->references('uuid')->on('users')->onDelete('restrict');
         });
     }
 

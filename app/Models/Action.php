@@ -77,19 +77,19 @@ class Action extends Model
         return $this->belongsTo(Structure::class, 'structure_uuid', 'uuid');
     }
 
+    public function responsibleStructure(): BelongsTo
+    {
+        return $this->belongsTo(Structure::class, 'responsible_structure_uuid', 'uuid');
+    }
+
+    public function responsible(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'responsible_uuid', 'uuid');
+    }
+
     public function actionPlan(): BelongsTo
     {
         return $this->belongsTo(ActionPlan::class, 'action_plan_uuid', 'uuid');
-    }
-
-    public function contractType(): BelongsTo
-    {
-        return $this->belongsTo(ContractType::class, 'contract_type_uuid', 'uuid');
-    }
-
-    public function procurementMode(): BelongsTo
-    {
-        return $this->belongsTo(ProcurementMode::class, 'procurement_mode_uuid', 'uuid');
     }
 
     public function projectOwner(): BelongsTo
