@@ -24,17 +24,11 @@ class RoleSeeder extends Seeder
 
             // Priority matrix
             ['name' => 'ACCESS_PRIORITY_MATRIX', 'category' => 'Matrice de priorité', 'description' => 'Accès au module'],
-            ['name' => 'CREATE_PRIORITY_MATRIX', 'category' => 'Matrice de priorité', 'description' => 'Créer une matrice'],
-            ['name' => 'READ_PRIORITY_MATRIX', 'category' => 'Matrice de priorité', 'description' => 'Voir les matrices'],
-            ['name' => 'UPDATE_PRIORITY_MATRIX', 'category' => 'Matrice de priorité', 'description' => 'Modifier une matrice'],
-            ['name' => 'DELETE_PRIORITY_MATRIX', 'category' => 'Matrice de priorité', 'description' => 'Supprimer une matrice'],
+            ['name' => 'MANAGE_PRIORITY_MATRIX', 'category' => 'Matrice de priorité', 'description' => 'Gérer une matrice'],
 
             // Stakeholders
             ['name' => 'ACCESS_STAKEHOLDERS', 'category' => 'Partie prenante', 'description' => 'Accès au module'],
-            ['name' => 'CREATE_STAKEHOLDER', 'category' => 'Partie prenante', 'description' => 'Créer une partie prenante'],
-            ['name' => 'READ_STAKEHOLDERS', 'category' => 'Partie prenante', 'description' => 'Voir les parties prenante'],
-            ['name' => 'UPDATE_STAKEHOLDER', 'category' => 'Partie prenante', 'description' => 'Modifier une partie prenante'],
-            ['name' => 'DELETE_STAKEHOLDER', 'category' => 'Partie prenante', 'description' => 'Supprimer une partie prenante'],
+            ['name' => 'MANAGE_STAKEHOLDERS', 'category' => 'Partie prenante', 'description' => 'Gérer les parties prenantes'],
 
             // Strategic levers
             ['name' => 'ACCESS_STRATEGIC_LEVERS', 'category' => 'Levier stratégique', 'description' => 'Accès au module'],
@@ -57,12 +51,47 @@ class RoleSeeder extends Seeder
             ['name' => 'UPDATE_STRATEGIC_OBJECTIVE', 'category' => 'Objectif stratégique', 'description' => 'Modifier un objectif'],
             ['name' => 'DELETE_STRATEGIC_OBJECTIVE', 'category' => 'Objectif stratégique', 'description' => 'Supprimer un objectif'],
 
-            // Indicators
+            // Strategic objective — Alignment
+            ['name' => 'OBJ_ACCESS_ALIGNMENT', 'category' => 'Objectif — Alignement', 'description' => 'Accès à l\'onglet'],
+            ['name' => 'OBJ_MANAGE_ALIGNMENT', 'category' => 'Objectif — Alignement', 'description' => 'Gérer l\'alignement'],
+
+            // Strategic objective — Decision
+            ['name' => 'OBJ_ACCESS_DECISIONS', 'category' => 'Objectif — Décision', 'description' => 'Accès au module'],
+            ['name' => 'OBJ_MANAGE_DECISIONS', 'category' => 'Objectif — Décision', 'description' => 'Gérer les décisions'],
+
+            // Strategic objective — File
+            ['name' => 'OBJ_ACCESS_FILES', 'category' => 'Objectif — Fichier', 'description' => 'Accès aux fichiers'],
+            ['name' => 'OBJ_MANAGE_FILES', 'category' => 'Objectif — Fichier', 'description' => 'Gérer les fichiers'],
+
+            // Indicator
             ['name' => 'ACCESS_INDICATORS', 'category' => 'Indicateur', 'description' => 'Accès au module'],
             ['name' => 'CREATE_INDICATOR', 'category' => 'Indicateur', 'description' => 'Créer un indicateur'],
             ['name' => 'READ_INDICATORS', 'category' => 'Indicateur', 'description' => 'Voir les indicateurs'],
             ['name' => 'UPDATE_INDICATOR', 'category' => 'Indicateur', 'description' => 'Modifier un indicateur'],
             ['name' => 'DELETE_INDICATOR', 'category' => 'Indicateur', 'description' => 'Supprimer un indicateur'],
+
+            // Indicator — Status
+            ['name' => 'IND_ACCESS_STATUS', 'category' => 'Indicateur statut', 'description' => 'Accès au statut'],
+            ['name' => 'IND_MANAGE_STATUS', 'category' => 'Indicateur — Statut', 'description' => 'Gérer le statut'],
+
+            // Indicator — Planning
+            ['name' => 'IND_ACCESS_PLANNING', 'category' => 'Indicateur planification', 'description' => 'Accès à la planification'],
+            ['name' => 'IND_MANAGE_PLANNING', 'category' => 'Indicateur — Planification', 'description' => 'Gérer la planification'],
+
+            // Indicator — Control
+            ['name' => 'IND_ACCESS_CONTROL', 'category' => 'Indicateur contrôle', 'description' => 'Accès au contrôle'],
+            ['name' => 'IND_MANAGE_CONTROL', 'category' => 'Indicateur — Contrôle', 'description' => 'Gérer les contrôles'],
+
+            // Indicator — File
+            ['name' => 'IND_ACCESS_FILES', 'category' => 'Indicateur fichier', 'description' => 'Accès aux fichiers'],
+            ['name' => 'IND_MANAGE_FILES', 'category' => 'Indicateur — Fichier', 'description' => 'Gérer les fichiers'],
+
+            // Indicator — Decision
+            ['name' => 'IND_ACCESS_DECISIONS', 'category' => 'Indicateur décision', 'description' => 'Accès aux décisions'],
+            ['name' => 'IND_MANAGE_DECISIONS', 'category' => 'Indicateur — Décision', 'description' => 'Gérer les décisions'],
+
+            // Indicator — Reporting : performance
+            ['name' => 'IND_ACCESS_REPORTING', 'category' => 'Indicateur reporting', 'description' => 'Accès au reporting'],
 
             // Action plans
             ['name' => 'ACCESS_ACTION_PLANS', 'category' => 'Plan d\'action', 'description' => 'Accès au module'],
@@ -78,6 +107,36 @@ class RoleSeeder extends Seeder
             ['name' => 'UPDATE_ACTION', 'category' => 'Action', 'description' => 'Modifier une action'],
             ['name' => 'DELETE_ACTION', 'category' => 'Action', 'description' => 'Supprimer une action'],
 
+            // Action - Status
+            ['name' => 'ACT_ACCESS_STATUS', 'category' => 'Action statut', 'description' => 'Accès au statut'],
+            ['name' => 'ACT_MANAGE_STATUS', 'category' => 'Action — Statut', 'description' => 'Gérer le statut'],
+
+            // Action - Planning
+            ['name' => 'ACT_ACCESS_PLANNING', 'category' => 'Action planification', 'description' => 'Accès à la planification'],
+            ['name' => 'ACT_MANAGE_PLANNING', 'category' => 'Action — Planification', 'description' => 'Gérer la planification'],
+
+            // Action - Control
+            ['name' => 'ACT_ACCESS_CONTROL', 'category' => 'Action contrôle', 'description' => 'Accès au contrôle'],
+            ['name' => 'ACT_MANAGE_CONTROL', 'category' => 'Action — Contrôle', 'description' => 'Gérer les contrôles'],
+
+            // Action - Alignment
+            ['name' => 'ACT_ACCESS_ALIGNMENT', 'category' => 'Action alignement', 'description' => 'Accès à l\'alignement'],
+            ['name' => 'ACT_MANAGE_ALIGNMENT', 'category' => 'Action — Alignement', 'description' => 'Gérer l\'alignement'],
+
+            // Action - Files
+            ['name' => 'ACT_ACCESS_FILES', 'category' => 'Action fichier', 'description' => 'Accès aux fichiers'],
+            ['name' => 'ACT_MANAGE_FILES', 'category' => 'Action — Fichier', 'description' => 'Gérer les fichiers'],
+
+            // Action - Decisions
+            ['name' => 'ACT_ACCESS_DECISIONS', 'category' => 'Action décision', 'description' => 'Accès aux décisions'],
+            ['name' => 'ACT_MANAGE_DECISIONS', 'category' => 'Action — Décision', 'description' => 'Gérer les décisions'],
+
+            // Action - Phases
+            ['name' => 'ACT_ACCESS_PHASES', 'category' => 'Action — Phase', 'description' => 'Accès aux phases'],
+            ['name' => 'ACT_MANAGE_PHASES', 'category' => 'Action — Phase', 'description' => 'Gérer les phases'],
+
+            // Action - Reporting
+            ['name' => 'ACT_ACCESS_REPORTING', 'category' => 'Action reporting', 'description' => 'Accès au reporting'],
 
             // Suppliers
             ['name' => 'ACCESS_SUPPLIERS', 'category' => 'Fournisseur', 'description' => 'Accès au module'],
@@ -85,6 +144,18 @@ class RoleSeeder extends Seeder
             ['name' => 'READ_SUPPLIERS', 'category' => 'Fournisseur', 'description' => 'Voir les fournisseurs'],
             ['name' => 'UPDATE_SUPPLIER', 'category' => 'Fournisseur', 'description' => 'Modifier un fournisseur'],
             ['name' => 'DELETE_SUPPLIER', 'category' => 'Fournisseur', 'description' => 'Supprimer un fournisseur'],
+
+            // Supplier - Contracts
+            ['name' => 'SUP_ACCESS_CONTRACTS', 'category' => 'Fournisseur contrat', 'description' => 'Accès aux contrats'],
+            ['name' => 'SUP_MANAGE_CONTRACTS', 'category' => 'Fournisseur — Contrats', 'description' => 'Gérer les contrats'],
+
+            // Supplier - Evaluation
+            ['name' => 'SUP_ACCESS_EVALUATIONS', 'category' => 'Fournisseur évaluation', 'description' => 'Accès aux évaluations'],
+            ['name' => 'SUP_MANAGE_EVALUATIONS', 'category' => 'Fournisseur — Évaluations', 'description' => 'Gérer les évaluations'],
+
+            // Supplier - Files
+            ['name' => 'SUP_ACCESS_FILES', 'category' => 'Fournisseur fichier', 'description' => 'Accès aux fichiers'],
+            ['name' => 'SUP_MANAGE_FILES', 'category' => 'Fournisseur — Fichiers', 'description' => 'Gérer les fichiers'],
 
             // Fund receipts
             ['name' => 'ACCESS_FUND_RECEIPTS', 'category' => 'Encaissement', 'description' => 'Accès au module'],
@@ -159,7 +230,6 @@ class RoleSeeder extends Seeder
             // Default phases
             ['name' => 'ACCESS_DEFAULT_PHASES', 'category' => 'Phase par défaut', 'description' => 'Accès au module'],
             ['name' => 'CREATE_DEFAULT_PHASE', 'category' => 'Phase par défaut', 'description' => 'Créer une phase'],
-            ['name' => 'READ_DEFAULT_PHASES', 'category' => 'Phase par défaut', 'description' => 'Voir les phases'],
             ['name' => 'UPDATE_DEFAULT_PHASE', 'category' => 'Phase par défaut', 'description' => 'Modifier une phase'],
             ['name' => 'DELETE_DEFAULT_PHASE', 'category' => 'Phase par défaut', 'description' => 'Supprimer une phase'],
 
@@ -274,7 +344,6 @@ class RoleSeeder extends Seeder
             ['name' => 'READ_ROLES', 'category' => 'Rôle et permission', 'description' => 'Voir les rôles'],
             ['name' => 'UPDATE_ROLE', 'category' => 'Rôle et permission', 'description' => 'Modifier un rôle'],
             ['name' => 'DELETE_ROLE', 'category' => 'Rôle et permission', 'description' => 'Supprimer un rôle'],
-
         ];
 
         foreach ($permissions as $perm) {

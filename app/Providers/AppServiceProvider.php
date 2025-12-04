@@ -11,6 +11,7 @@ use App\Models\Decision;
 use App\Models\DecisionStatus;
 use App\Models\Indicator;
 use App\Models\StrategicDomain;
+use App\Models\IndicatorControl;
 use App\Models\StrategicObjective;
 use App\Models\Supplier;
 use App\Models\User;
@@ -44,7 +45,8 @@ class AppServiceProvider extends ServiceProvider
             CapabilityDomain::class,
             ActionControl::class,
             Supplier::class,
-            ActionFundDisbursement::class
+            ActionFundDisbursement::class,
+            IndicatorControl::class
         ]);
     }
 }
