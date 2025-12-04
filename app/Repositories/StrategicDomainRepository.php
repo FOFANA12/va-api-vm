@@ -9,9 +9,9 @@ use App\Models\ActionDomain;
 use App\Models\Beneficiary;
 use App\Support\Currency;
 use App\Models\FundingSource;
-use App\Models\ProjectState;
-use App\Models\ProjectStatus;
 use App\Models\StrategicDomain;
+use App\Models\StrategicDomainState;
+use App\Models\StrategicDomainStatus;
 use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -178,7 +178,7 @@ class StrategicDomainRepository
             $strategicDomain->refresh();
 
             //Save initial status
-            $status = ProjectStatus::create([
+            $status = StrategicDomainStatus::create([
                 'strategic_domain_uuid' => $strategicDomain->uuid,
                 'strategic_domain_id' => $strategicDomain->id,
                 'status_code' => $strategicDomain->status,
@@ -188,7 +188,7 @@ class StrategicDomainRepository
             ]);
 
             //Save initial state
-            $state = ProjectState::create([
+            $state = StrategicDomainState::create([
                 'strategic_domain_uuid' => $strategicDomain->uuid,
                 'strategic_domain_id' => $strategicDomain->id,
                 'state_code' => $strategicDomain->state,

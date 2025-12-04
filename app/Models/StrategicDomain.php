@@ -98,12 +98,12 @@ class StrategicDomain extends Model
 
     public function statuses(): HasMany
     {
-        return $this->hasMany(ProjectStatus::class, 'strategic_domain_uuid', 'uuid');
+        return $this->hasMany(StrategicDomainStatus::class, 'strategic_domain_uuid', 'uuid');
     }
 
     public function states(): HasMany
     {
-        return $this->hasMany(ProjectState::class, 'strategic_domain_uuid', 'uuid');
+        return $this->hasMany(StrategicDomainState::class, 'strategic_domain_uuid', 'uuid');
     }
 
     public function statusChangedBy(): BelongsTo

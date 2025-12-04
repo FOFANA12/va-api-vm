@@ -23,8 +23,8 @@ class StrategicDomainController extends Controller
 
     public function __construct(StrategicDomainRepository $repository)
     {
-        $this->messageSuccessCreated = __('app/trategic_domain.controller.message_success_created');
-        $this->messageSuccessUpdated = __('app/trategic_domain.controller.message_success_updated');
+        $this->messageSuccessCreated = __('app/strategic_domain.controller.message_success_created');
+        $this->messageSuccessUpdated = __('app/strategic_domain.controller.message_success_updated');
         $this->messageSuccessDeleted = __('app/common.controller.message_success_deleted');
         $this->repository = $repository;
     }

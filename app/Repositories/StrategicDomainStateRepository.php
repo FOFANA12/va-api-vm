@@ -2,25 +2,25 @@
 
 namespace App\Repositories;
 
-use App\Http\Resources\ProjectStateResource;
-use App\Models\ProjectState as ModelsProjectState;
+use App\Http\Resources\StrategicDomainStateResource;
+use App\Models\StrategicDomainState as ModelsStrategicDomainState;
 use App\Models\StrategicDomain;
-use App\Support\ProjectState;
+use App\Support\StrategicDomainState;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
-class ProjectStateRepository
+class StrategicDomainStateRepository
 {
     /**
      * List all states for a given project.
      */
     public function index($strategicDomainId)
     {
-        $query = ModelsProjectState::where('strategic_domain_id', $strategicDomainId)
+        $query = ModelsStrategicDomainState::where('strategic_domain_id', $strategicDomainId)
             ->orderByDesc('created_at');
 
-        return ProjectStateResource::collection($query->get());
+        return StrategicDomainStateResource::collection($query->get());
     }
 
     /**
@@ -29,11 +29,11 @@ class ProjectStateRepository
     public function requirements(StrategicDomain $strategicDomain)
     {
         $current = $strategicDomain->state;
-        $next = ProjectState::next($current);
+        $next = StrategicDomainState::next($current);
 
         return [
             'states' => collect($next)->map(function ($code) {
-                $state = ProjectState::get($code, app()->getLocale());
+                $state = StrategicDomainState::get($code, app()->getLocale());
                 return [
                     'code'  => $state->code,
                     'name'  => $state->label,
@@ -52,7 +52,7 @@ class ProjectStateRepository
         try {
             $stateCode = $request->input('state');
 
-            $state = ModelsProjectState::create([
+            $state = ModelsStrategicDomainState::create([
                 'strategic_domain_uuid' => $strategicDomain->uuid,
                 'strategic_domain_id' => $strategicDomain->id,
                 'state_code' => $stateCode,
@@ -69,7 +69,7 @@ class ProjectStateRepository
 
             DB::commit();
 
-            return new ProjectStateResource($state);
+            return new StrategicDomainStateResource($state);
         } catch (\Throwable $e) {
             DB::rollBack();
             throw $e;
@@ -113,7 +113,7 @@ class ProjectStateRepository
 
             DB::commit();
 
-            return new ProjectStateResource($lastState);
+            return new StrategicDomainStateResource($lastState);
         } catch (\Throwable $e) {
             DB::rollBack();
             throw $e;

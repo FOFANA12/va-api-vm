@@ -62,6 +62,8 @@ use App\Http\Controllers\Settings\DelegatedProjectOwnerController;
 use App\Http\Controllers\Settings\FileTypeController;
 use App\Http\Controllers\Settings\RoleController;
 use App\Http\Controllers\StrategicDomainController;
+use App\Http\Controllers\StrategicDomainStateController;
+use App\Http\Controllers\StrategicDomainStatusController;
 use App\Http\Controllers\StrategicElementController;
 use App\Http\Controllers\StrategicObjectiveAlignmentController;
 use App\Http\Controllers\SupplierController;
@@ -249,16 +251,16 @@ Route::middleware('auth:sanctum')->group(function () {
     });
     Route::apiResource('strategic-domains', StrategicDomainController::class)->only(['index', 'store', 'show', 'update']);
 
-    //Projects statuses
-    Route::prefix('project-statuses/{strategic_domain}')->controller(ProjectStatusController::class)->group(function () {
+    //Strategic domain statuses
+    Route::prefix('strategic-domain-statuses/{strategic_domain}')->controller(StrategicDomainStatusController::class)->group(function () {
         Route::get('/', 'index');
         Route::get('/requirements', 'requirements');
         Route::post('/', 'store');
         Route::post('/destroy', 'destroy');
     });
 
-    //Projects states
-    Route::prefix('project-states/{strategic_domain}')->controller(ProjectStateController::class)->group(function () {
+    //Strategic domain states
+    Route::prefix('strategic-domain-states/{strategic_domain}')->controller(StrategicDomainStateController::class)->group(function () {
         Route::get('/', 'index');
         Route::get('/requirements', 'requirements');
         Route::post('/', 'store');

@@ -4,18 +4,18 @@ namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
 use App\Models\StrategicDomain;
-use App\Repositories\ProjectStatusRepository;
-use App\Support\ProjectStatus;
+use App\Repositories\StrategicDomainStatusRepository;
+use App\Support\StrategicDomainStatus;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 
-class ProjectStatusController extends Controller
+class StrategicDomainStatusController extends Controller
 {
     private $messageSuccessUpdated;
     private $messageSuccessDeleted;
     private $repository;
 
-    public function __construct(ProjectStatusRepository $repository)
+    public function __construct(StrategicDomainStatusRepository $repository)
     {
         $this->messageSuccessUpdated = __('app/strategic_domain.controller.message_success_status_updated');
         $this->messageSuccessDeleted = __('app/common.controller.message_success_deleted');
@@ -23,7 +23,7 @@ class ProjectStatusController extends Controller
     }
 
     /**
-     * Display a listing of statuses for a given project.
+     * Display a listing of statuses for a given strategic domain.
      */
     public function index($strategicDomainId)
     {
@@ -43,7 +43,7 @@ class ProjectStatusController extends Controller
      */
     public function store(Request $request, StrategicDomain $strategicDomain)
     {
-        $validStatuses = ProjectStatus::codes();
+        $validStatuses = StrategicDomainStatus::codes();
 
         $status = $request->input('status');
 
@@ -61,7 +61,7 @@ class ProjectStatusController extends Controller
     }
 
     /**
-     * Remove the specified project statuses records.
+     * Remove the specified StrategicDomainStatusRepository statuses records.
      */
     public function destroy(Request $request, StrategicDomain $strategicDomain)
     {

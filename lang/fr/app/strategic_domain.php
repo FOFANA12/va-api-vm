@@ -5,10 +5,10 @@ declare(strict_types=1);
 return [
 
     'controller' => [
-        'message_success_created' => 'Le projet a été créé avec succès.',
-        'message_success_updated' => 'Le projet a été modifié avec succès.',
-        'message_success_status_updated' => 'Le statut du projet a été mis à jour avec succès.',
-        'message_success_state_updated' => 'L\'état du projet a été mis à jour avec succès.',
+        'message_success_created' => 'Le domaine stratégique a été créé avec succès.',
+        'message_success_updated' => 'Le domaine stratégique a été modifié avec succès.',
+        'message_success_status_updated' => 'Le statut du domaine stratégique a été mis à jour avec succès.',
+        'message_success_state_updated' => 'L\'état du domaine stratégique a été mis à jour avec succès.',
     ],
 
     'request' => [
@@ -21,8 +21,8 @@ return [
         'start_date' => 'date de début',
         'end_date' => 'date de fin',
         'currency' => 'devise',
-        'status' => 'statut du projet',
-        'state' => 'état du projet',
+        'status' => 'statut du domaine stratégique',
+        'state' => 'état du domaine stratégique',
         'responsible' => 'responsable',
 
         "funding_sources" => [

@@ -2,39 +2,39 @@
 
 namespace App\Repositories;
 
-use App\Http\Resources\ProjectStatusResource;
-use App\Models\ProjectStatus as ModelsProjectStatus;
+use App\Http\Resources\StrategicDomainStatusResource;
+use App\Models\StrategicDomainStatus as ModelsStrategicDomainStatus;
 use App\Models\StrategicDomain;
-use App\Support\ProjectStatus;
+use App\Support\StrategicDomainStatus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
 
-class ProjectStatusRepository
+class StrategicDomainStatusRepository
 {
     /**
      *  List all statuses for a given project.
      */
     public function index($strategicDomainId)
     {
-        $query = ModelsProjectStatus::where('strategic_domain_id', $strategicDomainId)
+        $query = ModelsStrategicDomainStatus::where('strategic_domain_id', $strategicDomainId)
             ->orderByDesc('created_at');
 
-        return ProjectStatusResource::collection($query->get());
+        return StrategicDomainStatusResource::collection($query->get());
     }
 
     /**
-     * Retrieve available project statuses with localized labels.
+     * Retrieve available strategic domain statuses with localized labels.
      */
     public function requirements(StrategicDomain $strategicDomain)
     {
         $current = $strategicDomain->status;
-        $next = ProjectStatus::next($current);
+        $next = StrategicDomainStatus::next($current);
 
         return [
             'statuses' => collect($next)->map(function ($code) {
-                $status = ProjectStatus::get($code, app()->getLocale());
+                $status = StrategicDomainStatus::get($code, app()->getLocale());
                 return [
                     'code'  => $status->code,
                     'name'  => $status->label,
@@ -53,7 +53,7 @@ class ProjectStatusRepository
         try {
             $statusCode = $request->input('status');
 
-            $status = ModelsProjectStatus::create([
+            $status = ModelsStrategicDomainStatus::create([
                 'strategic_domain_uuid' => $strategicDomain->uuid,
                 'strategic_domain_id' => $strategicDomain->id,
                 'status_code' => $statusCode,
@@ -70,7 +70,7 @@ class ProjectStatusRepository
 
             DB::commit();
 
-            return new ProjectStatusResource($status);
+            return new StrategicDomainStatusResource($status);
         } catch (\Throwable $e) {
             DB::rollBack();
             throw $e;
@@ -115,7 +115,7 @@ class ProjectStatusRepository
 
             DB::commit();
 
-            return new ProjectStatusResource($lastStatus);
+            return new StrategicDomainStatusResource($lastStatus);
         } catch (\Throwable $e) {
             DB::rollBack();
             throw $e;

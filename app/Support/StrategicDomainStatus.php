@@ -2,7 +2,7 @@
 
 namespace App\Support;
 
-class ProjectStatus
+class StrategicDomainStatus
 {
     /**
      * List of available statuses with their localized names and display colors.
@@ -53,7 +53,7 @@ class ProjectStatus
         'preparation' => ['engaged', 'stopped'],
         'engaged' => ['closed', 'stopped'],
         'stopped' => ['engaged', 'preparation'],
-        'closed' => ['engaged', 'preparation'],   
+        'closed' => ['engaged', 'preparation'],
     ];
 
     /**

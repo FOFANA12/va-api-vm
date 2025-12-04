@@ -3,8 +3,8 @@
 namespace App\Http\Resources;
 
 use App\Helpers\DateTimeFormatter;
-use App\Support\ProjectState;
-use App\Support\ProjectStatus;
+use App\Support\StrategicDomainState;
+use App\Support\StrategicDomainStatus;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 
@@ -42,8 +42,8 @@ class StrategicDomainResource extends JsonResource
             'budget' => $this->budget,
             'currency' => $this->currency,
             'responsible' => $this->responsible,
-            'status' => $this->status ? ProjectStatus::get($this->status, $currentLang) : null,
-            'state' => $this->state ? ProjectState::get($this->state, $currentLang) : null,
+            'status' => $this->status ? StrategicDomainStatus::get($this->status, $currentLang) : null,
+            'state' => $this->state ? StrategicDomainState::get($this->state, $currentLang) : null,
         ];
     }
 
@@ -63,11 +63,11 @@ class StrategicDomainResource extends JsonResource
             'currency' => $this->currency,
             'responsible' => $this->responsible_uuid,
 
-            'status' => $this->status ? ProjectStatus::get($this->status, $currentLang) : null,
+            'status' => $this->status ? StrategicDomainStatus::get($this->status, $currentLang) : null,
             'status_changed_at' => $this->status_changed_at ? DateTimeFormatter::formatDatetime($this->status_changed_at) : null,
             'status_changed_by' => $this->statusChangedBy?->name,
 
-            'state' => $this->state ? ProjectState::get($this->state, $currentLang) : null,
+            'state' => $this->state ? StrategicDomainState::get($this->state, $currentLang) : null,
             'state_changed_at' => $this->state_changed_at ? DateTimeFormatter::formatDatetime($this->state_changed_at) : null,
             'state_changed_by' => $this->stateChangedBy?->name,
 
@@ -109,11 +109,11 @@ class StrategicDomainResource extends JsonResource
             'action_domain' => $this->actionDomain ? $this->actionDomain->name : null,
             'responsible' => $this->responsible ? $this->responsible->name : null,
 
-            'status' => $this->status ? ProjectStatus::get($this->status, $currentLang) : null,
+            'status' => $this->status ? StrategicDomainStatus::get($this->status, $currentLang) : null,
             'status_changed_at' => $this->status_changed_at ? DateTimeFormatter::formatDatetime($this->status_changed_at) : null,
             'status_changed_by' => $this->statusChangedBy?->name,
 
-            'state' => $this->state ? ProjectState::get($this->state, $currentLang) : null,
+            'state' => $this->state ? StrategicDomainState::get($this->state, $currentLang) : null,
             'state_changed_at' => $this->state_changed_at ? DateTimeFormatter::formatDatetime($this->state_changed_at) : null,
             'state_changed_by' => $this->stateChangedBy?->name,
 

@@ -3,10 +3,10 @@
 namespace App\Http\Resources;
 
 use App\Helpers\DateTimeFormatter;
-use App\Support\ProjectStatus;
+use App\Support\StrategicDomainStatus;
 use Illuminate\Http\Resources\Json\JsonResource;
 
-class ProjectStatusResource extends JsonResource
+class StrategicDomainStatusResource extends JsonResource
 {
     /**
      * Transform the resource into an array.
@@ -23,7 +23,7 @@ class ProjectStatusResource extends JsonResource
             'id' => $this->id,
             'uuid' => $this->uuid,
             'strategic_domain_uuid' => $this->strategic_domain_uuid,
-            'status' => ProjectStatus::get($this->status_code, app()->getLocale()),
+            'status' => StrategicDomainStatus::get($this->status_code, app()->getLocale()),
             'status_date' => DateTimeFormatter::formatDatetime($this->status_date),
             'author' => $author,
         ];

@@ -2,7 +2,7 @@
 
 namespace App\Support;
 
-class ProjectState
+class StrategicDomainState
 {
     /**
      * List of possible states with localized names and display colors.
