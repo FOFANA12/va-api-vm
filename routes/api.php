@@ -35,14 +35,11 @@ use App\Http\Controllers\Settings\BeneficiaryController;
 use App\Http\Controllers\Settings\ExpenseTypeController;
 use App\Http\Controllers\Settings\StakeholderController;
 use App\Http\Controllers\StrategicStakeholderController;
-use App\Http\Controllers\Settings\ContractTypeController;
 use App\Http\Controllers\Settings\MunicipalityController;
 use App\Http\Controllers\Settings\PaymentModelController;
 use App\Http\Controllers\Settings\ProjectOwnerController;
 use App\Http\Controllers\ActionFundDisbursementController;
 use App\Http\Controllers\ActionStatusController;
-use App\Http\Controllers\ActivityStateController;
-use App\Http\Controllers\ActivityStatusController;
 use App\Http\Controllers\CapabilityDomainController;
 use App\Http\Controllers\CapabilityDomainStateController;
 use App\Http\Controllers\CapabilityDomainStatusController;
@@ -50,15 +47,12 @@ use App\Http\Controllers\ContractController;
 use App\Http\Controllers\IndicatorStatusController;
 use App\Http\Controllers\Report\ActionPerformanceReportController;
 use App\Http\Controllers\LogActivityController;
-use App\Http\Controllers\ProjectStateController;
-use App\Http\Controllers\ProjectStatusController;
 use App\Http\Controllers\Report\DahsboardReportController;
 use App\Http\Controllers\Report\IndicatorPerformanceReportController;
 use App\Http\Controllers\Report\StructureReportController;
 use App\Http\Controllers\Report\StructureStatisticReportController;
 use App\Http\Controllers\Settings\DefaultPhaseController;
 use App\Http\Controllers\Settings\FundingSourceController;
-use App\Http\Controllers\Settings\ProcurementModeController;
 use App\Http\Controllers\Settings\IndicatorCategoryController;
 use App\Http\Controllers\Settings\DelegatedProjectOwnerController;
 use App\Http\Controllers\Settings\FileTypeController;
@@ -71,7 +65,6 @@ use App\Http\Controllers\StrategicObjectiveAlignmentController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\SupplierEvaluationController;
 use App\Http\Controllers\TaskController;
-use App\Repositories\CapabilityDomainStateRepository;
 
 // ==========================
 // AUTHENTICATION ROUTES
@@ -115,12 +108,6 @@ Route::prefix('settings')->group(function () {
     });
     Route::apiResource('funding-sources', FundingSourceController::class)->only(['index', 'store', 'show', 'update']);
 
-    Route::prefix('procurement-modes')->controller(ProcurementModeController::class)->group(function () {
-        Route::get('requirements', 'requirements');
-        Route::post('destroy', 'destroy');
-    });
-    Route::apiResource('procurement-modes', ProcurementModeController::class)->only(['index', 'store', 'show', 'update']);
-
     Route::prefix('regions')->controller(RegionController::class)->group(function () {
         Route::get('requirements', 'requirements');
         Route::post('destroy', 'destroy');
@@ -150,11 +137,6 @@ Route::prefix('settings')->group(function () {
         Route::post('destroy', 'destroy');
     });
     Route::apiResource('delegated-project-owners', DelegatedProjectOwnerController::class)->only(['index', 'store', 'show', 'update'])->parameters(["delegated-project-owners" => "delegatedProjectOwner"]);
-
-    Route::prefix('contract-types')->controller(ContractTypeController::class)->group(function () {
-        Route::post('destroy', 'destroy');
-    });
-    Route::apiResource('contract-types', ContractTypeController::class)->only(['index', 'store', 'show', 'update']);
 
     Route::prefix('beneficiaries')->controller(BeneficiaryController::class)->group(function () {
         Route::post('destroy', 'destroy');
