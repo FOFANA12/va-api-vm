@@ -123,6 +123,22 @@ class RoleSeeder extends Seeder
             ['name' => 'ACT_ACCESS_ALIGNMENT', 'category' => 'Action alignement', 'description' => 'Accès à l\'alignement'],
             ['name' => 'ACT_MANAGE_ALIGNMENT', 'category' => 'Action — Alignement', 'description' => 'Gérer l\'alignement'],
 
+            // Action Domain - Files
+            ['name' => 'ACD_ACCESS_FILES', 'category' => 'Action Domain fichier', 'description' => 'Accès aux fichiers'],
+            ['name' => 'ACD_MANAGE_FILES', 'category' => 'Action — Domain — Fichier', 'description' => 'Gérer les fichiers'],
+
+            // Strategic Domain - Files
+            ['name' => 'SD_ACCESS_FILES', 'category' => 'Stratégic Domain fichier', 'description' => 'Accès aux fichiers'],
+            ['name' => 'SD_MANAGE_FILES', 'category' => 'Stratégic — Domain — Fichier', 'description' => 'Gérer les fichiers'],
+
+            // Capability Domain - Files
+            ['name' => 'CD_ACCESS_FILES', 'category' => 'Capacitaire Domain fichier', 'description' => 'Accès aux fichiers'],
+            ['name' => 'CD_MANAGE_FILES', 'category' => 'Capacitaire — Domain — Fichier', 'description' => 'Gérer les fichiers'],
+
+            // Elementary Level - Files
+            ['name' => 'EML_ACCESS_FILES', 'category' => 'Niveau Elémentaire fichier', 'description' => 'Accès aux fichiers'],
+            ['name' => 'EML_MANAGE_FILES', 'category' => 'Niveau — Elémentaire — Fichier', 'description' => 'Gérer les fichiers'],
+
             // Action - Files
             ['name' => 'ACT_ACCESS_FILES', 'category' => 'Action fichier', 'description' => 'Accès aux fichiers'],
             ['name' => 'ACT_MANAGE_FILES', 'category' => 'Action — Fichier', 'description' => 'Gérer les fichiers'],
