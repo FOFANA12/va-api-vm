@@ -44,6 +44,9 @@ use App\Http\Controllers\CapabilityDomainController;
 use App\Http\Controllers\CapabilityDomainStateController;
 use App\Http\Controllers\CapabilityDomainStatusController;
 use App\Http\Controllers\ContractController;
+use App\Http\Controllers\ElementaryLevelController;
+use App\Http\Controllers\ElementaryLevelStateController;
+use App\Http\Controllers\ElementaryLevelStatusController;
 use App\Http\Controllers\IndicatorStatusController;
 use App\Http\Controllers\Report\ActionPerformanceReportController;
 use App\Http\Controllers\LogActivityController;
@@ -268,6 +271,29 @@ Route::middleware('auth:sanctum')->group(function () {
 
     //Capability domains states
     Route::prefix('capability-domain-states/{capability_domain}')->controller(CapabilityDomainStateController::class)->group(function () {
+        Route::get('/', 'index');
+        Route::get('/requirements', 'requirements');
+        Route::post('/', 'store');
+        Route::post('/destroy', 'destroy');
+    });
+
+     // elementary levels
+    Route::prefix('elementary-levels')->controller(ElementaryLevelController::class)->group(function () {
+        Route::get('requirements', 'requirements');
+        Route::post('destroy', 'destroy');
+    });
+    Route::apiResource('elementary-levels', ElementaryLevelController::class)->only(['index', 'store', 'show', 'update']);
+
+    //elementary levels statuses
+    Route::prefix('elementary-level-statuses/{elementary_level}')->controller(ElementaryLevelStatusController::class)->group(function () {
+        Route::get('/', 'index');
+        Route::get('/requirements', 'requirements');
+        Route::post('/', 'store');
+        Route::post('/destroy', 'destroy');
+    });
+
+    //elementary levels states
+    Route::prefix('elementary-level-states/{elementary_level}')->controller(ElementaryLevelStateController::class)->group(function () {
         Route::get('/', 'index');
         Route::get('/requirements', 'requirements');
         Route::post('/', 'store');

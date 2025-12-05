@@ -56,6 +56,15 @@ class ReferenceGenerator
     }
 
     /**
+     * Generate a unique reference for elementary level.
+     */
+    public static function generateElementaryLevelReference(int $id): string
+    {
+
+        return "EML-" . str_pad((string) $id, 3, '0', STR_PAD_LEFT);
+    }
+
+    /**
      * Generate a unique reference for an Action Plan.
      */
     public static function generateActionFundDisbursementReference(ActionFundDisbursement $actionFundDisbursement, Action $action): string
@@ -63,7 +72,7 @@ class ReferenceGenerator
         if ($actionFundDisbursement->phase) {
             return 'DEC-' . $action->structure->abbreviation . '-' . $action->reference . '-' . $actionFundDisbursement->phase->number . '-' . str_pad((string) $actionFundDisbursement->id, 3, '0', STR_PAD_LEFT);
         }
-        
+
         return 'DEC-' . $action->structure->abbreviation . '-' . $action->reference . '-' . str_pad((string) $actionFundDisbursement->id, 3, '0', STR_PAD_LEFT);
     }
 

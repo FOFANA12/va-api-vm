@@ -62,6 +62,7 @@ class DatabaseSeeder extends Seeder
                 TaskSeeder::class,
                 DefaultPhaseSeeder::class,
                 FileTypeSeeder::class,
+                ElementaryLevelSeeder::class,
             ]
         );
     }

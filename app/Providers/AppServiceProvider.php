@@ -9,6 +9,7 @@ use App\Models\ActionFundDisbursement;
 use App\Models\CapabilityDomain;
 use App\Models\Decision;
 use App\Models\DecisionStatus;
+use App\Models\ElementaryLevel;
 use App\Models\Indicator;
 use App\Models\StrategicDomain;
 use App\Models\IndicatorControl;
@@ -43,6 +44,7 @@ class AppServiceProvider extends ServiceProvider
             ActionDomain::class,
             StrategicDomain::class,
             CapabilityDomain::class,
+            ElementaryLevel::class,
             ActionControl::class,
             Supplier::class,
             ActionFundDisbursement::class,
