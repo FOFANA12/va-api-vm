@@ -10,6 +10,7 @@ use App\Models\ActionPeriod;
 use App\Support\FrequencyUnit;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use App\Models\ActionStatus as ModelsActionStatus;
 
 class ActionPlanningRepository
 {
@@ -96,16 +97,31 @@ class ActionPlanningRepository
                 );
             }
 
-            $action->load('periods');
+            //Save initial status
+            $status = ModelsActionStatus::create([
+                'action_uuid' => $action->uuid,
+                'action_id' => $action->id,
+                'status_code' => 'planned',
+                'status_date' => now(),
+                'created_by' => Auth::user()?->uuid,
+                'updated_by' => Auth::user()?->uuid,
+            ]);
+
+            $action->update([
+                'status' => $status->status_code,
+                'status_changed_at' => $status->status_date,
+                'status_changed_by' => $status->created_by,
+            ]);
+
+            $action->load('periods')->refresh();
 
             DB::commit();
 
             dispatch(new EvaluateActionJob($action->uuid));
 
-             return (new ActionPlanningResource($action))->additional([
+            return (new ActionPlanningResource($action))->additional([
                 'mode' => $request->input('mode', 'edit')
             ]);
-
         } catch (\Throwable $e) {
             DB::rollBack();
             throw $e;

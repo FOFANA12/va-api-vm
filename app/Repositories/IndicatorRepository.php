@@ -2,7 +2,6 @@
 
 namespace App\Repositories;
 
-use App\Helpers\DateTimeFormatter;
 use App\Helpers\ReferenceGenerator;
 use App\Http\Requests\IndicatorRequest;
 use App\Http\Resources\IndicatorResource;
@@ -12,10 +11,9 @@ use App\Models\IndicatorCategory;
 use App\Models\StrategicMap;
 use App\Models\StrategicObjective;
 use App\Models\Structure;
-use App\Support\ActionStatus;
+use App\Models\IndicatorStatus as ModelsIndicatorStatus;
 use App\Support\ChartType;
 use App\Support\FrequencyUnit;
-use App\Support\IndicatorStatus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
@@ -41,6 +39,7 @@ class IndicatorRepository
 
         $query = Indicator::join('structures as str', 'indicators.structure_uuid', '=', 'str.uuid')
             ->join('structures as strP', 'indicators.lead_structure_uuid', '=', 'strP.uuid')
+
             ->select(
                 'indicators.id as id',
                 'indicators.uuid',
@@ -108,7 +107,9 @@ class IndicatorRepository
                     ->select('uuid', 'name', 'strategic_map_uuid')
                     ->orderByDesc('id')
                     ->with(['objectives' => function ($q2) {
-                        $q2->select('uuid', 'name', 'start_date', 'end_date', 'strategic_element_uuid')
+                        // EXCLUSION des objectifs terminés ou arrêtés
+                        $q2->whereNotIn('status', ['closed', 'stopped'])
+                            ->select('uuid', 'name', 'start_date', 'end_date', 'strategic_element_uuid', 'status')
                             ->orderByDesc('id');
                     }]);
             }])
@@ -150,56 +151,80 @@ class IndicatorRepository
     public function store(IndicatorRequest $request)
     {
 
-        $objective = StrategicObjective::where('uuid', $request->input('strategic_objective'))->firstOrFail();
+        DB::beginTransaction();
+        try {
+            $objective = StrategicObjective::where('uuid', $request->input('strategic_objective'))->firstOrFail();
 
-        $request->merge([
-            'structure_uuid' => $request->input('structure'),
-            'strategic_map_uuid' => $request->input('strategic_map'),
-            'strategic_element_uuid' => $request->input('strategic_element'),
-            'strategic_objective_uuid' => $request->input('strategic_objective'),
-            'lead_structure_uuid' => $objective->lead_structure_uuid,
-            'category_uuid' => $request->input('category'),
-            'created_by' => Auth::user()?->uuid,
-            'updated_by' => Auth::user()?->uuid,
-            'status_changed_at' => now(),
-            'status_changed_by' => Auth::user()?->uuid,
-        ]);
+            $request->merge([
+                'structure_uuid' => $request->input('structure'),
+                'strategic_map_uuid' => $request->input('strategic_map'),
+                'strategic_element_uuid' => $request->input('strategic_element'),
+                'strategic_objective_uuid' => $request->input('strategic_objective'),
+                'lead_structure_uuid' => $objective->lead_structure_uuid,
+                'category_uuid' => $request->input('category'),
+                'created_by' => Auth::user()?->uuid,
+                'updated_by' => Auth::user()?->uuid,
+                'status_changed_at' => now(),
+                'status_changed_by' => Auth::user()?->uuid,
+            ]);
 
-        $indicator = Indicator::create($request->only([
-            'structure_uuid',
-            'strategic_map_uuid',
-            'strategic_element_uuid',
-            'strategic_objective_uuid',
-            'lead_structure_uuid',
-            'category_uuid',
-            'name',
-            'description',
-            'chart_type',
-            'unit',
-            'initial_value',
-            'final_target_value',
-            'created_by',
-            'updated_by'
-        ]));
+            $indicator = Indicator::create($request->only([
+                'structure_uuid',
+                'strategic_map_uuid',
+                'strategic_element_uuid',
+                'strategic_objective_uuid',
+                'lead_structure_uuid',
+                'category_uuid',
+                'name',
+                'description',
+                'chart_type',
+                'unit',
+                'initial_value',
+                'final_target_value',
+                'created_by',
+                'updated_by'
+            ]));
 
-        $indicator->update([
-            'reference' => ReferenceGenerator::generateIndicatorReference($indicator->id, $objective->reference),
-        ]);
+            $indicator->refresh();
 
-        $indicator->load([
-            'structure',
-            'leadStructure',
-            'strategicMap',
-            'strategicElement',
-            'strategicObjective',
-            'category',
-            'statusChangedBy',
-        ]);
-        $indicator->refresh();
+            //Save initial status
+            $status = ModelsIndicatorStatus::create([
+                'action_uuid' => $indicator->uuid,
+                'action_id' => $indicator->id,
+                'status_code' => $indicator->status,
+                'status_date' => now(),
+                'created_by' => Auth::user()?->uuid,
+                'updated_by' => Auth::user()?->uuid,
+            ]);
 
-        return (new IndicatorResource($indicator))->additional([
-            'mode' => $request->input('mode', 'view')
-        ]);
+            $indicator->update([
+                'reference' => ReferenceGenerator::generateIndicatorReference($indicator->id, $objective->reference),
+                'status' => $status->status_code,
+                'status_changed_at' => $status->status_date,
+                'status_changed_by' => $status->created_by,
+            ]);
+
+            $indicator->load([
+                'structure',
+                'leadStructure',
+                'strategicMap',
+                'strategicElement',
+                'strategicObjective',
+                'category',
+                'statusChangedBy',
+            ]);
+
+            DB::commit();
+
+            $indicator->refresh();
+
+            return (new IndicatorResource($indicator))->additional([
+                'mode' => $request->input('mode', 'view')
+            ]);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            throw $e;
+        }
     }
 
     /**
@@ -258,57 +283,6 @@ class IndicatorRepository
         return (new IndicatorResource($indicator))->additional([
             'mode' => $request->input('mode', 'edit')
         ]);
-    }
-
-    /**
-     * Retrieve available indicator statuses with localized labels.
-     */
-    public function getStatuses()
-    {
-        return [
-            'statuses' => collect(IndicatorStatus::all())->map(function ($item) {
-                return [
-                    'code' => $item['code'],
-                    'name' => $item['name'][app()->getLocale()] ?? $item['name']['fr'],
-                ];
-            }),
-        ];
-    }
-
-    /**
-     * Update the status of a specific indicator.
-     */
-    public function updateStatus(Request $request, Indicator $indicator)
-    {
-        $status = $request->input('status');
-        $indicator->status = $status;
-        $indicator->status_changed_at = now();
-        $indicator->status_changed_by = Auth::user()?->uuid;
-
-        if ($status === 'initializing') {
-            $indicator->actual_start_date = null;
-            $indicator->actual_end_date = null;
-        } elseif ($status === 'in_progress') {
-            if (empty($indicator->actual_start_date)) {
-                $indicator->actual_start_date = now();
-            }
-            $indicator->actual_end_date = null;
-        } elseif ($status === 'paused') {
-            $indicator->actual_end_date = null;
-        } elseif ($status === 'completed') {
-            $indicator->actual_end_date = now();
-        }
-
-        $indicator->timestamps = false;
-        $indicator->save();
-
-        dispatch(new EvaluateStrategicObjectiveJob($indicator->strategic_objective_uuid));
-
-        return [
-            'status' => ActionStatus::get($indicator->status, app()->getLocale()),
-            'status_changed_at' => $indicator->status_changed_at ? DateTimeFormatter::formatDatetime($indicator->status_changed_at) : null,
-            'status_changed_by' => $indicator->statusChangedBy?->name,
-        ];
     }
 
     /**

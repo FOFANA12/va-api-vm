@@ -424,6 +424,7 @@ class ActionRepository
 
             DB::commit();
 
+            $action->refresh();
             return new ActionResource($action);
         } catch (\Throwable $e) {
             DB::rollBack();

@@ -10,6 +10,7 @@ use App\Models\IndicatorPeriod;
 use App\Support\FrequencyUnit;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
+use App\Models\IndicatorStatus as ModelsIndicatorStatus;
 
 class IndicatorPlanningRepository
 {
@@ -84,7 +85,23 @@ class IndicatorPlanningRepository
                 );
             }
 
-            $indicator->load(['periods', 'strategicObjective']);
+            //Save initial status
+            $status = ModelsIndicatorStatus::create([
+                'action_uuid' => $indicator->uuid,
+                'action_id' => $indicator->id,
+                'status_code' => 'planned',
+                'status_date' => now(),
+                'created_by' => Auth::user()?->uuid,
+                'updated_by' => Auth::user()?->uuid,
+            ]);
+
+            $indicator->update([
+                'status' => $status->status_code,
+                'status_changed_at' => $status->status_date,
+                'status_changed_by' => $status->created_by,
+            ]);
+
+            $indicator->load(['periods', 'strategicObjective'])->refresh();
 
             DB::commit();
 

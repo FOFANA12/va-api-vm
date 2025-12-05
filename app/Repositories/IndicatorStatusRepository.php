@@ -139,7 +139,6 @@ class IndicatorStatusRepository
 
         switch ($statusCode) {
 
-            case 'draft':
             case 'created':
             case 'planned':
                 // Retour arrière → nettoyage complet
