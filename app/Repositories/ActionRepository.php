@@ -17,6 +17,7 @@ use App\Models\CapabilityDomain;
 use App\Support\Currency;
 use App\Models\DelegatedProjectOwner;
 use App\Models\Department;
+use App\Models\ElementaryLevel;
 use App\Models\FileType;
 use App\Models\FundingSource;
 use App\Models\Municipality;
@@ -190,6 +191,10 @@ class ActionRepository
             ->select('uuid', 'name', 'strategic_domain_uuid')
             ->get();
 
+        $elementaryLevels = ElementaryLevel::whereNotIn('status', ['closed', 'stopped'])
+            ->orderBy('id', 'desc')
+            ->select('uuid', 'name', 'capability_domain_uuid')
+            ->get();
 
         $generateDocumentTypes =  collect(GenerateDocumentTypes::all())->map(function ($item) {
             return [
@@ -246,9 +251,12 @@ class ActionRepository
             'regions' => $regions,
             'departments' => $departments,
             'municipalities' => $municipalities,
+            
             'action_domains' => $actionDomains,
             'strategic_domains' => $strategicDomains,
             'capability_domains' => $capabilityDomains,
+            'elementary_levels' => $elementaryLevels,
+            
             'risk_levels' => $riskLevels,
             'priority_levels' => $priorityLevels,
             'generate_document_types' => $generateDocumentTypes,
@@ -281,9 +289,11 @@ class ActionRepository
                 'region_uuid' => $request->input('region'),
                 'department_uuid' => $request->input('department'),
                 'municipality_uuid' => $request->input('municipality'),
+
                 'action_domain_uuid' => $request->input('action_domain'),
                 'strategic_domain_uuid' => $request->input('strategic_domain'),
                 'capability_domain_uuid' => $request->input('capability_domain'),
+                'elementary_level_uuid' => $request->input('elementary_level'),
 
                 'mode' => $request->input('mode', 'view'),
                 'created_by' => Auth::user()?->uuid,
@@ -312,6 +322,7 @@ class ActionRepository
                 'action_domain_uuid',
                 'strategic_domain_uuid',
                 'capability_domain_uuid',
+                'elementary_level_uuid',
                 'responsible_structure_uuid',
                 'responsible_uuid',
                 'created_by',
@@ -450,6 +461,7 @@ class ActionRepository
             'actionDomain',
             'strategicDomain',
             'capabilityDomain',
+            'elementaryLevel',
             'beneficiaries',
             'stakeholders',
             'fundingSources',
@@ -476,9 +488,11 @@ class ActionRepository
                 'region_uuid' => $request->input('region'),
                 'department_uuid' => $request->input('department'),
                 'municipality_uuid' => $request->input('municipality'),
+
                 'action_domain_uuid' => $request->input('action_domain'),
                 'strategic_domain_uuid' => $request->input('strategic_domain'),
                 'capability_domain_uuid' => $request->input('capability_domain'),
+                'elementary_level_uuid' => $request->input('elementary_level'),
 
                 'mode' => $request->input('mode', 'edit'),
                 'updated_by' => Auth::user()?->uuid,
@@ -504,6 +518,7 @@ class ActionRepository
                 'action_domain_uuid',
                 'strategic_domain_uuid',
                 'capability_domain_uuid',
+                'elementary_level_uuid',
                 'responsible_structure_uuid',
                 'responsible_uuid',
                 'updated_by'
@@ -563,6 +578,7 @@ class ActionRepository
                 'actionDomain',
                 'strategicDomain',
                 'capabilityDomain',
+                'elementaryLevel',
                 'beneficiaries',
                 'stakeholders',
                 'fundingSources',

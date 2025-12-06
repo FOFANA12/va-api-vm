@@ -117,6 +117,11 @@ class Action extends Model
         return $this->belongsTo(CapabilityDomain::class, 'capability_domain_uuid', 'uuid');
     }
 
+    public function elementaryLevel(): BelongsTo
+    {
+        return $this->belongsTo(ElementaryLevel::class, 'elementary_level_uuid', 'uuid');
+    }
+
     public function region(): BelongsTo
     {
         return $this->belongsTo(Region::class, 'region_uuid', 'uuid');

@@ -25,6 +25,7 @@ return new class extends Migration
             $table->uuid('action_domain_uuid')->nullable();
             $table->uuid('strategic_domain_uuid')->nullable();
             $table->uuid('capability_domain_uuid')->nullable();
+            $table->uuid('elementary_level_uuid')->nullable();
             $table->string('name', 100);
             $table->string('priority', 50);
             $table->string('risk_level', 50);
@@ -70,6 +71,7 @@ return new class extends Migration
             $table->foreign('action_domain_uuid')->references('uuid')->on('action_domains')->onDelete('restrict');
             $table->foreign('strategic_domain_uuid')->references('uuid')->on('strategic_domains')->onDelete('restrict');
             $table->foreign('capability_domain_uuid')->references('uuid')->on('capability_domains')->onDelete('restrict');
+            $table->foreign('elementary_level_uuid')->references('uuid')->on('elementary_levels')->onDelete('restrict');
             $table->foreign('region_uuid')->references('uuid')->on('regions')->onDelete('restrict');
             $table->foreign('department_uuid')->references('uuid')->on('departments')->onDelete('restrict');
             $table->foreign('municipality_uuid')->references('uuid')->on('municipalities')->onDelete('restrict');

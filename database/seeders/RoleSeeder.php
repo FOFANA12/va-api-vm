@@ -201,7 +201,6 @@ class RoleSeeder extends Seeder
             ['name' => 'UPDATE_EMPLOYEE', 'category' => 'Personnel', 'description' => 'Modifier le personnel'],
             ['name' => 'DELETE_EMPLOYEE', 'category' => 'Personnel', 'description' => 'Supprimer le personnel'],
 
-
             // Action domains
             ['name' => 'ACCESS_ACTION_DOMAINS', 'category' => 'Domaine d\'action', 'description' => 'Accès au module'],
             ['name' => 'CREATE_ACTION_DOMAIN', 'category' => 'Domaine d\'action', 'description' => 'Créer un domaine d\'action'],

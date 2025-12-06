@@ -7,6 +7,7 @@ use App\Models\ActionPlan;
 use App\Models\CapabilityDomain;
 use App\Models\DelegatedProjectOwner;
 use App\Models\Department;
+use App\Models\ElementaryLevel;
 use App\Models\FundingSource;
 use App\Models\Municipality;
 use App\Models\ProjectOwner;
@@ -51,9 +52,11 @@ class ActionRequest extends FormRequest
             'project_owner' => 'bail|required|exists:' . ProjectOwner::tableName() . ',uuid',
             'delegated_project_owner' => 'bail|required|exists:' . DelegatedProjectOwner::tableName() . ',uuid',
 
-            'actionDomain' => 'bail|nullable|exists:' . ActionDomain::tableName() . ',uuid',
+            'action_domain' => 'bail|nullable|exists:' . ActionDomain::tableName() . ',uuid',
             'strategic_domain' => 'bail|nullable|exists:' . StrategicDomain::tableName() . ',uuid',
             'capability_domain' => 'bail|nullable|exists:' . CapabilityDomain::tableName() . ',uuid',
+            'elementary_level' => 'bail|nullable|exists:' . ElementaryLevel::tableName() . ',uuid',
+            
             'region' => 'bail|nullable|exists:' . Region::tableName() . ',uuid',
             'department' => 'bail|nullable|exists:' . Department::tableName() . ',uuid',
             'municipality' => 'bail|nullable|exists:' . Municipality::tableName() . ',uuid',
@@ -89,6 +92,8 @@ class ActionRequest extends FormRequest
             'action_domain' => __('app/action.request.action_domain'),
             'strategic_domain' => __('app/action.request.strategic_domain'),
             'capability_domain' => __('app/action.request.capability_domain'),
+            'elementary_level' => __('app/action.request.elementary_level'),
+            
             'region' => __('app/action.request.region'),
             'department' => __('app/action.request.department'),
             'municipality' => __('app/action.request.municipality'),
