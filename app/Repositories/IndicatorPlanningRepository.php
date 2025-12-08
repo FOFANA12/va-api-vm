@@ -87,8 +87,8 @@ class IndicatorPlanningRepository
 
             //Save initial status
             $status = ModelsIndicatorStatus::create([
-                'action_uuid' => $indicator->uuid,
-                'action_id' => $indicator->id,
+                'indicator_uuid' => $indicator->uuid,
+                'indicator_id' => $indicator->id,
                 'status_code' => 'planned',
                 'status_date' => now(),
                 'created_by' => Auth::user()?->uuid,
