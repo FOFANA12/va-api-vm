@@ -9,6 +9,7 @@ use App\Models\Action;
 use App\Models\ActionFundReceipt;
 use App\Models\Currency;
 use App\Models\FundingSource;
+use App\Services\StructureAccessService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
@@ -16,6 +17,16 @@ use Illuminate\Support\Facades\Auth;
 
 class ActionFundReceiptRepository
 {
+    /**
+     * Injected service for structure visibility.
+     */
+    protected StructureAccessService $structureAccess;
+
+    public function __construct(StructureAccessService $structureAccess)
+    {
+        $this->structureAccess = $structureAccess;
+    }
+
     /**
      * List actions with pagination, filters, sorting.
      */
@@ -48,6 +59,12 @@ class ActionFundReceiptRepository
                 'actions.name as action_name',
                 'actions.id as action_id',
             );
+
+        $allowed = $this->structureAccess->getAccessibleStructureUuids(Auth::user());
+
+        if ($allowed !== null) {
+            $query->whereIn('actions.structure_uuid', $allowed);
+        }
 
         if (!empty($searchTerm)) {
             $query->where(function ($q) use ($searchTerm, $searchable) {
@@ -175,7 +192,7 @@ class ActionFundReceiptRepository
      * Update an action fund receipt.
      */
     public function update(Request $request, ActionFundReceipt $actionFundReceipt)
-    {        
+    {
         $request->merge([
             'funding_source_uuid' => $request->input('funding_source'),
             'currency_uuid' => $request->input('currency'),

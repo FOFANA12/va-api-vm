@@ -8,6 +8,7 @@ use App\Models\Employee;
 use App\Models\Role;
 use App\Models\Structure;
 use App\Models\User;
+use App\Services\StructureAccessService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
@@ -16,6 +17,16 @@ use Illuminate\Support\Facades\Auth;
 
 class EmployeeRepository
 {
+    /**
+     * Injected service for structure visibility.
+     */
+    protected StructureAccessService $structureAccess;
+
+    public function __construct(StructureAccessService $structureAccess)
+    {
+        $this->structureAccess = $structureAccess;
+    }
+
     /**
      * List employees with pagination, filters, sorting.
      */
@@ -47,6 +58,12 @@ class EmployeeRepository
             )
             ->where('employees.user_uuid', '<>', Auth::user()->uuid);
 
+        $user = Auth::user();
+        $allowed = $this->structureAccess->getAccessibleStructureUuids($user);
+
+        if ($allowed !== null) {
+            $query->whereIn('employees.structure_uuid', $allowed);
+        }
 
         if (!empty($searchTerm)) {
             $query->where(function ($q) use ($searchTerm, $searchable) {

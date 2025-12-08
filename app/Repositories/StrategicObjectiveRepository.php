@@ -11,6 +11,7 @@ use App\Models\StrategicElement;
 use App\Models\StrategicMap;
 use App\Models\Structure;
 use App\Models\StrategicObjective;
+use App\Services\StructureAccessService;
 use App\Support\PriorityLevel;
 use App\Support\RiskLevel;
 use App\Support\StrategicObjectiveStatus;
@@ -21,6 +22,16 @@ use Illuminate\Support\Facades\Auth;
 
 class StrategicObjectiveRepository
 {
+    /**
+     * Injected service for structure visibility.
+     */
+    protected StructureAccessService $structureAccess;
+
+    public function __construct(StructureAccessService $structureAccess)
+    {
+        $this->structureAccess = $structureAccess;
+    }
+
     /**
      * List strategic objective  with pagination, filters, sorting.
      */
@@ -54,6 +65,10 @@ class StrategicObjectiveRepository
                 'strategic_objectives.state',
             );
 
+        $allowed = $this->structureAccess->getAccessibleStructureUuids(Auth::user());
+        if ($allowed !== null) {
+            $query->whereIn('strategic_objectives.structure_uuid', $allowed);
+        }
 
         if (!empty($searchTerm)) {
             $query->where(function ($q) use ($searchTerm, $searchable) {

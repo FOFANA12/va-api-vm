@@ -12,6 +12,7 @@ use App\Models\BudgetType;
 use App\Models\ExpenseType;
 use App\Models\PaymentMode;
 use App\Models\Supplier;
+use App\Services\StructureAccessService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
@@ -19,6 +20,16 @@ use Illuminate\Support\Facades\Auth;
 
 class ActionFundDisbursementRepository
 {
+    /**
+     * Injected service for structure visibility.
+     */
+    protected StructureAccessService $structureAccess;
+
+    public function __construct(StructureAccessService $structureAccess)
+    {
+        $this->structureAccess = $structureAccess;
+    }
+
     /**
      * List disbursements with pagination, filters, sorting.
      */
@@ -66,6 +77,12 @@ class ActionFundDisbursementRepository
                 'suppliers.company_name as supplier',
                 'attachments.id as attachment_id',
             );
+
+        $allowed = $this->structureAccess->getAccessibleStructureUuids(Auth::user());
+
+        if ($allowed !== null) {
+            $query->whereIn('actions.structure_uuid', $allowed);
+        }
 
         if (!empty($searchTerm)) {
             $query->where(function ($q) use ($searchTerm, $searchable) {

@@ -5,6 +5,7 @@ namespace App\Repositories;
 use App\Http\Requests\StructureRequest;
 use App\Http\Resources\StructureResource;
 use App\Models\Structure;
+use App\Services\StructureAccessService;
 use App\Support\StructureType;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
@@ -13,6 +14,17 @@ use RuntimeException;
 
 class StructureRepository
 {
+    /**
+     * Injected service for structure visibility.
+     */
+    protected StructureAccessService $structureAccess;
+
+    public function __construct(StructureAccessService $structureAccess)
+    {
+        $this->structureAccess = $structureAccess;
+    }
+
+
     /**
      * List structures with pagination, filters, sorting.
      */
@@ -41,6 +53,13 @@ class StructureRepository
             'parents.name as parent'
         )
             ->leftJoin('structures as parents', 'structures.parent_uuid', '=', 'parents.uuid');
+
+        $user = Auth::user();
+        $allowed = $this->structureAccess->getAccessibleStructureUuids($user);
+
+        if ($allowed !== null) {
+            $query->whereIn('structures.uuid', $allowed);
+        }
 
         if (!empty($searchTerm)) {
             $query->where(function ($q) use ($searchTerm, $searchable) {

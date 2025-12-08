@@ -14,6 +14,7 @@ use App\Models\Attachment;
 use App\Models\FileType;
 use App\Models\Structure;
 use App\Models\User;
+use App\Services\StructureAccessService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
@@ -23,6 +24,16 @@ use RuntimeException;
 
 class ActionPlanRepository
 {
+    /**
+     * Injected service for structure visibility.
+     */
+    protected StructureAccessService $structureAccess;
+
+    public function __construct(StructureAccessService $structureAccess)
+    {
+        $this->structureAccess = $structureAccess;
+    }
+
     /**
      * List action plans with pagination, filters, and sorting.
      */
@@ -52,6 +63,11 @@ class ActionPlanRepository
         )
             ->leftJoin('structures', 'action_plans.structure_uuid', '=', 'structures.uuid')
             ->leftJoin('users', 'action_plans.responsible_uuid', '=', 'users.uuid');
+
+        $allowed = $this->structureAccess->getAccessibleStructureUuids(Auth::user());
+        if ($allowed !== null) {
+            $query->whereIn('action_plans.structure_uuid', $allowed);
+        }
 
         if (!empty($searchTerm)) {
             $query->where(function ($q) use ($searchTerm, $searchable) {

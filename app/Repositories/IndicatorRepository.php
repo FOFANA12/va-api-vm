@@ -12,6 +12,7 @@ use App\Models\StrategicMap;
 use App\Models\StrategicObjective;
 use App\Models\Structure;
 use App\Models\IndicatorStatus as ModelsIndicatorStatus;
+use App\Services\StructureAccessService;
 use App\Support\ChartType;
 use App\Support\FrequencyUnit;
 use Illuminate\Http\Request;
@@ -21,6 +22,16 @@ use Illuminate\Support\Facades\Auth;
 
 class IndicatorRepository
 {
+    /**
+     * Injected service for structure visibility.
+     */
+    protected StructureAccessService $structureAccess;
+
+    public function __construct(StructureAccessService $structureAccess)
+    {
+        $this->structureAccess = $structureAccess;
+    }
+
     /**
      * List indicators with pagination, filters, sorting.
      */
@@ -56,6 +67,10 @@ class IndicatorRepository
                 'indicators.is_planned',
             );
 
+        $allowed = $this->structureAccess->getAccessibleStructureUuids(Auth::user());
+        if ($allowed !== null) {
+            $query->whereIn('indicators.structure_uuid', $allowed);
+        }
 
         if (!empty($searchTerm)) {
             $query->where(function ($q) use ($searchTerm, $searchable) {
@@ -63,7 +78,7 @@ class IndicatorRepository
                     if ($column === 'structure') {
                         $q->orWhere('str.name', 'LIKE', '%' . strtolower($searchTerm) . '%');
                     }
-                    if ($column === 'lead_structure') {
+                    else if ($column === 'lead_structure') {
                         $q->orWhere('strP.name', 'LIKE', '%' . strtolower($searchTerm) . '%');
                     } else {
                         $q->orWhere("indicators.$column", 'LIKE', '%' . strtolower($searchTerm) . '%');

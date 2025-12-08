@@ -27,6 +27,7 @@ use App\Models\Stakeholder;
 use App\Models\StrategicDomain;
 use App\Models\Structure;
 use App\Models\User;
+use App\Services\StructureAccessService;
 use App\Support\GenerateDocumentTypes;
 use App\Support\PriorityLevel;
 use App\Support\RiskLevel;
@@ -39,6 +40,16 @@ use Illuminate\Support\Str;
 
 class ActionRepository
 {
+    /**
+     * Injected service for structure visibility.
+     */
+    protected StructureAccessService $structureAccess;
+
+    public function __construct(StructureAccessService $structureAccess)
+    {
+        $this->structureAccess = $structureAccess;
+    }
+
     /**
      * List actions with pagination, filters, sorting.
      */
@@ -78,6 +89,11 @@ class ActionRepository
                 'actions.is_planned',
             );
 
+
+        $allowed = $this->structureAccess->getAccessibleStructureUuids(Auth::user());
+        if ($allowed !== null) {
+            $query->whereIn('actions.structure_uuid', $allowed);
+        }
 
         if (!empty($searchTerm)) {
             $query->where(function ($q) use ($searchTerm, $searchable) {
@@ -251,12 +267,12 @@ class ActionRepository
             'regions' => $regions,
             'departments' => $departments,
             'municipalities' => $municipalities,
-            
+
             'action_domains' => $actionDomains,
             'strategic_domains' => $strategicDomains,
             'capability_domains' => $capabilityDomains,
             'elementary_levels' => $elementaryLevels,
-            
+
             'risk_levels' => $riskLevels,
             'priority_levels' => $priorityLevels,
             'generate_document_types' => $generateDocumentTypes,

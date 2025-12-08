@@ -10,9 +10,20 @@ use Illuminate\Support\Facades\Auth;
 use App\Models\StrategicMap;
 use App\Http\Requests\StrategicMapRequest;
 use App\Http\Resources\StrategicMapResource;
+use App\Services\StructureAccessService;
 
 class StrategicMapRepository
 {
+    /**
+     * Injected service for structure visibility.
+     */
+    protected StructureAccessService $structureAccess;
+
+    public function __construct(StructureAccessService $structureAccess)
+    {
+        $this->structureAccess = $structureAccess;
+    }
+
     /**
      * List strategic map with pagination, filters, sorting.
      */
@@ -40,6 +51,11 @@ class StrategicMapRepository
             'structures.name as structure',
         )
             ->join('structures', 'strategic_maps.structure_uuid', '=', 'structures.uuid');
+
+        $allowed = $this->structureAccess->getAccessibleStructureUuids(Auth::user());
+        if ($allowed !== null) {
+            $query->whereIn('strategic_maps.structure_uuid', $allowed);
+        }
 
         if (!empty($searchTerm)) {
             $query->where(function ($q) use ($searchTerm, $searchable) {

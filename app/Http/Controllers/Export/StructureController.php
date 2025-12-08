@@ -227,17 +227,20 @@ class StructureController extends Controller
 
             // --- First summary table ---
             $headers = [
-                "A" => "Nbr Prog/Progr",
-                "B" => "Nbr d'actions",
-                "C" => "Nbr d'objectifs",
-                "D" => "Taux de réalisation",
-                "E" => "Indice de réalisation",
-                "F" => "Taux de décaissement",
-                "G" => "Budget prévisionnel",
-                "H" => "Budget acquis",
-                "I" => "Budget consommé",
-                "J" => "Budget disponible",
-                "K" => "Budget à mobiliser",
+                "A" => "Nbr domaines d'action",
+                "B" => "Nbr domaines stratégique",
+                "C" => "Nbr domaines capacitaire",
+                "D" => "Nbr niveau élémentaire",
+                "E" => "Nbr d'actions",
+                "F" => "Nbr d'objectifs",
+                "G" => "Taux de réalisation",
+                "H" => "Indice de réalisation",
+                "I" => "Taux de décaissement",
+                "J" => "Budget prévisionnel",
+                "K" => "Budget acquis",
+                "L" => "Budget consommé",
+                "M" => "Budget disponible",
+                "N" => "Budget à mobiliser",
             ];
             foreach ($headers as $col => $label) {
                 $worksheet->setCellValue("{$col}{$startRow}", $label);
@@ -252,7 +255,11 @@ class StructureController extends Controller
                 $actionIds = $actionPlan->actions->pluck('id');
 
                 $totalActions = $actionIds->count();
-                $totalPrograms = $actionPlan->actions->pluck('program_uuid')->filter()->unique()->count();
+
+                $actionDomainCount = $actionPlan->actions->pluck('action_domain_uuid')->filter()->unique()->count();
+                $strategicDomainCount = $actionPlan->actions->pluck('strategic_domain_uuid')->filter()->unique()->count();
+                $capabilityDomainCount = $actionPlan->actions->pluck('capability_domain_uuid')->filter()->unique()->count();
+                $elementaryLevelCount = $actionPlan->actions->pluck('elementary_level_uuid')->filter()->unique()->count();
 
                 $metricsQuery = DB::table('action_metrics')->whereIn('action_id', $actionIds);
                 $totalObjectives = $metricsQuery->avg('aligned_objectives_count');
@@ -266,17 +273,20 @@ class StructureController extends Controller
                 $budgetAvailable = $budgetReceived - $budgetSpent;
                 $disbursementRate = $budgetPlanned > 0 ? ($budgetSpent / $budgetPlanned) * 100 : 0;
 
-                $worksheet->setCellValue("A{$startRow}", $totalPrograms);
-                $worksheet->setCellValue("B{$startRow}", $totalActions);
-                $worksheet->setCellValue("C{$startRow}", round($totalObjectives, 2));
-                $worksheet->setCellValue("D{$startRow}", round($realizationRate, 2));
-                $worksheet->setCellValue("E{$startRow}", round($realizationIndex, 2));
-                $worksheet->setCellValue("F{$startRow}", round($disbursementRate, 2));
-                $worksheet->setCellValue("G{$startRow}", $budgetPlanned);
-                $worksheet->setCellValue("H{$startRow}", $budgetReceived);
-                $worksheet->setCellValue("I{$startRow}", $budgetSpent);
-                $worksheet->setCellValue("J{$startRow}", $budgetAvailable);
-                $worksheet->setCellValue("K{$startRow}", $budgetToMobilize);
+                $worksheet->setCellValue("A{$startRow}", $actionDomainCount);
+                $worksheet->setCellValue("B{$startRow}", $strategicDomainCount);
+                $worksheet->setCellValue("C{$startRow}", $capabilityDomainCount);
+                $worksheet->setCellValue("D{$startRow}", $elementaryLevelCount);
+                $worksheet->setCellValue("E{$startRow}", $totalActions);
+                $worksheet->setCellValue("F{$startRow}", round($totalObjectives, 2));
+                $worksheet->setCellValue("G{$startRow}", round($realizationRate, 2));
+                $worksheet->setCellValue("H{$startRow}", round($realizationIndex, 2));
+                $worksheet->setCellValue("I{$startRow}", round($disbursementRate, 2));
+                $worksheet->setCellValue("J{$startRow}", $budgetPlanned);
+                $worksheet->setCellValue("K{$startRow}", $budgetReceived);
+                $worksheet->setCellValue("L{$startRow}", $budgetSpent);
+                $worksheet->setCellValue("M{$startRow}", $budgetAvailable);
+                $worksheet->setCellValue("N{$startRow}", $budgetToMobilize);
             }
             $worksheet->getStyle("A{$startRow}:K{$startRow}")->applyFromArray($styleValues);
             $worksheet->getRowDimension($startRow)->setRowHeight(22);
@@ -284,40 +294,43 @@ class StructureController extends Controller
             $startRow += 3;
 
             // --- Second detailed table ---
-            $worksheet->setCellValue("A{$startRow}", "Pilier TaahoudatY");
-            $worksheet->setCellValue("B{$startRow}", "Axe Département");
+            $worksheet->setCellValue("A{$startRow}", "Levier");
+            $worksheet->setCellValue("B{$startRow}", "Axe stratégique");
             $worksheet->setCellValue("C{$startRow}", "Objectifs");
             $worksheet->setCellValue("D{$startRow}", "Actions programmées");
             $worksheet->setCellValue("E{$startRow}", "Référence");
-            $worksheet->setCellValue("F{$startRow}", "Programme");
-            $worksheet->setCellValue("G{$startRow}", "Parties prenantes");
+            $worksheet->setCellValue("F{$startRow}", "Domaine d'action");
+            $worksheet->setCellValue("G{$startRow}", "Domaine stratégique");
+            $worksheet->setCellValue("H{$startRow}", "Domaine capacitaire");
+            $worksheet->setCellValue("I{$startRow}", "Niveau élémentaire");
+            $worksheet->setCellValue("J{$startRow}", "Parties prenantes");
 
             // Merge 2 cols for Chronogramme
-            $worksheet->mergeCells("H{$startRow}:I{$startRow}");
-            $worksheet->setCellValue("H{$startRow}", "Chronogramme de mise en oeuvre");
-            $worksheet->setCellValue("H" . ($startRow + 1), "Début");
-            $worksheet->setCellValue("I" . ($startRow + 1), "Fin");
+            $worksheet->mergeCells("K{$startRow}:I{$startRow}");
+            $worksheet->setCellValue("K{$startRow}", "Chronogramme de mise en oeuvre");
+            $worksheet->setCellValue("K" . ($startRow + 1), "Début");
+            $worksheet->setCellValue("L" . ($startRow + 1), "Fin");
 
-            $worksheet->setCellValue("J{$startRow}", "Zone d'intervention");
-            $worksheet->setCellValue("K{$startRow}", "Source de financement");
+            $worksheet->setCellValue("M{$startRow}", "Zone d'intervention");
+            $worksheet->setCellValue("N{$startRow}", "Source de financement");
 
             // Merge 2 cols for Budget alloué
-            $worksheet->mergeCells("L{$startRow}:M{$startRow}");
-            $worksheet->setCellValue("L{$startRow}", "Budget alloué en MRU");
-            $worksheet->setCellValue("L" . ($startRow + 1), "Disponible");
-            $worksheet->setCellValue("M" . ($startRow + 1), "Prévisionnel");
+            $worksheet->mergeCells("O{$startRow}:M{$startRow}");
+            $worksheet->setCellValue("O{$startRow}", "Budget alloué en MRU");
+            $worksheet->setCellValue("O" . ($startRow + 1), "Disponible");
+            $worksheet->setCellValue("P" . ($startRow + 1), "Prévisionnel");
 
-            $worksheet->setCellValue("N{$startRow}", "% Avancement");
-            $worksheet->setCellValue("O{$startRow}", "Description");
+            $worksheet->setCellValue("Q{$startRow}", "% Avancement");
+            $worksheet->setCellValue("R{$startRow}", "Description");
 
-            $colsToMerge = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'J', 'K', 'N', 'O'];
+            $colsToMerge = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'M', 'N', 'Q', 'R'];
             foreach ($colsToMerge as $col) {
                 $worksheet->mergeCells("{$col}{$startRow}:{$col}" . ($startRow + 1));
             }
 
             // Apply styles to header row
-            $worksheet->getStyle("A{$startRow}:O{$startRow}")->applyFromArray($styleHeaders);
-            $worksheet->getStyle("A" . ($startRow + 1) . ":O" . ($startRow + 1))->applyFromArray($styleHeaders);
+            $worksheet->getStyle("A{$startRow}:R{$startRow}")->applyFromArray($styleHeaders);
+            $worksheet->getStyle("A" . ($startRow + 1) . ":R" . ($startRow + 1))->applyFromArray($styleHeaders);
 
             $worksheet->getRowDimension($startRow)->setRowHeight(25);
             $worksheet->getRowDimension($startRow + 1)->setRowHeight(25);
@@ -333,20 +346,26 @@ class StructureController extends Controller
                     $actions = Action::whereIn('uuid', $alignedActionUuids)->get();
 
                     foreach ($actions as $action) {
-                        $currencyCode = $action->currency?->code ?? '';
+                        $currencyCode = $action->currency?->code ?? 'MRU';
 
-                        $worksheet->setCellValue("A{$startRow}", '');
+                        $parentElement = $objective->strategicElement?->parent;
+
+                        $worksheet->setCellValue("A{$startRow}", $parentElement ? $parentElement->name : '');
                         $worksheet->setCellValue("B{$startRow}", $objective->strategicElement?->name ?? '');
                         $worksheet->setCellValue("C{$startRow}", $objective->name);
                         $worksheet->setCellValue("D{$startRow}", $action->name);
                         $worksheet->setCellValue("E{$startRow}", $action->reference);
-                        $worksheet->setCellValue("F{$startRow}", $action->program?->name ?? '');
+
+                        $worksheet->setCellValue("F{$startRow}", $action->actionDomain?->name ?? '');
+                        $worksheet->setCellValue("G{$startRow}", $action->strategicDomain?->name ?? '');
+                        $worksheet->setCellValue("H{$startRow}", $action->capabilityDomain?->name ?? '');
+                        $worksheet->setCellValue("I{$startRow}", $action->elementaryLevel?->name ?? '');
 
                         $stakeholders = $action->stakeholders->pluck('name')->implode(",\n");
-                        $worksheet->setCellValue("G{$startRow}", $stakeholders);
+                        $worksheet->setCellValue("J{$startRow}", $stakeholders);
 
-                        $worksheet->setCellValue("H{$startRow}", DateTimeFormatter::formatDate($action->start_date));
-                        $worksheet->setCellValue("I{$startRow}", DateTimeFormatter::formatDate($action->end_date));
+                        $worksheet->setCellValue("K{$startRow}", DateTimeFormatter::formatDate($action->start_date));
+                        $worksheet->setCellValue("L{$startRow}", DateTimeFormatter::formatDate($action->end_date));
 
                         $localisation = '';
                         if ($action->region || $action->department || $action->municipality) {
@@ -354,29 +373,24 @@ class StructureController extends Controller
                             $localisation .= "\nDépartement : " . ($action->department?->name ?? '');
                             $localisation .= "\nCommune : " . ($action->municipality?->name ?? '');
                         }
-
-                        $worksheet->setCellValue("J{$startRow}", $localisation);
+                        $worksheet->setCellValue("M{$startRow}", $localisation);
 
                         $fundingSources = $action->fundingSources->pluck('name')->implode(",\n");
-                        $worksheet->setCellValue("K{$startRow}", $fundingSources);
+                        $worksheet->setCellValue("N{$startRow}", $fundingSources);
 
-                        $worksheet->setCellValue("L{$startRow}", $action->total_receipt_fund - $action->total_disbursement_fund);
-                        $worksheet->getStyle("L{$startRow}")
-                            ->getNumberFormat()
-                            ->setFormatCode('#,##0 [$' . $currencyCode . ']');
+                        $worksheet->setCellValue("O{$startRow}", $action->total_receipt_fund - $action->total_disbursement_fund);
+                        $worksheet->getStyle("O{$startRow}")->getNumberFormat()->setFormatCode('#,##0 [$' . $currencyCode . ']');
 
-                        $worksheet->setCellValue("M{$startRow}", $action->total_budget);
-                        $worksheet->getStyle("M{$startRow}")
-                            ->getNumberFormat()
-                            ->setFormatCode('#,##0 [$' . $currencyCode . ']');
+                        $worksheet->setCellValue("P{$startRow}", $action->total_budget);
+                        $worksheet->getStyle("P{$startRow}")->getNumberFormat()->setFormatCode('#,##0 [$' . $currencyCode . ']');
 
-                        $worksheet->setCellValue("N{$startRow}", $action->actual_progress_percent);
-                        $worksheet->setCellValue("O{$startRow}", $action->description ?? '');
+                        $worksheet->setCellValue("Q{$startRow}", $action->actual_progress_percent);
+                        $worksheet->setCellValue("R{$startRow}", $action->description ?? '');
 
-                        $worksheet->getStyle("A{$startRow}:O{$startRow}")->applyFromArray($styleValues);
+                        $worksheet->getStyle("A{$startRow}:R{$startRow}")->applyFromArray($styleValues);
 
-                        $textCols = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'J', 'K', 'O'];
-                        $numericCols = ['H', 'I', 'L', 'M', 'N'];
+                        $textCols = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'M', 'N', 'R'];
+                        $numericCols = ['K', 'L', 'O', 'P', 'Q'];
 
                         foreach ($textCols as $col) {
                             $worksheet->getStyle("{$col}{$startRow}")->getAlignment()

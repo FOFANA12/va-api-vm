@@ -6,6 +6,7 @@ use App\Http\Requests\StrategicElementRequest;
 use App\Http\Resources\StrategicElementResource;
 use App\Models\StrategicElement;
 use App\Models\Structure;
+use App\Services\StructureAccessService;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
@@ -13,6 +14,16 @@ use RuntimeException;
 
 class StrategicElementRepository
 {
+    /**
+     * Injected service for structure visibility.
+     */
+    protected StructureAccessService $structureAccess;
+
+    public function __construct(StructureAccessService $structureAccess)
+    {
+        $this->structureAccess = $structureAccess;
+    }
+
     /**
      * List structure strategic element with pagination, filters, sorting.
      */
@@ -47,6 +58,11 @@ class StrategicElementRepository
             ->join('structures', 'strategic_elements.structure_uuid', '=', 'structures.uuid')
             ->leftJoin('strategic_elements as stEl', 'strategic_elements.parent_element_uuid', '=', 'stEl.uuid')
             ->where('strategic_elements.type', $type);
+
+        $allowed = $this->structureAccess->getAccessibleStructureUuids(Auth::user());
+        if ($allowed !== null) {
+            $query->whereIn('strategic_elements.structure_uuid', $allowed);
+        }
 
         if (!empty($searchTerm)) {
             $query->where(function ($q) use ($searchTerm, $searchable) {
