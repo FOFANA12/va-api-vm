@@ -53,6 +53,7 @@ use App\Http\Controllers\LogActivityController;
 use App\Http\Controllers\Report\ActionDomainReportController;
 use App\Http\Controllers\Report\CapabilityDomainReportController;
 use App\Http\Controllers\Report\DahsboardReportController;
+use App\Http\Controllers\Report\ElementaryLevelReportController;
 use App\Http\Controllers\Report\IndicatorPerformanceReportController;
 use App\Http\Controllers\Report\StrategicDomainReportController;
 use App\Http\Controllers\Report\StructureReportController;
@@ -296,12 +297,17 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/destroy', 'destroy');
     });
 
-    // elementary levels
+    // Elementary levels
     Route::prefix('elementary-levels')->controller(ElementaryLevelController::class)->group(function () {
         Route::get('requirements', 'requirements');
         Route::post('destroy', 'destroy');
     });
     Route::apiResource('elementary-levels', ElementaryLevelController::class)->only(['index', 'store', 'show', 'update']);
+
+    // Elementary Level Reporting
+    Route::prefix('report-elementary-levels')->controller(ElementaryLevelReportController::class)->group(function () {
+        Route::get('{elementary_level}/global', 'globalReport');
+    });
 
     //elementary levels statuses
     Route::prefix('elementary-level-statuses/{elementary_level}')->controller(ElementaryLevelStatusController::class)->group(function () {

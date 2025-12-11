@@ -17,7 +17,7 @@ class CapabilityDomainReportController extends Controller
     }
 
     /**
-     * Global reporting for a specific Action Domain.
+     * Global reporting for a specific Capability Domain.
      */
     public function globalReport(CapabilityDomain $capabilityDomain)
     {
