@@ -91,8 +91,13 @@ class ActionRepository
 
 
         $allowed = $this->structureAccess->getAccessibleStructureUuids(Auth::user());
+        $currentUserUuid = Auth::user()?->uuid;
+
         if ($allowed !== null) {
-            $query->whereIn('actions.structure_uuid', $allowed);
+            $query->where(function ($q) use ($allowed, $currentUserUuid) {
+                $q->whereIn('actions.structure_uuid', $allowed)
+                    ->orWhere('actions.responsible_uuid', $currentUserUuid);
+            });
         }
 
         if (!empty($searchTerm)) {
