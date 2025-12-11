@@ -53,6 +53,7 @@ use App\Http\Controllers\LogActivityController;
 use App\Http\Controllers\Report\ActionDomainReportController;
 use App\Http\Controllers\Report\DahsboardReportController;
 use App\Http\Controllers\Report\IndicatorPerformanceReportController;
+use App\Http\Controllers\Report\StrategicDomainReportController;
 use App\Http\Controllers\Report\StructureReportController;
 use App\Http\Controllers\Report\StructureStatisticReportController;
 use App\Http\Controllers\Settings\DefaultPhaseController;
@@ -222,7 +223,7 @@ Route::middleware('auth:sanctum')->group(function () {
     });
 
     
-    //Program statuses
+    //Action domain statuses
     Route::prefix('action-domain-statuses/{action_domain}')->controller(ActionDomainStatusController::class)->group(function () {
         Route::get('/', 'index');
         Route::get('/requirements', 'requirements');
@@ -230,7 +231,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/destroy', 'destroy');
     });
 
-    //Program states
+    //Action domain states
     Route::prefix('action-domain-states/{action_domain}')->controller(ActionDomainStateController::class)->group(function () {
         Route::get('/', 'index');
         Route::get('/requirements', 'requirements');
@@ -238,12 +239,17 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/destroy', 'destroy');
     });
 
-    // strategic domains
+    // Strategic domains
     Route::prefix('strategic-domains')->controller(StrategicDomainController::class)->group(function () {
         Route::get('requirements', 'requirements');
         Route::post('destroy', 'destroy');
     });
     Route::apiResource('strategic-domains', StrategicDomainController::class)->only(['index', 'store', 'show', 'update']);
+
+    // Strategic Domain Reporting
+    Route::prefix('report-strategic-domains')->controller(StrategicDomainReportController::class)->group(function () {
+        Route::get('{strategic_domain}/global', 'globalReport');
+    });
 
     //Strategic domain statuses
     Route::prefix('strategic-domain-statuses/{strategic_domain}')->controller(StrategicDomainStatusController::class)->group(function () {
