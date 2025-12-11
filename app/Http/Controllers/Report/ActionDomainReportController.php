@@ -19,9 +19,9 @@ class ActionDomainReportController extends Controller
     /**
      * Global reporting for a specific Action Domain.
      */
-    public function globalReport(ActionDomain $domain)
+    public function globalReport(ActionDomain $actionDomain)
     {
-        $report = $this->repository->getGlobalReport($domain);
+        $report = $this->repository->getGlobalReport($actionDomain);
 
         return response()->json($report, Response::HTTP_OK);
     }

@@ -19,9 +19,9 @@ class StrategicDomainReportController extends Controller
     /**
      * Global reporting for a specific Strategic Domain.
      */
-    public function globalReport(StrategicDomain $domain)
+    public function globalReport(StrategicDomain $strategicDomain)
     {
-        $report = $this->repository->getGlobalReport($domain);
+        $report = $this->repository->getGlobalReport($strategicDomain);
 
         return response()->json($report, Response::HTTP_OK);
     }

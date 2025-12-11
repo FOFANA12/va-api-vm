@@ -2,7 +2,6 @@
 
 namespace App\Repositories\Report;
 
-use App\Models\ActionDomain;
 use App\Models\StrategicDomain;
 use App\Models\CapabilityDomain;
 use App\Models\ElementaryLevel;
@@ -11,22 +10,22 @@ use Illuminate\Support\Facades\DB;
 
 class StrategicDomainReportRepository
 {
-    public function getGlobalReport(StrategicDomain $domain): array
+    public function getGlobalReport(StrategicDomain $strategicDomain): array
     {
-        return $this->buildReport($domain);
+        return $this->buildReport($strategicDomain);
     }
 
-    private function buildReport(StrategicDomain $domain): array
+    private function buildReport(StrategicDomain $strategicDomain): array
     {
         // COUNTS
-        $capabilityIds = CapabilityDomain::where('strategic_domain_uuid', $domain->uuid)->pluck('uuid');
+        $capabilityIds = CapabilityDomain::where('strategic_domain_uuid', $strategicDomain->uuid)->pluck('uuid');
         $elementaryIds = ElementaryLevel::whereIn('capability_domain_uuid', $capabilityIds)->pluck('uuid');
 
         $capabilityCount = $capabilityIds->count();
         $elementaryCount = $elementaryIds->count();
 
         // ACTIONS
-        $actions = Action::where('strategic_domain_uuid', $domain->uuid)->get();
+        $actions = Action::where('strategic_domain_uuid', $strategicDomain->uuid)->get();
         $totalActions = $actions->count();
 
         // Eviter division par zéro
@@ -88,7 +87,7 @@ class StrategicDomainReportRepository
             ->join('actions as a', 'a.uuid', '=', 'afd.action_uuid')
             ->join('expense_types as et', 'afdet.expense_type_uuid', '=', 'et.uuid')
             ->select('et.name as type', DB::raw('SUM(DISTINCT afd.payment_amount) as total'))
-            ->where('a.strategic_domain_uuid', $domain->uuid)
+            ->where('a.strategic_domain_uuid', $strategicDomain->uuid)
             ->groupBy('et.uuid', 'et.name')
             ->get()
             ->map(function ($row) use ($totalSpentBudget) {

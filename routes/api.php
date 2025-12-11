@@ -51,6 +51,7 @@ use App\Http\Controllers\IndicatorStatusController;
 use App\Http\Controllers\Report\ActionPerformanceReportController;
 use App\Http\Controllers\LogActivityController;
 use App\Http\Controllers\Report\ActionDomainReportController;
+use App\Http\Controllers\Report\CapabilityDomainReportController;
 use App\Http\Controllers\Report\DahsboardReportController;
 use App\Http\Controllers\Report\IndicatorPerformanceReportController;
 use App\Http\Controllers\Report\StrategicDomainReportController;
@@ -222,7 +223,7 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('{action_domain}/global', 'globalReport');
     });
 
-    
+
     //Action domain statuses
     Route::prefix('action-domain-statuses/{action_domain}')->controller(ActionDomainStatusController::class)->group(function () {
         Route::get('/', 'index');
@@ -267,12 +268,17 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('/destroy', 'destroy');
     });
 
-    // capability domains
+    // Capability domains
     Route::prefix('capability-domains')->controller(CapabilityDomainController::class)->group(function () {
         Route::get('requirements', 'requirements');
         Route::post('destroy', 'destroy');
     });
     Route::apiResource('capability-domains', CapabilityDomainController::class)->only(['index', 'store', 'show', 'update']);
+
+    // Capability Domain Reporting
+    Route::prefix('report-capability-domains')->controller(CapabilityDomainReportController::class)->group(function () {
+        Route::get('{capability_domain}/global', 'globalReport');
+    });
 
     //Capability domains statuses
     Route::prefix('capability-domain-statuses/{capability_domain}')->controller(CapabilityDomainStatusController::class)->group(function () {

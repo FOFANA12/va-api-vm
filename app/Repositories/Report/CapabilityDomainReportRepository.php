@@ -2,33 +2,27 @@
 
 namespace App\Repositories\Report;
 
-use App\Models\ActionDomain;
-use App\Models\StrategicDomain;
 use App\Models\CapabilityDomain;
 use App\Models\ElementaryLevel;
 use App\Models\Action;
 use Illuminate\Support\Facades\DB;
 
-class ActionDomainReportRepository
+class CapabilityDomainReportRepository
 {
-    public function getGlobalReport(ActionDomain $actionDomain): array
+    public function getGlobalReport(CapabilityDomain $capabilityDomain): array
     {
-        return $this->buildReport($actionDomain);
+        return $this->buildReport($capabilityDomain);
     }
 
-    private function buildReport(ActionDomain $actionDomain): array
+    private function buildReport(CapabilityDomain $capabilityDomain): array
     {
         // COUNTS
-        $strategicIds = StrategicDomain::where('action_domain_uuid', $actionDomain->uuid)->pluck('uuid');
-        $capabilityIds = CapabilityDomain::whereIn('strategic_domain_uuid', $strategicIds)->pluck('uuid');
-        $elementaryIds = ElementaryLevel::whereIn('capability_domain_uuid', $capabilityIds)->pluck('uuid');
+        $elementaryIds = ElementaryLevel::where('capability_domain_uuid', $capabilityDomain->uuid)->pluck('uuid');
 
-        $strategicCount = $strategicIds->count();
-        $capabilityCount = $capabilityIds->count();
         $elementaryCount = $elementaryIds->count();
 
         // ACTIONS
-        $actions = Action::where('action_domain_uuid', $actionDomain->uuid)->get();
+        $actions = Action::where('capability_domain_uuid', $capabilityDomain->uuid)->get();
         $totalActions = $actions->count();
 
         // Eviter division par zéro
@@ -90,13 +84,13 @@ class ActionDomainReportRepository
             ->join('actions as a', 'a.uuid', '=', 'afd.action_uuid')
             ->join('expense_types as et', 'afdet.expense_type_uuid', '=', 'et.uuid')
             ->select('et.name as type', DB::raw('SUM(DISTINCT afd.payment_amount) as total'))
-            ->where('a.action_domain_uuid', $actionDomain->uuid)
+            ->where('a.capability_domain_uuid', $capabilityDomain->uuid)
             ->groupBy('et.uuid', 'et.name')
             ->get()
             ->map(function ($row) use ($totalSpentBudget) {
                 return [
-                    'type' => $row->type,
-                    'total' => (float) $row->total,
+                    'type'    => $row->type,
+                    'total'   => (float) $row->total,
                     'percent' => $totalSpentBudget > 0
                         ? round(($row->total / $totalSpentBudget) * 100, 2)
                         : 0,
@@ -105,8 +99,6 @@ class ActionDomainReportRepository
 
         return [
             'counts' => [
-                'strategic_domains' => $strategicCount,
-                'capability_domains' => $capabilityCount,
                 'elementary_levels' => $elementaryCount,
                 'actions' => $totalActions,
             ],
