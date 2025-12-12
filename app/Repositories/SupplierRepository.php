@@ -29,7 +29,6 @@ class SupplierRepository
         $perPage = $request->input('perPage');
 
         $query = DB::table('suppliers')
-            ->join('contract_types', 'suppliers.contract_type_uuid', '=', 'contract_types.uuid')
             ->select(
                 'suppliers.id',
                 'suppliers.uuid',
@@ -61,23 +60,12 @@ class SupplierRepository
     }
 
     /**
-     * Retrieve required data for create/edit customer
-     */
-    public function requirements(): array
-    {
-        return [
-            'contract_types' => ContractType::where('status', true)->orderBy('id', 'desc')->get(['uuid', 'name'])
-        ];
-    }
-
-    /**
      * Store a new supplier.
      */
     public function store(SupplierRequest $request)
     {
         $request->merge([
             'status' => filter_var($request->input('status'), FILTER_VALIDATE_BOOLEAN),
-            'contract_type_uuid' => $request->input('contract_type'),
             'created_by' => Auth::user()?->uuid,
             'updated_by' => Auth::user()?->uuid,
             'mode' => $request->input('mode', 'view'),
@@ -91,7 +79,6 @@ class SupplierRepository
             'capital',
             'annual_turnover',
             'employees_count',
-            'contract_type_uuid',
             'name',
             'phone',
             'whatsapp',
@@ -102,9 +89,6 @@ class SupplierRepository
             'updated_by'
         ]));
 
-
-        $supplier->load(['contractType']);
-
         return new SupplierResource($supplier);
     }
 
@@ -114,9 +98,7 @@ class SupplierRepository
     public function show(Supplier $supplier)
     {
         return [
-            'supplier' => new SupplierResource($supplier->load([
-                'contractType'
-            ]))
+            'supplier' => new SupplierResource($supplier)
         ];
     }
 
@@ -127,7 +109,6 @@ class SupplierRepository
     {
         $request->merge([
             'status' => filter_var($request->input('status'), FILTER_VALIDATE_BOOLEAN),
-            'contract_type_uuid' => $request->input('contract_type'),
             'updated_by' => Auth::user()?->uuid,
             'mode' => $request->input('mode', 'edit'),
         ]);
@@ -142,7 +123,6 @@ class SupplierRepository
             'capital',
             'annual_turnover',
             'employees_count',
-            'contract_type_uuid',
             'name',
             'phone',
             'whatsapp',
@@ -152,8 +132,6 @@ class SupplierRepository
             'updated_by'
         ]))->save();
 
-
-        $supplier->loadMissing('contractType');
 
         return (new SupplierResource($supplier))->additional([
             'mode' => $request->input('mode', 'edit')

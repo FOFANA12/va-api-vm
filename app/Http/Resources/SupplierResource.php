@@ -46,7 +46,6 @@ class SupplierResource extends JsonResource
             'annual_turnover' => $this->annual_turnover,
             'employees_count' => $this->employees_count,
             'note' => $this->note,
-            'contract_type' => $this->contract_type_uuid,
 
             'name' => $this->name,
             'phone' => $this->phone,
@@ -72,7 +71,6 @@ class SupplierResource extends JsonResource
             'annual_turnover' => $this->annual_turnover,
             'employees_count' => $this->employees_count,
             'note' => $this->note,
-            'contract_type' => $contractType?->name,
 
             'name' => $this->name,
             'phone' => $this->phone,

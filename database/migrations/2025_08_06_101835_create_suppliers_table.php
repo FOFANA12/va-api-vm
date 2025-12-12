@@ -25,7 +25,6 @@ return new class extends Migration
             $table->decimal('note', 3, 2)->default(0);
             $table->boolean('status')->default(true);
 
-            $table->uuid('contract_type_uuid');
             $table->string('name', 100);
             $table->string('phone', 20);
             $table->string('whatsapp', 20)->nullable();
@@ -36,7 +35,6 @@ return new class extends Migration
             $table->uuid('updated_by')->nullable();
             $table->timestamps();
 
-            $table->foreign('contract_type_uuid')->references('uuid')->on('contract_types')->onDelete('restrict');
             $table->foreign('created_by')->references('uuid')->on('users')->onDelete('set null');
             $table->foreign('updated_by')->references('uuid')->on('users')->onDelete('set null');
         });

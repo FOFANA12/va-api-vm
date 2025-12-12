@@ -31,12 +31,6 @@ class Supplier extends Model
         ];
     }
 
-    public function contractType(): BelongsTo
-    {
-        return $this->belongsTo(ContractType::class, 'contract_type_uuid', 'uuid');
-    }
-
-
     public function contracts(): HasMany
     {
         return $this->hasMany(Contract::class, 'supplier_uuid', 'uuid');

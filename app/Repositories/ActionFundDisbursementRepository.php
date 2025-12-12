@@ -158,7 +158,7 @@ class ActionFundDisbursementRepository
                     ->select('uuid', 'contract_number', 'supplier_uuid', 'signed_at');
             }])
             ->orderByDesc('note')
-            ->select('uuid', 'company_name', 'tax_number', 'note', 'contract_type_uuid')
+            ->select('uuid', 'company_name', 'tax_number', 'note')
             ->get();
 
         if ($mode === 'create') {
@@ -173,7 +173,7 @@ class ActionFundDisbursementRepository
                 }
             ])->where('status', 'in_progress')
                 ->orderBy('id', 'desc')
-                ->select('uuid', 'name', 'reference', 'currency', 'contract_type_uuid')
+                ->select('uuid', 'name', 'reference', 'currency')
                 ->get();
 
             return [

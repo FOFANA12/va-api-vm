@@ -14,8 +14,6 @@ return [
         'capital' => 'capital',
         'annual_turnover' => 'chiffre d\'affaires',
         'employees_count' => 'nombre d\'employés',
-
-        'contract_type' => 'type de marché',
         'name' => 'nom et prénom',
         'phone' => 'téléphone',
         'whatsapp' => 'WhatsApp',
