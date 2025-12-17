@@ -2,9 +2,7 @@
 
 namespace Database\Seeders;
 
-use App\Models\ContractType;
 use App\Models\ProcurementMode;
-use App\Models\Structure;
 use Illuminate\Database\Seeder;
 
 class ProcurementModeSeeder extends Seeder
@@ -35,7 +33,6 @@ class ProcurementModeSeeder extends Seeder
 
         foreach ($modes as $data) {
             ProcurementMode::create([
-                'contract_type_uuid' => ContractType::query()->inRandomOrder()->value('uuid'),
                 'name' => $data['name'],
                 'duration' => $data['duration'],
                 'status' => $data['status'],

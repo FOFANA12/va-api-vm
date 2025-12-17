@@ -536,7 +536,7 @@ class StructureController extends Controller
                         $table->addCell(1600)->addText($action->reference, null, ['align' => 'left']);
                         $table->addCell(2400)->addText($action->name, null, ['align' => 'left']);
                         $table->addCell(2000)->addText('', null, ['align' => 'left']);
-                        $table->addCell(1600)->addText($action->contractType?->name ?? '', null, ['align' => 'left']);
+                        $table->addCell(1600)->addText('###', null, ['align' => 'left']);
                         $table->addCell(1600)->addText($action->procurementMode?->name ?? '', null, ['align' => 'left']);
                         $table->addCell(2000)->addText($action->total_budget, null, ['align' => 'right']);
                         $table->addCell(1600)->addText(DateTimeFormatter::formatDate($action->start_date), null, ['align' => 'right']);
@@ -548,7 +548,7 @@ class StructureController extends Controller
                         $table->addCell(2400)->addText($action->name, null, ['align' => 'left']);
                         $table->addCell(2000)->addText($action->fundingSources->pluck('name')->implode(', '), null, ['align' => 'left']);
                         $table->addCell(2000)->addText($action->total_budget, null, ['align' => 'right']);
-                        $table->addCell(1600)->addText($action->contractType?->name ?? '', null, ['align' => 'left']);
+                        $table->addCell(1600)->addText('###', null, ['align' => 'left']);
                         $table->addCell(1600)->addText($action->procurementMode?->name ?? '', null, ['align' => 'left']);
                         $table->addCell(1600)->addText(DateTimeFormatter::formatDate($action->start_date), null, ['align' => 'right']);
                         $table->addCell(1600)->addText(DateTimeFormatter::formatDate($attributionDate), null, ['align' => 'right']);

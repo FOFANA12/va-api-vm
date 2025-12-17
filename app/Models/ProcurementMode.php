@@ -42,12 +42,4 @@ class ProcurementMode extends Model
             'duration' => 'integer',
         ];
     }
-
-    /**
-     * Contract Type
-     */
-    public function contractType(): BelongsTo
-    {
-        return $this->belongsTo(ContractType::class, 'contract_type_uuid', 'uuid');
-    }
 }

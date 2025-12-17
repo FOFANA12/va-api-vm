@@ -14,7 +14,6 @@ return new class extends Migration
         Schema::create('procurement_modes', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid')->unique();
-            $table->uuid('contract_type_uuid');
             $table->string('name', 50)->unique();
             $table->integer('duration')->default(0);
             $table->boolean('status')->default(true);
@@ -23,7 +22,6 @@ return new class extends Migration
             $table->timestamps();
 
 
-            $table->foreign('contract_type_uuid')->references('uuid')->on('contract_types')->onDelete('restrict');
             $table->foreign('created_by')->references('uuid')->on('users')->onDelete('restrict');
             $table->foreign('updated_by')->references('uuid')->on('users')->onDelete('restrict');
         });

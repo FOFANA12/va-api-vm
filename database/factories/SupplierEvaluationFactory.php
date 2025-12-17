@@ -2,7 +2,6 @@
 
 namespace Database\Factories;
 
-use App\Models\ContractType;
 use App\Models\Supplier;
 use Illuminate\Database\Eloquent\Factories\Factory;
 

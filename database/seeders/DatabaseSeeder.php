@@ -31,7 +31,6 @@ class DatabaseSeeder extends Seeder
                 ActionPlanSeeder::class,
                 RegionSeeder::class,
                 DepartmentSeeder::class,
-                ContractTypeSeeder::class,
                 ProcurementModeSeeder::class,
                 MunicipalitySeeder::class,
                 ActionDomainSeeder::class,

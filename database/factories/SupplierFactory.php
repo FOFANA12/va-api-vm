@@ -2,7 +2,6 @@
 
 namespace Database\Factories;
 
-use App\Models\ContractType;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
 /**
@@ -26,7 +25,6 @@ class SupplierFactory extends Factory
             'annual_turnover' => $this->faker->randomFloat(2, 0, 500000000),
             'employees_count' => $this->faker->numberBetween(1, 500),
             'status' => $this->faker->boolean(90),
-            'contract_type_uuid' => ContractType::query()->inRandomOrder()->value('uuid'),
             'name' => $this->faker->name(),
             'phone' => $this->faker->phoneNumber(),
             'whatsapp' => $this->faker->optional()->phoneNumber(),

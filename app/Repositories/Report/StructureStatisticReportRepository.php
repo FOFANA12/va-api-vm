@@ -157,26 +157,11 @@ class StructureStatisticReportRepository
             ->groupBy('procurement_modes.uuid', 'procurement_modes.name')
             ->get();
 
-        $byContractType = ActionFundDisbursement::query()
-            ->select(
-                'contract_types.uuid',
-                'contract_types.name',
-                DB::raw('SUM(action_fund_disbursements.payment_amount) as total_amount')
-            )
-            ->join('actions', 'actions.uuid', '=', 'action_fund_disbursements.action_uuid')
-            ->join('contract_types', 'contract_types.uuid', '=', 'actions.contract_type_uuid')
-            ->join('action_plans', 'action_plans.uuid', '=', 'actions.action_plan_uuid')
-            ->whereIn('actions.structure_uuid', $structures)
-            ->where('action_plans.status', true)
-            ->groupBy('contract_types.uuid', 'contract_types.name')
-            ->get();
-
         return [
             'expenses_by_budget_type' => $byBudgetType,
             'expenses_by_expense_type' => $byExpenseType,
             'expenses_by_structure' => $byStructure,
             'expenses_by_procurement_mode' => $byProcurementMode,
-            'expenses_by_contract_type' => $byContractType,
         ];
     }
 

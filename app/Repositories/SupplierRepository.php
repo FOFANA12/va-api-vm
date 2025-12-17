@@ -4,7 +4,6 @@ namespace App\Repositories;
 
 use App\Http\Requests\SupplierRequest;
 use App\Http\Resources\SupplierResource;
-use App\Models\ContractType;
 use App\Models\Supplier;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;

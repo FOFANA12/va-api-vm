@@ -25,7 +25,7 @@ return [
 
     'allowed_methods' => ['*'],
 
-    'allowed_origins' => ['http://127.0.0.1:5170','http://localhost:5170'],
+    'allowed_origins' => ['http://127.0.0.1:5170','http://localhost:5170', 'https://mdarem.frb.io'],
 
     'allowed_origins_patterns' => [],
 

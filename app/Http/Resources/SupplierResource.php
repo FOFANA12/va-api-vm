@@ -58,8 +58,6 @@ class SupplierResource extends JsonResource
 
     protected function forView(): array
     {
-        $contractType = $this->whenLoaded('contractType');
-
         return [
             'id' => $this->id,
             'uuid' => $this->uuid,
