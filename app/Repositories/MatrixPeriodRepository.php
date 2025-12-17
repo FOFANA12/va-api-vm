@@ -45,7 +45,7 @@ class MatrixPeriodRepository
                     'name',
                     'status',
                     'state',
-                    'strategic_axis_uuid',
+                    // 'strategic_axis_uuid',
                     'matrix_period_uuid',
                     'start_date',
                     'end_date',

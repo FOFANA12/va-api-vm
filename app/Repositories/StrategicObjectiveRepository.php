@@ -85,7 +85,7 @@ class StrategicObjectiveRepository
         }
 
         if ($sortBy === 'lead_structure') {
-            $query->orderBy('structures.name', $sortOrder);
+            $query->orderBy('lst.name', $sortOrder);
         } else if ($sortBy === 'structure') {
             $query->orderBy('st.name', $sortOrder);
         } else {
