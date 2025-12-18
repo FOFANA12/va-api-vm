@@ -28,7 +28,7 @@ class ActionAlignmentRepository
      */
     public function index(Request $request)
     {
-        $searchable = ['reference', 'name', 'lead_structure'];
+        $searchable = ['reference', 'name', 'lead_structure', 'structure'];
         $sortable = ['reference', 'name', 'priority', 'risk_level', 'lead_structure', 'structure', 'end_date', 'start_date', 'status'];
 
         $actionId   = $request->input('actionId');
@@ -77,7 +77,7 @@ class ActionAlignmentRepository
 
         if ($sortBy === 'lead_structure') {
             $query->orderBy('lst.name', $sortOrder);
-        } else if ($sortBy === 'lead_structure') {
+        } else if ($sortBy === 'structure') {
             $query->orderBy('st.name', $sortOrder);
         } else {
             $query->orderBy("strategic_objectives.$sortBy", $sortOrder);
