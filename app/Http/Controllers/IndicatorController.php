@@ -6,7 +6,6 @@ use App\Http\Requests\IndicatorRequest;
 use App\Http\Resources\IndicatorResource;
 use App\Models\Indicator;
 use App\Repositories\IndicatorRepository;
-use App\Support\IndicatorStatus;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -48,9 +47,9 @@ class IndicatorController extends Controller
     /**
      * Requirements data for indicator.
      */
-    public function requirements()
+    public function requirements(Request $request)
     {
-        return response()->json($this->repository->requirements())->setStatusCode(Response::HTTP_OK);
+        return response()->json($this->repository->requirements($request))->setStatusCode(Response::HTTP_OK);
     }
 
     /**
@@ -85,38 +84,6 @@ class IndicatorController extends Controller
             'message' => $this->messageSuccessUpdated,
             'indicator' => $indicator
         ])->setStatusCode(Response::HTTP_OK);
-    }
-
-    /**
-     * Return the list of available statuses.
-     */
-    public function getStatuses()
-    {
-        return response()->json(
-            $this->repository->getStatuses()
-        )->setStatusCode(Response::HTTP_OK);
-    }
-
-    /**
-     * Update only the status of a specific indicator.
-     */
-    public function updateStatus(Request $request, Indicator $indicator)
-    {
-        $validStatuses = IndicatorStatus::codes();
-
-        $status = $request->input('status');
-
-        if (!in_array($status, $validStatuses)) {
-            throw new \Exception(__('app/indicator.request.invalid_status'));
-        }
-
-        if (!$status) {
-            throw new \Exception(__('app/indicator.request.status'));
-        }
-
-        $result = $this->repository->updateStatus($request, $indicator);
-
-        return response()->json(['message' => $this->messageSuccessStatusUpdated, ...$result])->setStatusCode(Response::HTTP_OK);
     }
 
     /**

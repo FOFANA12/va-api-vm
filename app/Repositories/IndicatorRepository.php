@@ -15,6 +15,8 @@ use App\Models\IndicatorStatus as ModelsIndicatorStatus;
 use App\Services\StructureAccessService;
 use App\Support\ChartType;
 use App\Support\FrequencyUnit;
+use App\Support\IndicatorStatus;
+use App\Support\StrategicState;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
@@ -72,13 +74,27 @@ class IndicatorRepository
             $query->whereIn('indicators.structure_uuid', $allowed);
         }
 
+        // Status filter
+        if ($request->filled('status')) {
+            $query->where('indicators.status', $request->status);
+        }
+
+        // State filter
+        if ($request->filled('state')) {
+            $query->where('indicators.state', $request->state);
+        }
+
+        // Category filter
+        if ($request->filled('category')) {
+            $query->where('indicators.category_uuid', $request->category);
+        }
+
         if (!empty($searchTerm)) {
             $query->where(function ($q) use ($searchTerm, $searchable) {
                 foreach ($searchable as $column) {
                     if ($column === 'structure') {
                         $q->orWhere('str.name', 'LIKE', '%' . strtolower($searchTerm) . '%');
-                    }
-                    else if ($column === 'lead_structure') {
+                    } else if ($column === 'lead_structure') {
                         $q->orWhere('strP.name', 'LIKE', '%' . strtolower($searchTerm) . '%');
                     } else {
                         $q->orWhere("indicators.$column", 'LIKE', '%' . strtolower($searchTerm) . '%');
@@ -105,8 +121,35 @@ class IndicatorRepository
     /**
      * Load requirements data
      */
-    public function requirements()
+    public function requirements(Request $request)
     {
+        if ($request->mode == 'filters') {
+            $statuses =  collect(IndicatorStatus::all())->map(function ($item) {
+                return [
+                    'code' => $item['code'],
+                    'name' => $item['name'][app()->getLocale()] ?? $item['name']['fr'],
+                ];
+            });
+
+            $states =  collect(StrategicState::all())->map(function ($item) {
+                return [
+                    'code' => $item['code'],
+                    'name' => $item['name'][app()->getLocale()] ?? $item['name']['fr'],
+                ];
+            });
+
+            $categories = IndicatorCategory::where('status', true)
+                ->orderBy('id', 'desc')
+                ->select('uuid', 'name')
+                ->get();
+
+            return [
+                'statuses' => $statuses,
+                'states' => $states,
+                'categories' => $categories,
+            ];
+        }
+
         $structures = Structure::query()
             ->where('status', true)
             ->whereIn('type', ['STATE', 'STRATEGIC'])

@@ -25,4 +25,14 @@ class ActionDomainReportController extends Controller
 
         return response()->json($report, Response::HTTP_OK);
     }
+
+    /**
+     * Generate the general dashboard for all Action Domains.
+     */
+    public function generalDashboard()
+    {
+        $report = $this->repository->buildGeneralDashboard();
+
+        return response()->json($report, Response::HTTP_OK);
+    }
 }

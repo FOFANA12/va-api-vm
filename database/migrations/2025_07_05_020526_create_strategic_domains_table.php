@@ -40,7 +40,7 @@ return new class extends Migration
             $table->text('risks')->nullable();
 
             $table->foreign('action_domain_uuid')->references('uuid')->on('action_domains')->onDelete('restrict');
-            $table->foreign('responsible_uuid')->references('uuid')->on('users')->onDelete('restrict');
+            $table->foreign('responsible_uuid')->references('uuid')->on('users')->onDelete('set null');
             $table->foreign('created_by')->references('uuid')->on('users')->onDelete('set null');
             $table->foreign('updated_by')->references('uuid')->on('users')->onDelete('set null');
         });

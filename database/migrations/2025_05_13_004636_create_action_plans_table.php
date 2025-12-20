@@ -28,7 +28,7 @@ return new class extends Migration
 
             $table->unique(['structure_uuid', 'name']);
             $table->foreign('structure_uuid')->references('uuid')->on('structures')->onDelete('restrict');
-            $table->foreign('responsible_uuid')->references('uuid')->on('users')->onDelete('restrict');
+            $table->foreign('responsible_uuid')->references('uuid')->on('users')->onDelete('set null');
             $table->foreign('created_by')->references('uuid')->on('users')->onDelete('set null');
             $table->foreign('updated_by')->references('uuid')->on('users')->onDelete('set null');
         });

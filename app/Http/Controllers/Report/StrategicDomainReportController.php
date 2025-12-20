@@ -25,4 +25,14 @@ class StrategicDomainReportController extends Controller
 
         return response()->json($report, Response::HTTP_OK);
     }
+
+    /**
+     * Generate the general dashboard for all Strategic Domains.
+     */
+    public function generalDashboard()
+    {
+        $report = $this->repository->buildGeneralDashboard();
+
+        return response()->json($report, Response::HTTP_OK);
+    }
 }

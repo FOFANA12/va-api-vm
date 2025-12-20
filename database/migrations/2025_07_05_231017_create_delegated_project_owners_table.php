@@ -24,8 +24,8 @@ return new class extends Migration
             $table->timestamps();
 
             $table->foreign('project_owner_uuid')->references('uuid')->on('project_owners')->onDelete('restrict');
-            $table->foreign('created_by')->references('uuid')->on('users')->onDelete('restrict');
-            $table->foreign('updated_by')->references('uuid')->on('users')->onDelete('restrict');
+            $table->foreign('created_by')->references('uuid')->on('users')->onDelete('set null');
+            $table->foreign('updated_by')->references('uuid')->on('users')->onDelete('set null');
         });
     }
 

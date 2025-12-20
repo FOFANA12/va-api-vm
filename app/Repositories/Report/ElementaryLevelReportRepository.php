@@ -5,6 +5,7 @@ namespace App\Repositories\Report;
 use App\Models\CapabilityDomain;
 use App\Models\ElementaryLevel;
 use App\Models\Action;
+use App\Support\Currency;
 use Illuminate\Support\Facades\DB;
 
 class ElementaryLevelReportRepository
@@ -74,7 +75,7 @@ class ElementaryLevelReportRepository
         $averagePerformanceIndex = round($totalPerformanceIndex / $safeActionCount, 2);
 
         // DÉCAISSEMENT PAR TYPE
-         $expenseTypes = DB::table('action_fund_disbursement_expense_types as afdet')
+        $expenseTypes = DB::table('action_fund_disbursement_expense_types as afdet')
             ->join('action_fund_disbursements as afd', 'afd.uuid', '=', 'afdet.action_fund_disbursement_uuid')
             ->join('actions as a', 'a.uuid', '=', 'afd.action_uuid')
             ->join('expense_types as et', 'afdet.expense_type_uuid', '=', 'et.uuid')
@@ -113,6 +114,109 @@ class ElementaryLevelReportRepository
                 'average_disbursement_rate' => $averageDisbursementRate,
                 'average_realisation_rate' => $averageRealisationRate,
                 'average_performance_index' => $averagePerformanceIndex,
+            ],
+        ];
+    }
+
+    public function buildGeneralDashboard(): array
+    {
+        // COUNTS
+        $elementaryCount = ElementaryLevel::count();
+
+        // ACTIONS
+        $actions = Action::whereNotNull('elementary_level_uuid')->get();
+        $totalActions = $actions->count();
+
+        $safeActionCount = max($totalActions, 1);
+
+        // INIT
+        $totalPlannedBudget = 0;
+        $totalAcquiredBudget = 0;
+        $totalSpentBudget = 0;
+
+        $totalDisbursementRate = 0;
+        $totalRealisationRate = 0;
+        $totalPerformanceIndex = 0;
+
+        foreach ($actions as $action) {
+            $planned = (float) $action->total_budget;
+            $acquired = (float) $action->total_receipt_fund;
+            $spent = (float) $action->total_disbursement_fund;
+            $realised = (float) $action->actual_progress_percent;
+
+            $totalPlannedBudget += $planned;
+            $totalAcquiredBudget += $acquired;
+            $totalSpentBudget += $spent;
+
+            $rate = $acquired > 0
+                ? round(($spent / $acquired) * 100, 2)
+                : 0;
+
+            $totalDisbursementRate += $rate;
+            $totalRealisationRate += $realised;
+
+            $plannedPercent = $action->is_planned ? 100 : 0;
+
+            $performance = $plannedPercent > 0
+                ? round($realised / $plannedPercent, 2)
+                : 0;
+
+            $totalPerformanceIndex += $performance;
+        }
+
+        // BUDGET
+        $budgetToMobilize = max($totalPlannedBudget - $totalAcquiredBudget, 0);
+        $availableBudget = max($totalAcquiredBudget - $totalSpentBudget, 0);
+
+        // AVERAGES
+        $averageDisbursementRate = round($totalDisbursementRate / $safeActionCount, 2);
+        $averageRealisationRate = round($totalRealisationRate / $safeActionCount, 2);
+        $averagePerformanceIndex = round($totalPerformanceIndex / $safeActionCount, 2);
+
+        // DISBURSEMENT BY TYPE
+        $budgetTypes = DB::table('action_fund_disbursements as afd')
+            ->join('actions as a', 'a.uuid', '=', 'afd.action_uuid')
+            ->join('budget_types as bt', 'afd.budget_type_uuid', '=', 'bt.uuid')
+            ->whereNotNull('a.elementary_level_uuid')
+            ->select(
+                'bt.uuid',
+                'bt.name',
+                DB::raw('SUM(afd.payment_amount) as total')
+            )
+            ->groupBy('bt.uuid', 'bt.name')
+            ->get()
+            ->map(function ($row) use ($totalSpentBudget) {
+                return [
+                    'type' => $row->name,
+                    'total' => (float) $row->total,
+                    'percent' => $totalSpentBudget > 0
+                        ? round(($row->total / $totalSpentBudget) * 100, 2)
+                        : 0,
+                ];
+            });
+
+        return [
+            'counts' => [
+                'elementary_levels' => $elementaryCount,
+                'actions' => $totalActions,
+            ],
+
+            'budget' => [
+                'planned_budget' => $totalPlannedBudget,
+                'acquired_budget' => $totalAcquiredBudget,
+                'spent_budget' => $totalSpentBudget,
+                'budget_to_mobilize' => $budgetToMobilize,
+                'available_budget' => $availableBudget,
+                'budget_types' => $budgetTypes,
+                'currency' => Currency::getDefault(app()->getLocale())['code'],
+
+                'total_disbursement_rate' => $totalDisbursementRate,
+                'total_realisation_rate' => $totalRealisationRate,
+                'total_performance_index' => $totalPerformanceIndex,
+
+                'disbursement_rate' => $averageDisbursementRate,
+                'realisation_rate' => $averageRealisationRate,
+                'performance_index' => $averagePerformanceIndex,
             ],
         ];
     }

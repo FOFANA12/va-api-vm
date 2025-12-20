@@ -14,7 +14,7 @@ class StructurePerformanceReportRepository
     public function getReport(Structure $structure): array
     {
 
-        $structures = [];
+        $structures[] = $structure->uuid;
         $collect = function ($s) use (&$structures, &$collect) {
             foreach ($s->children as $child) {
                 if ($child->status) {

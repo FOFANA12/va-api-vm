@@ -52,7 +52,7 @@ use App\Http\Controllers\Report\ActionPerformanceReportController;
 use App\Http\Controllers\LogActivityController;
 use App\Http\Controllers\Report\ActionDomainReportController;
 use App\Http\Controllers\Report\CapabilityDomainReportController;
-use App\Http\Controllers\Report\DahsboardReportController;
+use App\Http\Controllers\Report\DashboardReportController;
 use App\Http\Controllers\Report\ElementaryLevelReportController;
 use App\Http\Controllers\Report\IndicatorPerformanceReportController;
 use App\Http\Controllers\Report\StrategicDomainReportController;
@@ -584,8 +584,19 @@ Route::middleware('auth:sanctum')->group(function () {
         });
     });
 
+    // Maillage Reporting
+    Route::prefix('report-maillage')->group(function () {
+        Route::get('action-domain', [ActionDomainReportController::class, 'generalDashboard']);
+        Route::get('strategic-domain', [StrategicDomainReportController::class, 'generalDashboard']);
+        Route::get('capability-domain', [CapabilityDomainReportController::class, 'generalDashboard']);
+        Route::get('elementary-level', [ElementaryLevelReportController::class, 'generalDashboard']);
+    });
+
     // Dashboard Reporting
-    Route::prefix('report-dashboard')->controller(DahsboardReportController::class)->group(function () {
+    Route::prefix('report-dashboard')->controller(DashboardReportController::class)->group(function () {
         Route::get('{structure?}/general', 'general');
+        Route::get('{structure?}/strategic', 'strategic');
+        Route::get('{structure?}/operational', 'operational');
+        Route::get('{structure?}/financial', 'financial');
     });
 });

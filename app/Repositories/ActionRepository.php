@@ -28,6 +28,8 @@ use App\Models\StrategicDomain;
 use App\Models\Structure;
 use App\Models\User;
 use App\Services\StructureAccessService;
+use App\Support\ActionState;
+use App\Support\ActionStatus;
 use App\Support\GenerateDocumentTypes;
 use App\Support\PriorityLevel;
 use App\Support\RiskLevel;
@@ -57,7 +59,6 @@ class ActionRepository
     {
         $searchable = ['reference', 'name', 'project_owner', 'structure'];
         $sortable = ['reference', 'name', 'priority', 'project_owner', 'structure', 'risk_level', 'status', 'state', 'actual_progress_percent', 'start_date', 'end_date', 'total_budget'];
-
 
         $searchTerm = $request->input('searchTerm');
         $sortByInput = $request->input('sortBy');
@@ -100,6 +101,25 @@ class ActionRepository
             });
         }
 
+        // Status filter
+        if ($request->filled('status')) {
+            $query->where('actions.status', $request->status);
+        }
+
+        // State filter
+        if ($request->filled('state')) {
+            $query->where('actions.state', $request->state);
+        }
+
+        // Nature filter (alert or failed)
+        if ($request->filled('nature')) {
+            if ($request->nature === 'alert') {
+                $query->where('actions.alert', true);
+            } elseif ($request->nature === 'failed') {
+                $query->where('actions.failed', true);
+            }
+        }
+
         if (!empty($searchTerm)) {
             $query->where(function ($q) use ($searchTerm, $searchable) {
                 foreach ($searchable as $column) {
@@ -130,8 +150,29 @@ class ActionRepository
     /**
      * Load requirements data
      */
-    public function requirements()
+    public function requirements(Request $request)
     {
+        if ($request->mode == 'filters') {
+            $statuses =  collect(ActionStatus::all())->map(function ($item) {
+                return [
+                    'code' => $item['code'],
+                    'name' => $item['name'][app()->getLocale()] ?? $item['name']['fr'],
+                ];
+            });
+
+            $states =  collect(ActionState::all())->map(function ($item) {
+                return [
+                    'code' => $item['code'],
+                    'name' => $item['name'][app()->getLocale()] ?? $item['name']['fr'],
+                ];
+            });
+
+            return [
+                'statuses' => $statuses,
+                'states' => $states,
+            ];
+        }
+
         $structures = Structure::query()
             ->where('status', true)
             // ->whereIn('type', ['DIRECTION'])

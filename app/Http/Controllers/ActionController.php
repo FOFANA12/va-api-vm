@@ -46,9 +46,9 @@ class ActionController extends Controller
     /**
      * Requirements data for action.
      */
-    public function requirements()
+    public function requirements(Request $request)
     {
-        return response()->json($this->repository->requirements())->setStatusCode(Response::HTTP_OK);
+        return response()->json($this->repository->requirements($request))->setStatusCode(Response::HTTP_OK);
     }
 
     /**

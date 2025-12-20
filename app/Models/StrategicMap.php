@@ -54,7 +54,7 @@ class StrategicMap extends Model
         return $this->hasMany(StrategicElement::class, 'strategic_map_uuid', 'uuid');
     }
 
-     public function objectives(): HasMany
+    public function objectives(): HasMany
     {
         return $this->hasMany(StrategicObjective::class, 'strategic_map_uuid', 'uuid');
     }

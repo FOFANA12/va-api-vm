@@ -143,31 +143,16 @@ class StructureStatisticReportRepository
             ->groupBy('structures.uuid', 'structures.abbreviation', 'structures.name')
             ->get();
 
-        $byProcurementMode = ActionFundDisbursement::query()
-            ->select(
-                'procurement_modes.uuid',
-                'procurement_modes.name',
-                DB::raw('SUM(action_fund_disbursements.payment_amount) as total_amount')
-            )
-            ->join('actions', 'actions.uuid', '=', 'action_fund_disbursements.action_uuid')
-            ->join('procurement_modes', 'procurement_modes.uuid', '=', 'actions.procurement_mode_uuid')
-            ->join('action_plans', 'action_plans.uuid', '=', 'actions.action_plan_uuid')
-            ->whereIn('actions.structure_uuid', $structures)
-            ->where('action_plans.status', true)
-            ->groupBy('procurement_modes.uuid', 'procurement_modes.name')
-            ->get();
-
         return [
             'expenses_by_budget_type' => $byBudgetType,
             'expenses_by_expense_type' => $byExpenseType,
             'expenses_by_structure' => $byStructure,
-            'expenses_by_procurement_mode' => $byProcurementMode,
         ];
     }
 
     public function getExpensesByObjective(Structure $structure): array
     {
-        $structures = [];
+        $structures[] = $structure->uuid;
         $collect = function ($s) use (&$structures, &$collect) {
             foreach ($s->children as $child) {
                 if ($child->status) {
@@ -200,7 +185,7 @@ class StructureStatisticReportRepository
 
     public function getExpensesByAxis(Structure $structure): array
     {
-        $structures = [];
+        $structures[] = $structure->uuid;
         $collect = function ($s) use (&$structures, &$collect) {
             foreach ($s->children as $child) {
                 if ($child->status) {
@@ -234,7 +219,7 @@ class StructureStatisticReportRepository
 
     public function getExpensesByMap(Structure $structure): array
     {
-        $structures = [];
+        $structures[] = $structure->uuid;
         $collect = function ($s) use (&$structures, &$collect) {
             foreach ($s->children as $child) {
                 if ($child->status) {

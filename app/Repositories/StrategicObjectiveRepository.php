@@ -15,6 +15,7 @@ use App\Services\StructureAccessService;
 use App\Support\PriorityLevel;
 use App\Support\RiskLevel;
 use App\Support\StrategicObjectiveStatus;
+use App\Support\StrategicState;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
@@ -70,6 +71,25 @@ class StrategicObjectiveRepository
             $query->whereIn('strategic_objectives.structure_uuid', $allowed);
         }
 
+        // Status filter
+        if ($request->filled('status')) {
+            $query->where('strategic_objectives.status', $request->status);
+        }
+
+        // State filter
+        if ($request->filled('state')) {
+            $query->where('strategic_objectives.state', $request->state);
+        }
+
+        // Nature filter (alert or failed)
+        if ($request->filled('nature')) {
+            if ($request->nature === 'alert') {
+                $query->where('strategic_objectives.alert', true);
+            } elseif ($request->nature === 'failed') {
+                $query->where('strategic_objectives.failed', true);
+            }
+        }
+
         if (!empty($searchTerm)) {
             $query->where(function ($q) use ($searchTerm, $searchable) {
                 foreach ($searchable as $column) {
@@ -102,8 +122,29 @@ class StrategicObjectiveRepository
     /**
      * Load requirements data
      */
-    public function requirements()
+    public function requirements(Request $request)
     {
+        if ($request->mode == 'filters') {
+            $statuses =  collect(StrategicObjectiveStatus::all())->map(function ($item) {
+                return [
+                    'code' => $item['code'],
+                    'name' => $item['name'][app()->getLocale()] ?? $item['name']['fr'],
+                ];
+            });
+
+            $states =  collect(StrategicState::all())->map(function ($item) {
+                return [
+                    'code' => $item['code'],
+                    'name' => $item['name'][app()->getLocale()] ?? $item['name']['fr'],
+                ];
+            });
+
+            return [
+                'statuses' => $statuses,
+                'states' => $states,
+            ];
+        }
+
         $ownerStructures = Structure::query()
             ->where('status', true)
             ->whereIn('type', ['STATE', 'STRATEGIC'])

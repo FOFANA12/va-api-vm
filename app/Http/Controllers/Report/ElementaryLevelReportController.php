@@ -18,11 +18,21 @@ class ElementaryLevelReportController extends Controller
     }
 
     /**
-     * Global reporting for a specific Elementary Elevel.
+     * Global reporting for a specific Elementary Level.
      */
     public function globalReport(ElementaryLevel $elementaryLevel)
     {
         $report = $this->repository->getGlobalReport($elementaryLevel);
+
+        return response()->json($report, Response::HTTP_OK);
+    }
+
+    /**
+     * Generate the general dashboard for all Elementary Levels.
+     */
+    public function generalDashboard()
+    {
+        $report = $this->repository->buildGeneralDashboard();
 
         return response()->json($report, Response::HTTP_OK);
     }

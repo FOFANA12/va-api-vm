@@ -41,7 +41,7 @@ return new class extends Migration
             $table->timestamps();
 
             $table->foreign('strategic_domain_uuid')->references('uuid')->on('strategic_domains')->onDelete('restrict');
-            $table->foreign('responsible_uuid')->references('uuid')->on('users')->onDelete('restrict');
+            $table->foreign('responsible_uuid')->references('uuid')->on('users')->onDelete('set null');
             $table->foreign('created_by')->references('uuid')->on('users')->onDelete('set null');
             $table->foreign('updated_by')->references('uuid')->on('users')->onDelete('set null');
         });
