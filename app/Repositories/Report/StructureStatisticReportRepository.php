@@ -14,8 +14,7 @@ class StructureStatisticReportRepository
      */
     public function getAcquisitionReport(Structure $structure): array
     {
-
-        $structures = [];
+        $structures[] = $structure->uuid;
         $collect = function ($s) use (&$structures, &$collect) {
             foreach ($s->children as $child) {
                 if ($child->status) {
@@ -85,7 +84,7 @@ class StructureStatisticReportRepository
      */
     public function getExpenseReport(Structure $structure): array
     {
-        $structures = [];
+        $structures[] = $structure->uuid;
         $collect = function ($s) use (&$structures, &$collect) {
             foreach ($s->children as $child) {
                 if ($child->status) {
