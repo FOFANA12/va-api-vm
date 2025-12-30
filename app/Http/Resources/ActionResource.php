@@ -11,6 +11,7 @@ use App\Support\RiskLevel;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\URL;
+use App\Support\ChartType;
 
 class ActionResource extends JsonResource
 {
@@ -40,6 +41,7 @@ class ActionResource extends JsonResource
             'state' => $this->state ? ActionState::get($this->state, $currentLang) : null,
             'currency' => $this->currency,
             'structure' => $this->structure,
+            'chart_type' => ChartType::get($this->chart_type, $currentLang),
             'project_owner' => $this->projectOwner,
             'is_planned' => $this->is_planned,
             'actual_progress_percent' => $this->actual_progress_percent,
@@ -88,6 +90,7 @@ class ActionResource extends JsonResource
             'prerequisites' => $this->prerequisites,
             'impacts' => $this->impacts,
             'risks' => $this->risks,
+            'chart_type' => $this->chart_type,
 
             'responsible_structure' => $this->responsible_structure_uuid,
             'responsible' => $this->responsible_uuid,
@@ -152,6 +155,7 @@ class ActionResource extends JsonResource
             'prerequisites' => $this->prerequisites,
             'impacts' => $this->impacts,
             'risks' => $this->risks,
+            'chart_type' => ChartType::name($this->chart_type, $currentLang),
             'responsible_structure' => $this->responsibleStructure?->name,
             'responsible' => $this->responsible?->name,
             'beneficiaries' => $this->beneficiaries->map(fn($item) => ['name' => $item->name]),

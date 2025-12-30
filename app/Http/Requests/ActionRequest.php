@@ -21,6 +21,7 @@ use App\Support\PriorityLevel;
 use App\Support\RiskLevel;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
+use App\Support\ChartType;
 
 class ActionRequest extends FormRequest
 {
@@ -56,7 +57,7 @@ class ActionRequest extends FormRequest
             'strategic_domain' => 'bail|nullable|exists:' . StrategicDomain::tableName() . ',uuid',
             'capability_domain' => 'bail|nullable|exists:' . CapabilityDomain::tableName() . ',uuid',
             'elementary_level' => 'bail|nullable|exists:' . ElementaryLevel::tableName() . ',uuid',
-            
+
             'region' => 'bail|nullable|exists:' . Region::tableName() . ',uuid',
             'department' => 'bail|nullable|exists:' . Department::tableName() . ',uuid',
             'municipality' => 'bail|nullable|exists:' . Municipality::tableName() . ',uuid',
@@ -65,6 +66,7 @@ class ActionRequest extends FormRequest
             'prerequisites' => 'bail|nullable|string|max:1000',
             'impacts' => 'bail|nullable|string|max:1000',
             'risks' => 'bail|nullable|string|max:1000',
+            'chart_type' => ['bail', 'required', Rule::in(ChartType::codes())],
 
             'responsible_structure' => 'bail|nullable|exists:' . Structure::tableName() . ',uuid',
             'responsible' => 'bail|nullable|exists:' . User::tableName() . ',uuid',
@@ -93,7 +95,7 @@ class ActionRequest extends FormRequest
             'strategic_domain' => __('app/action.request.strategic_domain'),
             'capability_domain' => __('app/action.request.capability_domain'),
             'elementary_level' => __('app/action.request.elementary_level'),
-            
+
             'region' => __('app/action.request.region'),
             'department' => __('app/action.request.department'),
             'municipality' => __('app/action.request.municipality'),
@@ -102,6 +104,7 @@ class ActionRequest extends FormRequest
             'prerequisites' => __('app/action.request.prerequisites'),
             'impacts' => __('app/action.request.impacts'),
             'risks' => __('app/action.request.risks'),
+            'chart_type' => __('app/action.request.chart_type'),
 
             'funding_sources' => __('app/action.request.funding_sources.title'),
 

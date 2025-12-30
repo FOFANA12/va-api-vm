@@ -38,6 +38,7 @@ return new class extends Migration
             $table->string('status', 50)->default('created');
             $table->timestamp('status_changed_at')->nullable();
             $table->uuid('status_changed_by')->nullable();
+            $table->string('chart_type', 20);
 
             $table->date('start_date')->nullable();
             $table->date('end_date')->nullable();

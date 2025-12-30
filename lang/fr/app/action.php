@@ -25,6 +25,7 @@ return [
         'region' => 'région',
         'department' => 'département',
         'municipality' => 'commune',
+        'chart_type' => 'type de graphique',
 
         'responsible_structure' => 'structure responsable',
         'responsible' => 'responsable',

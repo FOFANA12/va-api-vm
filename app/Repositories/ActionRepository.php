@@ -39,6 +39,7 @@ use RuntimeException;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
+use App\Support\ChartType;
 
 class ActionRepository
 {
@@ -57,8 +58,8 @@ class ActionRepository
      */
     public function index(Request $request)
     {
-        $searchable = ['reference', 'name', 'project_owner', 'structure'];
-        $sortable = ['reference', 'name', 'priority', 'project_owner', 'structure', 'risk_level', 'status', 'state', 'actual_progress_percent', 'start_date', 'end_date', 'total_budget'];
+        $searchable = ['reference', 'name', 'project_owner', 'chart_type', 'structure'];
+        $sortable = ['reference', 'name', 'priority', 'project_owner', 'chart_type', 'structure', 'risk_level', 'status', 'state', 'actual_progress_percent', 'start_date', 'end_date', 'total_budget'];
 
         $searchTerm = $request->input('searchTerm');
         $sortByInput = $request->input('sortBy');
@@ -77,6 +78,7 @@ class ActionRepository
                 'actions.name',
                 'actions.priority',
                 'actions.risk_level',
+                'actions.chart_type',
                 'structures.name as structure',
                 'project_owners.name as projectOwner',
                 'actions.actual_progress_percent',
@@ -305,6 +307,13 @@ class ActionRepository
 
         $currency = Currency::getDefault();
 
+        $chartTypes =  collect(ChartType::all())->map(function ($item) {
+            return [
+                'code' => $item['code'],
+                'name' => $item['name'][app()->getLocale()] ?? $item['name']['fr'],
+            ];
+        });
+
         return [
             'structures' => $structures,
             'action_plans' => $actionPlans,
@@ -328,6 +337,7 @@ class ActionRepository
             'stakeholders' => $stakeholders,
             'funding_sources' => $fundingSources,
             'currency' => $currency,
+            'chart_types' => $chartTypes,
         ];
     }
 
@@ -372,6 +382,7 @@ class ActionRepository
                 'prerequisites',
                 'impacts',
                 'risks',
+                'chart_type',
                 'generate_document_type',
                 'structure_uuid',
                 'action_plan_uuid',
@@ -568,6 +579,7 @@ class ActionRepository
                 'prerequisites',
                 'impacts',
                 'risks',
+                'chart_type',
                 'generate_document_type',
                 'structure_uuid',
                 'action_plan_uuid',
