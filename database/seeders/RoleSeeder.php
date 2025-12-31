@@ -71,23 +71,23 @@ class RoleSeeder extends Seeder
             ['name' => 'DELETE_INDICATOR', 'category' => 'Indicateur', 'description' => 'Supprimer un indicateur'],
 
             // Indicator — Status
-            ['name' => 'IND_ACCESS_STATUS', 'category' => 'Indicateur statut', 'description' => 'Accès au statut'],
+            ['name' => 'IND_ACCESS_STATUS', 'category' => 'Indicateur — Statut', 'description' => 'Accès au statut'],
             ['name' => 'IND_MANAGE_STATUS', 'category' => 'Indicateur — Statut', 'description' => 'Gérer le statut'],
 
             // Indicator — Planning
-            ['name' => 'IND_ACCESS_PLANNING', 'category' => 'Indicateur planification', 'description' => 'Accès à la planification'],
+            ['name' => 'IND_ACCESS_PLANNING', 'category' => 'Indicateur — Planification', 'description' => 'Accès à la planification'],
             ['name' => 'IND_MANAGE_PLANNING', 'category' => 'Indicateur — Planification', 'description' => 'Gérer la planification'],
 
             // Indicator — Control
-            ['name' => 'IND_ACCESS_CONTROL', 'category' => 'Indicateur contrôle', 'description' => 'Accès au contrôle'],
+            ['name' => 'IND_ACCESS_CONTROL', 'category' => 'Indicateur — Contrôle', 'description' => 'Accès au contrôle'],
             ['name' => 'IND_MANAGE_CONTROL', 'category' => 'Indicateur — Contrôle', 'description' => 'Gérer les contrôles'],
 
             // Indicator — File
-            ['name' => 'IND_ACCESS_FILES', 'category' => 'Indicateur fichier', 'description' => 'Accès aux fichiers'],
+            ['name' => 'IND_ACCESS_FILES', 'category' => 'Indicateur — Fichier', 'description' => 'Accès aux fichiers'],
             ['name' => 'IND_MANAGE_FILES', 'category' => 'Indicateur — Fichier', 'description' => 'Gérer les fichiers'],
 
             // Indicator — Decision
-            ['name' => 'IND_ACCESS_DECISIONS', 'category' => 'Indicateur décision', 'description' => 'Accès aux décisions'],
+            ['name' => 'IND_ACCESS_DECISIONS', 'category' => 'Indicateur — Décision', 'description' => 'Accès aux décisions'],
             ['name' => 'IND_MANAGE_DECISIONS', 'category' => 'Indicateur — Décision', 'description' => 'Gérer les décisions'],
 
             // Indicator — Reporting : performance
@@ -108,43 +108,27 @@ class RoleSeeder extends Seeder
             ['name' => 'DELETE_ACTION', 'category' => 'Action', 'description' => 'Supprimer une action'],
 
             // Action - Status
-            ['name' => 'ACT_ACCESS_STATUS', 'category' => 'Action statut', 'description' => 'Accès au statut'],
+            ['name' => 'ACT_ACCESS_STATUS', 'category' => 'Action — Statut', 'description' => 'Accès au statut'],
             ['name' => 'ACT_MANAGE_STATUS', 'category' => 'Action — Statut', 'description' => 'Gérer le statut'],
 
             // Action - Planning
-            ['name' => 'ACT_ACCESS_PLANNING', 'category' => 'Action planification', 'description' => 'Accès à la planification'],
+            ['name' => 'ACT_ACCESS_PLANNING', 'category' => 'Action — Planification', 'description' => 'Accès à la planification'],
             ['name' => 'ACT_MANAGE_PLANNING', 'category' => 'Action — Planification', 'description' => 'Gérer la planification'],
 
             // Action - Control
-            ['name' => 'ACT_ACCESS_CONTROL', 'category' => 'Action contrôle', 'description' => 'Accès au contrôle'],
+            ['name' => 'ACT_ACCESS_CONTROL', 'category' => 'Action — Contrôle', 'description' => 'Accès au contrôle'],
             ['name' => 'ACT_MANAGE_CONTROL', 'category' => 'Action — Contrôle', 'description' => 'Gérer les contrôles'],
 
             // Action - Alignment
-            ['name' => 'ACT_ACCESS_ALIGNMENT', 'category' => 'Action alignement', 'description' => 'Accès à l\'alignement'],
+            ['name' => 'ACT_ACCESS_ALIGNMENT', 'category' => 'Action — Alignement', 'description' => 'Accès à l\'alignement'],
             ['name' => 'ACT_MANAGE_ALIGNMENT', 'category' => 'Action — Alignement', 'description' => 'Gérer l\'alignement'],
 
-            // Action Domain - Files
-            ['name' => 'ACD_ACCESS_FILES', 'category' => 'Action Domain fichier', 'description' => 'Accès aux fichiers'],
-            ['name' => 'ACD_MANAGE_FILES', 'category' => 'Action — Domain — Fichier', 'description' => 'Gérer les fichiers'],
-
-            // Strategic Domain - Files
-            ['name' => 'SD_ACCESS_FILES', 'category' => 'Stratégic Domain fichier', 'description' => 'Accès aux fichiers'],
-            ['name' => 'SD_MANAGE_FILES', 'category' => 'Stratégic — Domain — Fichier', 'description' => 'Gérer les fichiers'],
-
-            // Capability Domain - Files
-            ['name' => 'CD_ACCESS_FILES', 'category' => 'Capacitaire Domain fichier', 'description' => 'Accès aux fichiers'],
-            ['name' => 'CD_MANAGE_FILES', 'category' => 'Capacitaire — Domain — Fichier', 'description' => 'Gérer les fichiers'],
-
-            // Elementary Level - Files
-            ['name' => 'EML_ACCESS_FILES', 'category' => 'Niveau Elémentaire fichier', 'description' => 'Accès aux fichiers'],
-            ['name' => 'EML_MANAGE_FILES', 'category' => 'Niveau — Elémentaire — Fichier', 'description' => 'Gérer les fichiers'],
-
             // Action - Files
-            ['name' => 'ACT_ACCESS_FILES', 'category' => 'Action fichier', 'description' => 'Accès aux fichiers'],
+            ['name' => 'ACT_ACCESS_FILES', 'category' => 'Action — Fichier', 'description' => 'Accès aux fichiers'],
             ['name' => 'ACT_MANAGE_FILES', 'category' => 'Action — Fichier', 'description' => 'Gérer les fichiers'],
 
             // Action - Decisions
-            ['name' => 'ACT_ACCESS_DECISIONS', 'category' => 'Action décision', 'description' => 'Accès aux décisions'],
+            ['name' => 'ACT_ACCESS_DECISIONS', 'category' => 'Action — Décision', 'description' => 'Accès aux décisions'],
             ['name' => 'ACT_MANAGE_DECISIONS', 'category' => 'Action — Décision', 'description' => 'Gérer les décisions'],
 
             // Action - Phases
@@ -162,15 +146,15 @@ class RoleSeeder extends Seeder
             ['name' => 'DELETE_SUPPLIER', 'category' => 'Fournisseur', 'description' => 'Supprimer un fournisseur'],
 
             // Supplier - Contracts
-            ['name' => 'SUP_ACCESS_CONTRACTS', 'category' => 'Fournisseur contrat', 'description' => 'Accès aux contrats'],
+            ['name' => 'SUP_ACCESS_CONTRACTS', 'category' => 'Fournisseur — Contrats', 'description' => 'Accès aux contrats'],
             ['name' => 'SUP_MANAGE_CONTRACTS', 'category' => 'Fournisseur — Contrats', 'description' => 'Gérer les contrats'],
 
             // Supplier - Evaluation
-            ['name' => 'SUP_ACCESS_EVALUATIONS', 'category' => 'Fournisseur évaluation', 'description' => 'Accès aux évaluations'],
+            ['name' => 'SUP_ACCESS_EVALUATIONS', 'category' => 'Fournisseur — Évaluations', 'description' => 'Accès aux évaluations'],
             ['name' => 'SUP_MANAGE_EVALUATIONS', 'category' => 'Fournisseur — Évaluations', 'description' => 'Gérer les évaluations'],
 
             // Supplier - Files
-            ['name' => 'SUP_ACCESS_FILES', 'category' => 'Fournisseur fichier', 'description' => 'Accès aux fichiers'],
+            ['name' => 'SUP_ACCESS_FILES', 'category' => 'Fournisseur — Fichiers', 'description' => 'Accès aux fichiers'],
             ['name' => 'SUP_MANAGE_FILES', 'category' => 'Fournisseur — Fichiers', 'description' => 'Gérer les fichiers'],
 
             // Fund receipts
@@ -255,19 +239,19 @@ class RoleSeeder extends Seeder
             ['name' => 'UPDATE_FILE_TYPE', 'category' => 'Type de fichier', 'description' => 'Modifier un type'],
             ['name' => 'DELETE_FILE_TYPE', 'category' => 'Type de fichier', 'description' => 'Supprimer un type'],
 
-            // Contract types
-            ['name' => 'ACCESS_CONTRACT_TYPES', 'category' => 'Type de marché', 'description' => 'Accès au module'],
-            ['name' => 'CREATE_CONTRACT_TYPE', 'category' => 'Type de marché', 'description' => 'Créer un type'],
-            ['name' => 'READ_CONTRACT_TYPES', 'category' => 'Type de marché', 'description' => 'Voir les types'],
-            ['name' => 'UPDATE_CONTRACT_TYPE', 'category' => 'Type de marché', 'description' => 'Modifier un type'],
-            ['name' => 'DELETE_CONTRACT_TYPE', 'category' => 'Type de marché', 'description' => 'Supprimer un type'],
+            // // Contract types
+            // ['name' => 'ACCESS_CONTRACT_TYPES', 'category' => 'Type de marché', 'description' => 'Accès au module'],
+            // ['name' => 'CREATE_CONTRACT_TYPE', 'category' => 'Type de marché', 'description' => 'Créer un type'],
+            // ['name' => 'READ_CONTRACT_TYPES', 'category' => 'Type de marché', 'description' => 'Voir les types'],
+            // ['name' => 'UPDATE_CONTRACT_TYPE', 'category' => 'Type de marché', 'description' => 'Modifier un type'],
+            // ['name' => 'DELETE_CONTRACT_TYPE', 'category' => 'Type de marché', 'description' => 'Supprimer un type'],
 
-            // Procurement modes
-            ['name' => 'ACCESS_PROCUREMENT_MODES', 'category' => 'Mode de sélection', 'description' => 'Accès au module'],
-            ['name' => 'CREATE_PROCUREMENT_MODE', 'category' => 'Mode de sélection', 'description' => 'Créer un mode de sélection'],
-            ['name' => 'READ_PROCUREMENT_MODES', 'category' => 'Mode de sélection', 'description' => 'Voir les modes de sélection'],
-            ['name' => 'UPDATE_PROCUREMENT_MODE', 'category' => 'Mode de sélection', 'description' => 'Modifier un mode de sélection'],
-            ['name' => 'DELETE_PROCUREMENT_MODE', 'category' => 'Mode de sélection', 'description' => 'Supprimer un mode de sélection'],
+            // // Procurement modes
+            // ['name' => 'ACCESS_PROCUREMENT_MODES', 'category' => 'Mode de sélection', 'description' => 'Accès au module'],
+            // ['name' => 'CREATE_PROCUREMENT_MODE', 'category' => 'Mode de sélection', 'description' => 'Créer un mode de sélection'],
+            // ['name' => 'READ_PROCUREMENT_MODES', 'category' => 'Mode de sélection', 'description' => 'Voir les modes de sélection'],
+            // ['name' => 'UPDATE_PROCUREMENT_MODE', 'category' => 'Mode de sélection', 'description' => 'Modifier un mode de sélection'],
+            // ['name' => 'DELETE_PROCUREMENT_MODE', 'category' => 'Mode de sélection', 'description' => 'Supprimer un mode de sélection'],
 
             // Project owners
             ['name' => 'ACCESS_PROJECT_OWNERS', 'category' => 'Maître d\'ouvrage', 'description' => 'Accès au module'],
