@@ -4,6 +4,7 @@ namespace App\Repositories\Report;
 
 use App\Helpers\DateTimeFormatter;
 use App\Models\Action;
+use App\Support\ChartType;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -115,6 +116,9 @@ class ActionPerformanceReportRepository
         return [
             'rows' => $rows,
             'overall_progress' => $overallProgress,
+            'actual_progress_percent' => (float) $action->actual_progress_percent,
+            'chart_type' => ChartType::get($action->chart_type, app()->getLocale()),
+            'unit' => '%',
         ];
     }
 
