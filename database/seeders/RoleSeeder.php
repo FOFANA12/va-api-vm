@@ -26,9 +26,9 @@ class RoleSeeder extends Seeder
             ['name' => 'ACCESS_PRIORITY_MATRIX', 'category' => 'Matrice de priorité', 'description' => 'Accès au module'],
             ['name' => 'MANAGE_PRIORITY_MATRIX', 'category' => 'Matrice de priorité', 'description' => 'Gérer une matrice'],
 
-            // Stakeholders
-            ['name' => 'ACCESS_STAKEHOLDERS', 'category' => 'Partie prenante', 'description' => 'Accès au module'],
-            ['name' => 'MANAGE_STAKEHOLDERS', 'category' => 'Partie prenante', 'description' => 'Gérer les parties prenantes'],
+            // Map Stakeholders
+            ['name' => 'ACCESS_MAP_STAKEHOLDERS', 'category' => 'Partie prenante (Carte)', 'description' => 'Accès au module'],
+            ['name' => 'MANAGE_MAP_STAKEHOLDERS', 'category' => 'Partie prenante (Carte)', 'description' => 'Gérer les parties prenantes'],
 
             // Strategic levers
             ['name' => 'ACCESS_STRATEGIC_LEVERS', 'category' => 'Levier stratégique', 'description' => 'Accès au module'],
@@ -329,6 +329,13 @@ class RoleSeeder extends Seeder
             ['name' => 'READ_INDICATOR_CATEGORIES', 'category' => 'Catégorie d\'indicateur', 'description' => 'Voir les catégories'],
             ['name' => 'UPDATE_INDICATOR_CATEGORY', 'category' => 'Catégorie d\'indicateur', 'description' => 'Modifier une catégorie'],
             ['name' => 'DELETE_INDICATOR_CATEGORY', 'category' => 'Catégorie d\'indicateur', 'description' => 'Supprimer une catégorie'],
+
+            // Stakeholders
+            ['name' => 'ACCESS_STAKEHOLDERS', 'category' => 'Parties prenantes', 'description' => 'Accès au module'],
+            ['name' => 'CREATE_STAKEHOLDER', 'category' => 'Parties prenantes', 'description' => 'Créer une partie prenante'],
+            ['name' => 'READ_STAKEHOLDERS', 'category' => 'Parties prenantes', 'description' => 'Voir les parties prenantes'],
+            ['name' => 'UPDATE_STAKEHOLDER', 'category' => 'Parties prenantes', 'description' => 'Modifier une partie prenante'],
+            ['name' => 'DELETE_STAKEHOLDER', 'category' => 'Parties prenantes', 'description' => 'Supprimer une partie prenante'],
 
             // Users
             ['name' => 'ACCESS_USERS', 'category' => 'Utilisateur', 'description' => 'Accès au module'],
