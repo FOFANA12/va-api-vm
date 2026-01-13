@@ -32,7 +32,7 @@ class ActionPlanImportService
                 'errors' => [
                     [
                         'row' => 0,
-                        'errors' => [__('app/settings/account.import.file_empty')],
+                        'errors' => [__('app/action_plan.import.file_empty')],
                     ],
                 ],
             ];
@@ -47,7 +47,7 @@ class ActionPlanImportService
             foreach ($rows as $index => $row) {
                 $lineNumber = $index + 2;
 
-                $validator = $this->validateRow($row, $updateActionPlanIfExists);
+                $validator = $this->validateRow($row);
 
                 if ($validator->fails()) {
                     $errors[] = [
