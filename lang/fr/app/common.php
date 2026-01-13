@@ -15,9 +15,10 @@ return [
     'request' => [
         'line_items_required' => 'Aucune ligne d\'article n\'a été trouvée. Ajoutez des articles pour continuer.',
         'line_number' => 'ligne :line',
+        'import_file' => 'fichier d\'importation',
     ],
     'repository' => [
         'foreignKey' => 'L\'action ne peut pas être effectuée car cet enregistrement est lié à d\'autres ressources.',
-        'error' => 'Une erreur inattendue s’est produite lors du traitement de votre demande. Veuillez réessayer plus tard.',
+        'error' => 'Une erreur inattendue s\'est produite lors du traitement de votre demande. Veuillez réessayer plus tard.',
     ],
 ];

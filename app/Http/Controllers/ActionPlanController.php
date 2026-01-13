@@ -9,7 +9,8 @@ use App\Http\Requests\ActionPlanRequest;
 use App\Http\Resources\ActionPlanResource;
 use App\Models\ActionPlan;
 use App\Repositories\ActionPlanRepository;
-use App\Services\ActionPlan\ActionPlanImportService;
+use App\Services\Exports\ActionPlanExportService;
+use App\Services\Imports\ActionPlanImportService;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
@@ -19,6 +20,7 @@ use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Facades\Storage;
 
 class ActionPlanController extends Controller
 {
@@ -28,17 +30,23 @@ class ActionPlanController extends Controller
     private $messageSuccessDuplicated;
     private $messageSuccessUpdated;
     private $messageSuccessDeleted;
+     private string $messageImportSuccess;
+    private string $messageImportFailed;
     private $repository;
-    private $importService;
+    private ActionPlanExportService $exportService;
 
-    public function __construct(ActionPlanRepository $repository, ActionPlanImportService $importService)
+    public function __construct(ActionPlanRepository $repository, ActionPlanExportService $exportService)
     {
         $this->messageSuccessCreated = __('app/action_plan.controller.message_success_created');
         $this->messageSuccessDuplicated = __('app/action_plan.controller.message_success_duplicated');
         $this->messageSuccessUpdated = __('app/action_plan.controller.message_success_updated');
         $this->messageSuccessDeleted = __('app/common.controller.message_success_deleted');
+
+         $this->messageImportSuccess = __('app/action_plan.import.success');
+        $this->messageImportFailed = __('app/action_plan.import.failed');
+
         $this->repository = $repository;
-        $this->importService = $importService;
+        $this->exportService = $exportService;
     }
 
     /**
@@ -126,17 +134,6 @@ class ActionPlanController extends Controller
             'message' => $this->messageSuccessDeleted
         ])->setStatusCode(Response::HTTP_OK);
     }
-
-    public function import(ActionPlanImportRequest $request)
-    {
-        $this->importService->handleImport(
-            $request->file('file'),
-            $request->input('structure')
-        );
-
-        return response()->json(['message' => __('app/import.upload_success_and_processing')]);
-    }
-
 
     public function exportToExcel(ActionPlan $actionPlan)
     {
@@ -243,5 +240,48 @@ class ActionPlanController extends Controller
         $writer->save($filePath);
 
         return response()->download($filePath);
+    }
+
+    /**
+     * Import action plans from Excel / CSV file.
+     */
+    public function import(ActionPlanImportRequest $request, ActionPlanImportService $importService)
+    {
+        // Options (checkbox frontend)
+        $updateIfExists = filter_var(
+            $request->input('update_if_exists'),
+            FILTER_VALIDATE_BOOLEAN
+        );
+
+        // Store file temporarily
+        $path = $request->file('import_file')->store('imports/tmp');
+
+        $result = $importService->import(
+            Storage::path($path),
+            $updateIfExists
+        );
+
+        // Optional: cleanup file
+        Storage::delete($path);
+
+        if (!$result['success']) {
+            return response()->json([
+                'message' => $this->messageImportFailed,
+                'errors'  => $result['errors'],
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        return response()->json([
+            'message'  => $this->messageImportSuccess,
+            'imported' => $result['imported'],
+        ], Response::HTTP_OK);
+    }
+
+    /**
+     * Mass export (all accounts)
+     */
+    public function exportAll()
+    {
+        return $this->exportService->exportAll();
     }
 }

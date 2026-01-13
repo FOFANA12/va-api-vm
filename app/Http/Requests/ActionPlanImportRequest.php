@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests;
 
-use App\Models\Structure;
 use Illuminate\Foundation\Http\FormRequest;
 
 class ActionPlanImportRequest extends FormRequest
@@ -23,8 +22,7 @@ class ActionPlanImportRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'file' => 'bail|required|file|mimes:xlsx,xls,csv|max:5120',
-            'structure' => 'bail|required|exists:' . Structure::tableName() . ',uuid',
+            'import_file' => 'bail|required|file|mimes:xlsx,xls,csv|max:10240',
         ];
     }
 
@@ -34,8 +32,7 @@ class ActionPlanImportRequest extends FormRequest
     public function attributes(): array
     {
         return [
-            'file' => __('app/attachment.request.file'),
-            'structure' => __('app/action_plan.request.structure'),
+            'import_file' => __('app/common.request.import_file'),
         ];
     }
 }

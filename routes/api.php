@@ -599,4 +599,9 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::get('{structure?}/operational', 'operational');
         Route::get('{structure?}/financial', 'financial');
     });
+
+    // Imports
+    Route::prefix('imports')->group(function () {
+        Route::post('action-plans', [ActionPlanController::class, 'import']);
+    });
 });

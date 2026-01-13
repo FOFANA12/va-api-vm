@@ -30,4 +30,7 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('structure/export/procurement-plan-to-excel/{structure}/{generateDocumentType}',  [StructureController::class, 'exportProcurementPlanToWord'])->name('structure.exportProcurementPlanToWord');
     Route::get('structure/export/objective-to-excel/{structure}',  [StructureController::class, 'exportObjectiveToWord'])->name('structure.exportObjectiveToWord');
     Route::get('structure/export/objective-decision-to-excel/{structure}',  [StructureController::class, 'exportObjectiveDecisionToWord'])->name('structure.exportObjectiveDecisionToWord');
+
+    // Action plan
+    Route::get('action-plans/export/all', [ActionPlanController::class, 'exportAll']);
 });
