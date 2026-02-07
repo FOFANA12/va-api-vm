@@ -66,7 +66,7 @@ class StrategicObjectiveRepository
                 'strategic_objectives.state',
             );
 
-        $allowed = $this->structureAccess->getAccessibleStructureUuids(Auth::user());
+        $allowed = $this->structureAccess->getAccessibleStructureUuids(Auth::user(), true, true);
         if ($allowed !== null) {
             $query->whereIn('strategic_objectives.structure_uuid', $allowed);
         }

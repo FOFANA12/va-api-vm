@@ -55,15 +55,34 @@ class ElementaryLevelState
         ],
     ];
 
+
     /**
-     * Allowed transitions between states.
+     * Allowed strategic states depending on elementary level status.
      */
-    private static array $transitions = [
-        'none' => ['on_track', 'delayed', 'off_track'],
-        'on_track' => ['delayed', 'off_track', 'achieved'],
-        'delayed' => ['on_track', 'off_track', 'achieved'],
-        'off_track' => ['on_track', 'delayed', 'achieved'],
-        'achieved' => ['on_track'], // can reopen or continue monitoring
+    private static array $allowedByStatus = [
+        'preparation' => [
+            'none',
+        ],
+
+        'engaged' => [
+            'on_track',
+            'delayed',
+            'off_track',
+            'achieved',
+        ],
+
+        'closed' => [
+            'on_track',
+            'delayed',
+            'off_track',
+            'achieved',
+        ],
+
+        'stopped' => [
+            'on_track',
+            'delayed',
+            'off_track',
+        ],
     ];
 
     /**
@@ -115,18 +134,30 @@ class ElementaryLevelState
     }
 
     /**
-     * Get possible next states for a given state.
+     * Get allowed states for a given status.
      */
-    public static function next(string $code): array
+    public static function allowedStatesForStatus(string $status, string $locale = 'fr'): array
     {
-        return self::$transitions[$code] ?? [];
+        $allowedCodes = self::$allowedByStatus[$status] ?? [];
+
+        return array_values(array_map(
+            fn($state) => (object) [
+                'code' => $state['code'],
+                'label' => $state['name'][$locale] ?? $state['name']['fr'],
+                'color' => $state['color'],
+            ],
+            array_filter(
+                self::$states,
+                fn($state) => in_array($state['code'], $allowedCodes, true)
+            )
+        ));
     }
 
     /**
-     * Check if transition from one state to another is allowed.
+     * Check if a state is allowed for a given status.
      */
-    public static function canTransition(string $from, string $to): bool
+    public static function isAllowedForStatus(string $status, string $state): bool
     {
-        return in_array($to, self::$transitions[$from] ?? [], true);
+        return in_array($state, self::$allowedByStatus[$status] ?? [], true);
     }
 }

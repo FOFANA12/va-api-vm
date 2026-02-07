@@ -208,6 +208,7 @@ Route::middleware('auth:sanctum')->group(function () {
     // Structures
     Route::prefix('structures')->controller(StructureController::class)->group(function () {
         Route::get('requirements', 'requirements');
+        Route::get('{structure}/org-chart', 'orgChart');
         Route::post('destroy', 'destroy');
     });
     Route::apiResource('structures', StructureController::class)->only(['index', 'store', 'show', 'update']);

@@ -144,6 +144,31 @@ class StructureRepository
     }
 
     /**
+     * Get structure hierarchy formatted for vue3-tree-org.
+     */
+    public function getHierarchyForOrgChart(Structure $structure): array
+    {
+        $buildTree = function (Structure $node) use (&$buildTree) {
+            return [
+                'id' => $node->abbreviation,
+                'label' => $node->name,
+                'type' => $node->type,
+                'children' => $node->children
+                    ->where('status', true)
+                    ->map(function ($child) use ($buildTree) {
+                        return $buildTree($child);
+                    })
+                    ->values()
+                    ->toArray(),
+            ];
+        };
+
+        $structure->loadMissing('children.children');
+
+        return $buildTree($structure);
+    }
+
+    /**
      * Update a structure.
      */
     public function update(StructureRequest $request, Structure $structure)

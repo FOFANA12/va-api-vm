@@ -7,31 +7,60 @@ use App\Models\User;
 
 class StructureAccessService
 {
-    public function getAccessibleStructureUuids(User $user): ?array
-    {
-        if (!$user->employee) {
+    public function getAccessibleStructureUuids(
+        User $user,
+        bool $includeParents = false,
+        bool $includeChildren = true
+    ): ?array {
+        if (!$user->employee || !$user->employee->structure_uuid) {
             return null;
         }
 
-        $root = $user->employee->structure_uuid;
-        $children = $this->getDescendants($root);
+        $rootUuid = $user->employee->structure_uuid;
 
-        return array_merge([$root], $children);
+        $result = [$rootUuid];
+
+
+        if ($includeParents) {
+            $result = array_merge(
+                $result,
+                $this->getAncestors($rootUuid)
+            );
+        }
+
+        if ($includeChildren) {
+            $result = array_merge(
+                $result,
+                $this->getDescendants($rootUuid)
+            );
+        }
+
+        return array_values(array_unique($result));
     }
 
     private function getDescendants(string $uuid): array
     {
-        $children = Structure::where('parent_uuid', $uuid)->pluck('uuid')->toArray();
+        $children = Structure::where('parent_uuid', $uuid)->pluck('uuid');
 
-        if (!$children) {
+        return $children
+            ->flatMap(fn($childUuid) => [
+                $childUuid,
+                ...$this->getDescendants($childUuid),
+            ])
+            ->toArray();
+    }
+
+    private function getAncestors(string $uuid): array
+    {
+        $parentUuid = Structure::where('uuid', $uuid)->value('parent_uuid');
+
+        if (!$parentUuid) {
             return [];
         }
 
-        $nested = [];
-        foreach ($children as $child) {
-            $nested = array_merge($nested, $this->getDescendants($child));
-        }
-
-        return array_merge($children, $nested);
+        return [
+            $parentUuid,
+            ...$this->getAncestors($parentUuid),
+        ];
     }
 }

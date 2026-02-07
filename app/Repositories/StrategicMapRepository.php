@@ -52,7 +52,7 @@ class StrategicMapRepository
         )
             ->join('structures', 'strategic_maps.structure_uuid', '=', 'structures.uuid');
 
-        $allowed = $this->structureAccess->getAccessibleStructureUuids(Auth::user());
+        $allowed = $this->structureAccess->getAccessibleStructureUuids(Auth::user(), true, true);
         if ($allowed !== null) {
             $query->whereIn('strategic_maps.structure_uuid', $allowed);
         }

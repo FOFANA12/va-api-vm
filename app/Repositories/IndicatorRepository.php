@@ -69,7 +69,7 @@ class IndicatorRepository
                 'indicators.is_planned',
             );
 
-        $allowed = $this->structureAccess->getAccessibleStructureUuids(Auth::user());
+        $allowed = $this->structureAccess->getAccessibleStructureUuids(Auth::user(), true, true);
         if ($allowed !== null) {
             $query->whereIn('indicators.structure_uuid', $allowed);
         }

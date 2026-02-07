@@ -28,18 +28,21 @@ class CapabilityDomainStateRepository
      */
     public function requirements(CapabilityDomain $capabilityDomain)
     {
-        $current = $capabilityDomain->state;
-        $next = CapabilityDomainState::next($current);
+        $status = $capabilityDomain->status;
+        $currentState = $capabilityDomain->state;
+
+        $states = CapabilityDomainState::allowedStatesForStatus($status, app()->getLocale());
+        $states = collect($states)
+            ->reject(fn($state) => $state->code === $currentState)
+            ->map(fn($state) => [
+                'code' => $state->code,
+                'name' => $state->label,
+                'color' => $state->color,
+            ])
+            ->values();
 
         return [
-            'states' => collect($next)->map(function ($code) {
-                $state = CapabilityDomainState::get($code, app()->getLocale());
-                return [
-                    'code'  => $state->code,
-                    'name'  => $state->label,
-                    'color' => $state->color,
-                ];
-            })->values(),
+            'states' => $states,
         ];
     }
 

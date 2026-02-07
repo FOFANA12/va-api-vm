@@ -11,6 +11,7 @@ use App\Models\Indicator;
 use App\Models\IndicatorControl;
 use App\Models\IndicatorPeriod;
 use App\Models\StrategicObjective;
+use App\Support\StrategicObjectiveStatus;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use RuntimeException;
@@ -227,8 +228,10 @@ class IndicatorControlRepository
     protected function updateObjectiveState(StrategicObjective $strategicObjective)
     {
         $worstState = $strategicObjective->indicators
-            ->where('state', '!=', 'none')
-            ->min('state');
+            ->pluck('state')
+            ->filter(fn($state) => $state !== 'none')
+            ->sortBy(fn($state) => StrategicObjectiveStatus::severity($state))
+            ->first();
 
         $strategicObjective->update([
             'state' => $worstState ?? 'none',

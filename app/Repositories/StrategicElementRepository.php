@@ -59,7 +59,7 @@ class StrategicElementRepository
             ->leftJoin('strategic_elements as stEl', 'strategic_elements.parent_element_uuid', '=', 'stEl.uuid')
             ->where('strategic_elements.type', $type);
 
-        $allowed = $this->structureAccess->getAccessibleStructureUuids(Auth::user());
+        $allowed = $this->structureAccess->getAccessibleStructureUuids(Auth::user(), true, true);
         if ($allowed !== null) {
             $query->whereIn('strategic_elements.structure_uuid', $allowed);
         }

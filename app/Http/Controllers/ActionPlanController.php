@@ -137,7 +137,6 @@ class ActionPlanController extends Controller
 
     public function exportToExcel(ActionPlan $actionPlan)
     {
-
         $spreadsheet = IOFactory::load(public_path('storage/templates/template-ap.xlsx'));
         $worksheet = $spreadsheet->getActiveSheet();
         $worksheet->setTitle(\Illuminate\Support\Str::limit($actionPlan->reference, 25));
@@ -177,30 +176,33 @@ class ActionPlanController extends Controller
             $worksheet->setCellValue('F' . $startLine, DateTimeFormatter::formatDate($action->end_date));
             $worksheet->getStyle('F' . $startLine)->applyFromArray($styleArray);
 
-            $worksheet->setCellValue('G' . $startLine, $action->program?->name);
+            $worksheet->setCellValue('G' . $startLine, $action->actionDomain?->name);
             $worksheet->getStyle('G' . $startLine)->applyFromArray($styleArray);
 
-            $worksheet->setCellValue('H' . $startLine, $action->project?->name);
+            $worksheet->setCellValue('H' . $startLine,  $action->strategicDomain?->name);
             $worksheet->getStyle('H' . $startLine)->applyFromArray($styleArray);
 
-            $worksheet->setCellValue('I' . $startLine, $action->activity?->name);
+            $worksheet->setCellValue('I' . $startLine, $action->capabilityDomain?->name);
             $worksheet->getStyle('I' . $startLine)->applyFromArray($styleArray);
+            
+            $worksheet->setCellValue('J' . $startLine, $action->elementaryLevel?->name);
+            $worksheet->getStyle('J' . $startLine)->applyFromArray($styleArray);
 
             $objectives = $action->objectives->pluck('name')->implode(', ');
-            $worksheet->setCellValue("J{$startLine}", $objectives);
-            $worksheet->getStyle("J{$startLine}")->applyFromArray($styleArray);
-            $worksheet->getStyle("J{$startLine}")->getAlignment()->setWrapText(true);
+            $worksheet->setCellValue("K{$startLine}", $objectives);
+            $worksheet->getStyle("K{$startLine}")->applyFromArray($styleArray);
+            $worksheet->getStyle("K{$startLine}")->getAlignment()->setWrapText(true);
 
             $stakeholders = $action->stakeholders->pluck('name')->implode(",\n");
-            $worksheet->setCellValue("K{$startLine}", $stakeholders);
-            $worksheet->getStyle("K{$startLine}")->applyFromArray($styleArray);
-
-            $worksheet->setCellValue("L{$startLine}", $action->total_budget);
+            $worksheet->setCellValue("L{$startLine}", $stakeholders);
             $worksheet->getStyle("L{$startLine}")->applyFromArray($styleArray);
 
-            $fundingSources = $action->fundingSources->pluck('name')->implode(",\n");
-            $worksheet->setCellValue("M{$startLine}", $fundingSources);
+            $worksheet->setCellValue("M{$startLine}", $action->total_budget);
             $worksheet->getStyle("M{$startLine}")->applyFromArray($styleArray);
+
+            $fundingSources = $action->fundingSources->pluck('name')->implode(",\n");
+            $worksheet->setCellValue("N{$startLine}", $fundingSources);
+            $worksheet->getStyle("N{$startLine}")->applyFromArray($styleArray);
 
             $localisation = '';
             if ($action->region || $action->department || $action->municipality) {
@@ -208,21 +210,21 @@ class ActionPlanController extends Controller
                 $localisation .= "\nDépartement : " . ($action->department?->name ?? '');
                 $localisation .= "\nCommune : "     . ($action->municipality?->name ?? '');
             }
-            $worksheet->setCellValue("N{$startLine}", $localisation);
-            $worksheet->getStyle("N{$startLine}")->applyFromArray($styleArray);
-            $worksheet->getStyle("N{$startLine}")->getAlignment()->setWrapText(true);
+            $worksheet->setCellValue("O{$startLine}", $localisation);
+            $worksheet->getStyle("O{$startLine}")->applyFromArray($styleArray);
+            $worksheet->getStyle("O{$startLine}")->getAlignment()->setWrapText(true);
 
             $beneficiaries = $action->beneficiaries->pluck('name')->implode(",\n");
-            $worksheet->setCellValue("O{$startLine}", $beneficiaries);
-            $worksheet->getStyle("O{$startLine}")->applyFromArray($styleArray);
-
-            $worksheet->setCellValue("P{$startLine}", $action->actual_progress_percent);
+            $worksheet->setCellValue("P{$startLine}", $beneficiaries);
             $worksheet->getStyle("P{$startLine}")->applyFromArray($styleArray);
+
+            $worksheet->setCellValue("Q{$startLine}", $action->actual_progress_percent);
+            $worksheet->getStyle("Q{$startLine}")->applyFromArray($styleArray);
 
             ++$startLine;
         }
 
-        foreach (range('A', 'P') as $col) {
+        foreach (range('A', 'Q') as $col) {
             $worksheet->getStyle($col)->getAlignment()->setWrapText(true);
         }
 

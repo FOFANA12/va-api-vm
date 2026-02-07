@@ -28,18 +28,21 @@ class ElementaryLevelStateRepository
      */
     public function requirements(ElementaryLevel $elementaryLevel)
     {
-        $current = $elementaryLevel->state;
-        $next = ElementaryLevelState::next($current);
+        $status = $elementaryLevel->status;
+        $currentState = $elementaryLevel->state;
+
+        $states = ElementaryLevelState::allowedStatesForStatus($status, app()->getLocale());
+        $states = collect($states)
+            ->reject(fn($state) => $state->code === $currentState)
+            ->map(fn($state) => [
+                'code' => $state->code,
+                'name' => $state->label,
+                'color' => $state->color,
+            ])
+            ->values();
 
         return [
-            'states' => collect($next)->map(function ($code) {
-                $state = ElementaryLevelState::get($code, app()->getLocale());
-                return [
-                    'code'  => $state->code,
-                    'name'  => $state->label,
-                    'color' => $state->color,
-                ];
-            })->values(),
+            'states' => $states,
         ];
     }
 

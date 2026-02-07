@@ -13,5 +13,6 @@ return [
         'lang' => 'langue',
         'avatar' => 'photo de profil',
         'password' => 'mot de passe',
+        'role' => 'rôle',
     ],
 ];

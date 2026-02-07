@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Http\Requests\ActionPlanningRequest;
+use App\Http\Resources\ActionPhaseResource;
 use App\Http\Resources\ActionPlanningResource;
 use App\Jobs\EvaluateActionJob;
 use App\Models\Action;
@@ -44,7 +45,23 @@ class ActionPlanningRepository
      */
     public function show(Action $action)
     {
-        return ['action_planning' => new ActionPlanningResource($action->load('periods'))];
+        $action->load([
+            'phases' => function ($q) {
+                $q->orderBy('number', 'asc')
+                    ->with([
+                        'tasks' => function ($t) {
+                            $t->orderBy('start_date', 'asc')
+                                ->with('assignedTo');
+                        },
+                    ]);
+            },
+            'periods',
+        ]);
+
+        return [
+            'action_planning' => new ActionPlanningResource($action),
+            'phases' => ActionPhaseResource::collection($action->phases),
+        ];
     }
 
     /**

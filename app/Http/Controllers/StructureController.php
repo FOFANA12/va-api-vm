@@ -70,6 +70,15 @@ class StructureController extends Controller
         return response()->json($this->repository->show($structure))->setStatusCode(Response::HTTP_OK);
     }
 
+    /**
+     * Display structure hierarchy as an org chart (read-only).
+     */
+    public function orgChart(Structure $structure)
+    {
+        return response()->json(
+            $this->repository->getHierarchyForOrgChart($structure)
+        )->setStatusCode(Response::HTTP_OK);
+    }
 
     /**
      * Update the specified structure.

@@ -84,34 +84,37 @@ class StructureController extends Controller
                 $worksheet->setCellValue("G{$startRow}", DateTimeFormatter::formatDate($action->end_date));
                 $worksheet->getStyle("G{$startRow}")->applyFromArray($styleArray);
 
-                $worksheet->setCellValue("H{$startRow}", $action->program?->name);
+                $worksheet->setCellValue("H{$startRow}", $action->actionDomain?->name);
                 $worksheet->getStyle("H{$startRow}")->applyFromArray($styleArray);
 
-                $worksheet->setCellValue("I{$startRow}", $action->project?->name);
+                $worksheet->setCellValue("I{$startRow}", $action->strategicDomain?->name);
                 $worksheet->getStyle("I{$startRow}")->applyFromArray($styleArray);
 
-                $worksheet->setCellValue("J{$startRow}", $action->activity?->name);
+                $worksheet->setCellValue("J{$startRow}", $action->capabilityDomain?->name);
                 $worksheet->getStyle("J{$startRow}")->applyFromArray($styleArray);
 
-                $objectives = $action->objectives->pluck('name')->implode(', ');
-                $worksheet->setCellValue("K{$startRow}", $objectives);
+                $worksheet->setCellValue("K{$startRow}", $action->elementaryLevel?->name);
                 $worksheet->getStyle("K{$startRow}")->applyFromArray($styleArray);
-                $worksheet->getStyle("K{$startRow}")->getAlignment()->setWrapText(true);
+
+                $objectives = $action->objectives->pluck('name')->implode(', ');
+                $worksheet->setCellValue("L{$startRow}", $objectives);
+                $worksheet->getStyle("L{$startRow}")->applyFromArray($styleArray);
+                $worksheet->getStyle("L{$startRow}")->getAlignment()->setWrapText(true);
 
                 $stakeholders = $action->stakeholders->pluck('name')->implode(",\n");
-                $worksheet->setCellValue("L{$startRow}", $stakeholders);
-                $worksheet->getStyle("L{$startRow}")->applyFromArray($styleArray);
+                $worksheet->setCellValue("M{$startRow}", $stakeholders);
+                $worksheet->getStyle("M{$startRow}")->applyFromArray($styleArray);
 
                 $currencyCode = $action->currency?->code ?? '';
                 $budgetValue  = $action->total_budget ?? 0;
-                $worksheet->setCellValue("M{$startRow}", $budgetValue);
-                $worksheet->getStyle("M{$startRow}")
+                $worksheet->setCellValue("N{$startRow}", $budgetValue);
+                $worksheet->getStyle("N{$startRow}")
                     ->getNumberFormat()
                     ->setFormatCode('#,##0 [$' . $currencyCode . ']');
 
                 $fundingSources = $action->fundingSources->pluck('name')->implode(",\n");
-                $worksheet->setCellValue("N{$startRow}", $fundingSources);
-                $worksheet->getStyle("N{$startRow}")->applyFromArray($styleArray);
+                $worksheet->setCellValue("O{$startRow}", $fundingSources);
+                $worksheet->getStyle("O{$startRow}")->applyFromArray($styleArray);
 
                 $localisation = '';
                 if ($action->region || $action->department || $action->municipality) {
@@ -119,23 +122,23 @@ class StructureController extends Controller
                     $localisation .= "\nDépartement : " . ($action->department?->name ?? '');
                     $localisation .= "\nCommune : " . ($action->municipality?->name ?? '');
                 }
-                $worksheet->setCellValue("O{$startRow}", $localisation);
-                $worksheet->getStyle("O{$startRow}")->applyFromArray($styleArray);
-                $worksheet->getStyle("O{$startRow}")->getAlignment()->setWrapText(true);
+                $worksheet->setCellValue("P{$startRow}", $localisation);
+                $worksheet->getStyle("P{$startRow}")->applyFromArray($styleArray);
+                $worksheet->getStyle("P{$startRow}")->getAlignment()->setWrapText(true);
 
                 $beneficiaries = $action->beneficiaries->pluck('name')->implode(",\n");
-                $worksheet->setCellValue("P{$startRow}", $beneficiaries);
-                $worksheet->getStyle("P{$startRow}")->applyFromArray($styleArray);
-
-                $worksheet->setCellValue("Q{$startRow}", $action->actual_progress_percent);
+                $worksheet->setCellValue("Q{$startRow}", $beneficiaries);
                 $worksheet->getStyle("Q{$startRow}")->applyFromArray($styleArray);
+
+                $worksheet->setCellValue("R{$startRow}", $action->actual_progress_percent);
+                $worksheet->getStyle("R{$startRow}")->applyFromArray($styleArray);
 
                 $startRow++;
                 $rowIndex++;
             }
         }
 
-        foreach (range('A', 'Q') as $col) {
+        foreach (range('A', 'R') as $col) {
             $worksheet->getStyle($col)->getAlignment()->setWrapText(true);
         }
 

@@ -28,18 +28,21 @@ class ActionDomainStateRepository
      */
     public function requirements(ActionDomain $actionDomain)
     {
-        $current = $actionDomain->state;
-        $next = ActionDomainState::next($current);
+        $status = $actionDomain->status;
+        $currentState = $actionDomain->state;
+
+        $states = ActionDomainState::allowedStatesForStatus($status, app()->getLocale());
+        $states = collect($states)
+            ->reject(fn($state) => $state->code === $currentState)
+            ->map(fn($state) => [
+                'code' => $state->code,
+                'name' => $state->label,
+                'color' => $state->color,
+            ])
+            ->values();
 
         return [
-            'states' => collect($next)->map(function ($code) {
-                $state = ActionDomainState::get($code, app()->getLocale());
-                return [
-                    'code'  => $state->code,
-                    'name'  => $state->label,
-                    'color' => $state->color,
-                ];
-            })->values(),
+            'states' => $states,
         ];
     }
 

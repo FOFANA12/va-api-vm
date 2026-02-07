@@ -131,4 +131,15 @@ class StrategicObjectiveStatus
     {
         return in_array($to, self::$transitions[$from] ?? [], true);
     }
+
+    public static function severity(string $state): int
+    {
+        return match ($state) {
+            'off_track' => 1,
+            'delayed' => 2,
+            'on_track' => 3,
+            'achieved' => 4,
+            default => PHP_INT_MAX,
+        };
+    }
 }
