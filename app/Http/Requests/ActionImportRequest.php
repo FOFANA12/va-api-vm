@@ -1,0 +1,38 @@
+<?php
+
+namespace App\Http\Requests;
+
+use Illuminate\Foundation\Http\FormRequest;
+
+class ActionImportRequest extends FormRequest
+{
+    /**
+     * Determine if the user is authorized to make this request.
+     */
+    public function authorize(): bool
+    {
+        return true;
+    }
+
+    /**
+     * Get the validation rules that apply to the request.
+     *
+     * @return array<string, \Illuminate\Contracts\Validation\ValidationRule|array<mixed>|string>
+     */
+    public function rules(): array
+    {
+        return [
+            'import_file' => 'bail|required|file|mimes:xlsx,xls,csv|max:10240',
+        ];
+    }
+
+    /**
+     * Get custom attribute names for translations.
+     */
+    public function attributes(): array
+    {
+        return [
+            'import_file' => __('app/common.request.import_file'),
+        ];
+    }
+}

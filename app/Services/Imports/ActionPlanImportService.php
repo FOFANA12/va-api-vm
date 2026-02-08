@@ -50,9 +50,13 @@ class ActionPlanImportService
                 $validator = $this->validateRow($row);
 
                 if ($validator->fails()) {
+                    $field = array_key_first($validator->errors()->messages());
+
+                    $message = $validator->errors()->first($field);
+
                     $errors[] = [
                         'row' => $lineNumber,
-                        'errors' => $validator->errors()->all(),
+                        'errors' => [$message],
                     ];
 
                     if (count($errors) >= self::MAX_ERRORS) {
@@ -62,7 +66,7 @@ class ActionPlanImportService
                     continue;
                 }
 
-                $structure = Structure::where('abbreviation', $row['structure'])->first();
+                $structure = Structure::where('abbreviation', $row['structure'])->where('type', 'OPERATIONAL')->first();
 
                 if (!$structure) {
                     $errors[] = [
@@ -78,15 +82,15 @@ class ActionPlanImportService
 
                 $responsible = null;
 
-                if (!empty($row['responsible_email'])) {
-                    $responsible = User::whereHas('employee')->where('email', $row['responsible_email'])->first();
+                if (!empty($row['responsable_email'])) {
+                    $responsible = User::whereHas('employee')->where('email', $row['responsable_email'])->first();
 
                     if (!$responsible && $responsible?->employee->structure_uuid === $structure->uuid) {
                         $errors[] = [
                             'row' => $lineNumber,
                             'errors' => [
                                 __('app/action_plan.import.responsible_not_found', [
-                                    'email' => $row['responsible_email'],
+                                    'email' => $row['responsable_email'],
                                 ]),
                             ],
                         ];
@@ -95,7 +99,7 @@ class ActionPlanImportService
                 }
 
                 $existing = ActionPlan::where('structure_uuid', $structure->uuid)
-                    ->where('name', $row['name'])
+                    ->where('name', $row['nom'])
                     ->first();
 
                 if ($existing) {
@@ -104,7 +108,7 @@ class ActionPlanImportService
                             'row' => $lineNumber,
                             'errors' => [
                                 __('app/action_plan.import.already_exists', [
-                                    'name' => $row['name'],
+                                    'name' => $row['nom'],
                                     'structure' => $structure->abbreviation,
                                 ]),
                             ],
@@ -114,8 +118,8 @@ class ActionPlanImportService
 
                     $existing->update([
                         'description' => $row['description'] ?? null,
-                        'start_date' => $row['start_date'] ?? null,
-                        'end_date' => $row['end_date'] ?? null,
+                        'start_date' => $row['date_debut'] ?? null,
+                        'end_date' => $row['date_fin'] ?? null,
                         'responsible_uuid' => $responsible?->uuid,
                         'updated_by' => Auth::user()?->uuid,
                     ]);
@@ -123,10 +127,10 @@ class ActionPlanImportService
                     $actionPlan = ActionPlan::create([
                         'structure_uuid' => $structure->uuid,
                         'responsible_uuid' => $responsible?->uuid,
-                        'name' => $row['name'],
+                        'name' => $row['nom'],
                         'description' => $row['description'] ?? null,
-                        'start_date' => $row['start_date'] ?? null,
-                        'end_date' => $row['end_date'] ?? null,
+                        'start_date' => $row['date_debut'] ?? null,
+                        'end_date' => $row['date_fin'] ?? null,
                         'status' => false,
                         'created_by' => Auth::user()?->uuid,
                         'updated_by' => Auth::user()?->uuid,
@@ -215,17 +219,17 @@ class ActionPlanImportService
     {
         return Validator::make($row, [
             'structure' => ['bail', 'required', 'max:20'],
-            'name' => ['bail', 'required', 'string', 'max:100'],
+            'nom' => ['bail', 'required', 'string', 'max:100'],
             'description' => ['nullable', 'string', 'max:1000'],
-            'start_date' => ['nullable', 'date_format:Y-m-d'],
-            'end_date' => ['nullable', 'date_format:Y-m-d', 'after_or_equal:start_date'],
-            'responsible_email' => ['nullable', 'email'],
+            'date_debut' => ['nullable', 'date_format:Y-m-d'],
+            'date_fin' => ['nullable', 'date_format:Y-m-d', 'after_or_equal:date_debut'],
+            'responsable_email' => ['nullable', 'email'],
         ], [], [
             'structure' => __('app/action_plan.request.structure'),
-            'name' => __('app/action_plan.request.name'),
-            'start_date' => __('app/action_plan.request.start_date'),
-            'end_date' => __('app/action_plan.request.end_date'),
-            'responsible_email' => __('app/action_plan.request.responsible'),
+            'nom' => __('app/action_plan.request.name'),
+            'date_debut' => __('app/action_plan.request.start_date'),
+            'date_fin' => __('app/action_plan.request.end_date'),
+            'responsable_email' => __('app/action_plan.request.responsible'),
         ]);
     }
 }

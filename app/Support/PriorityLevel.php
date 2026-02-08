@@ -95,4 +95,28 @@ class PriorityLevel
 
         return null;
     }
+
+    private static function labels(array $priority): array
+    {
+        return array_values($priority['name'] ?? []);
+    }
+
+    public static function fromLabel(string $label): ?object
+    {
+        $normalizedInput = mb_strtolower(trim($label));
+
+        foreach (self::$priorities as $p) {
+            foreach ($p['name'] as $langLabel) {
+                if (mb_strtolower(trim($langLabel)) === $normalizedInput) {
+                    return (object) [
+                        'code'  => $p['code'],
+                        'level' => $p['level'],
+                        'color' => $p['color'],
+                    ];
+                }
+            }
+        }
+
+        return null;
+    }
 }

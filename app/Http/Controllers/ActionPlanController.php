@@ -30,7 +30,7 @@ class ActionPlanController extends Controller
     private $messageSuccessDuplicated;
     private $messageSuccessUpdated;
     private $messageSuccessDeleted;
-     private string $messageImportSuccess;
+    private string $messageImportSuccess;
     private string $messageImportFailed;
     private $repository;
     private ActionPlanExportService $exportService;
@@ -42,7 +42,7 @@ class ActionPlanController extends Controller
         $this->messageSuccessUpdated = __('app/action_plan.controller.message_success_updated');
         $this->messageSuccessDeleted = __('app/common.controller.message_success_deleted');
 
-         $this->messageImportSuccess = __('app/action_plan.import.success');
+        $this->messageImportSuccess = __('app/action_plan.import.success');
         $this->messageImportFailed = __('app/action_plan.import.failed');
 
         $this->repository = $repository;
@@ -184,7 +184,7 @@ class ActionPlanController extends Controller
 
             $worksheet->setCellValue('I' . $startLine, $action->capabilityDomain?->name);
             $worksheet->getStyle('I' . $startLine)->applyFromArray($styleArray);
-            
+
             $worksheet->setCellValue('J' . $startLine, $action->elementaryLevel?->name);
             $worksheet->getStyle('J' . $startLine)->applyFromArray($styleArray);
 

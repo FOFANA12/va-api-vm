@@ -3,14 +3,17 @@
 namespace App\Http\Controllers;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ActionImportRequest;
 use App\Http\Requests\ActionRequest;
 use App\Http\Resources\ActionResource;
 use App\Models\Action;
 use App\Repositories\ActionRepository;
+use App\Services\Imports\ActionImportService;
 use App\Traits\ApiResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use Illuminate\Pagination\LengthAwarePaginator;
+use Illuminate\Support\Facades\Storage;
 
 class ActionController extends Controller
 {
@@ -19,6 +22,8 @@ class ActionController extends Controller
     private $messageSuccessCreated;
     private $messageSuccessUpdated;
     private $messageSuccessDeleted;
+    private string $messageImportSuccess;
+    private string $messageImportFailed;
     private $repository;
 
     public function __construct(ActionRepository $repository)
@@ -26,6 +31,10 @@ class ActionController extends Controller
         $this->messageSuccessCreated = __('app/action.controller.message_success_created');
         $this->messageSuccessUpdated = __('app/action.controller.message_success_updated');
         $this->messageSuccessDeleted = __('app/common.controller.message_success_deleted');
+
+        $this->messageImportSuccess = __('app/action_plan.import.success');
+        $this->messageImportFailed = __('app/action_plan.import.failed');
+
         $this->repository = $repository;
     }
 
@@ -103,12 +112,42 @@ class ActionController extends Controller
         $filePath = public_path('storage/templates/selection-mode.pdf');
 
         if (!file_exists($filePath)) {
-            return response()->json([
-                'message' => 'Fichier introuvable.'
-            ], Response::HTTP_NOT_FOUND
-        );
+            return response()->json(
+                [
+                    'message' => 'Fichier introuvable.'
+                ],
+                Response::HTTP_NOT_FOUND
+            );
         }
 
         return response()->download($filePath, 'selection-modes.pdf');
+    }
+
+    /**
+     * Import action plans from Excel / CSV file.
+     */
+    public function import(ActionImportRequest $request, ActionImportService $importService)
+    {
+        // Store file temporarily
+        $path = $request->file('import_file')->store('imports/tmp');
+
+        $result = $importService->import(
+            Storage::path($path),
+        );
+
+        // Optional: cleanup file
+        Storage::delete($path);
+
+        if (!$result['success']) {
+            return response()->json([
+                'message' => $this->messageImportFailed,
+                'errors'  => $result['errors'],
+            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        }
+
+        return response()->json([
+            'message'  => $this->messageImportSuccess,
+            'imported' => $result['imported'],
+        ], Response::HTTP_OK);
     }
 }

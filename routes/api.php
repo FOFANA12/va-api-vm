@@ -604,5 +604,6 @@ Route::middleware('auth:sanctum')->group(function () {
     // Imports
     Route::prefix('imports')->group(function () {
         Route::post('action-plans', [ActionPlanController::class, 'import']);
+        Route::post('actions', [ActionController::class, 'import']);
     });
 });

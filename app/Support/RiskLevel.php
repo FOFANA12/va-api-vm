@@ -118,4 +118,23 @@ class RiskLevel
 
         return null;
     }
+
+    public static function fromLabel(string $label): ?object
+    {
+        $normalizedInput = mb_strtolower(trim($label));
+
+        foreach (self::$risks as $r) {
+            foreach ($r['name'] as $langLabel) {
+                if (mb_strtolower(trim($langLabel)) === $normalizedInput) {
+                    return (object) [
+                        'code'  => $r['code'],
+                        'level' => $r['level'],
+                        'color' => $r['color'],
+                    ];
+                }
+            }
+        }
+
+        return null;
+    }
 }

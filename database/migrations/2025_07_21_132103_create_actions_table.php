@@ -27,18 +27,18 @@ return new class extends Migration
             $table->uuid('capability_domain_uuid')->nullable();
             $table->uuid('elementary_level_uuid')->nullable();
             $table->string('name', 100);
-            $table->string('priority', 50);
-            $table->string('risk_level', 50);
+            $table->string('priority', 50)->default('medium');
+            $table->string('risk_level', 50)->default('moderate');
             $table->text('description')->nullable();
             $table->text('prerequisites')->nullable();
             $table->text('impacts')->nullable();
             $table->text('risks')->nullable();
-            $table->string('generate_document_type', 20);
+            $table->string('generate_document_type', 20)->default('autre');
             $table->string('state', 50)->default('none');
             $table->string('status', 50)->default('created');
             $table->timestamp('status_changed_at')->nullable();
             $table->uuid('status_changed_by')->nullable();
-            $table->string('chart_type', 20);
+            $table->string('chart_type', 20)->default('BAR');
 
             $table->date('start_date')->nullable();
             $table->date('end_date')->nullable();

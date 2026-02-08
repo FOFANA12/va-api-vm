@@ -94,4 +94,19 @@ class GenerateDocumentTypes
             ];
         }, self::$types);
     }
+
+    public static function fromCode(string $code): ?object
+    {
+        $normalized = mb_strtolower(trim($code));
+
+        foreach (self::$types as $type) {
+            if (mb_strtolower($type['code']) === $normalized) {
+                return (object) [
+                    'code' => $type['code'],
+                ];
+            }
+        }
+
+        return null;
+    }
 }

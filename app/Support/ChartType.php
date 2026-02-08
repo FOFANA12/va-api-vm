@@ -111,4 +111,21 @@ class ChartType
             ];
         }, self::$types);
     }
+
+    public static function fromLabel(string $label): ?object
+    {
+        $normalizedInput = mb_strtolower(trim($label));
+
+        foreach (self::$types as $t) {
+            foreach ($t['name'] as $langLabel) {
+                if (mb_strtolower(trim($langLabel)) === $normalizedInput) {
+                    return (object) [
+                        'code'  => $t['code'],
+                    ];
+                }
+            }
+        }
+
+        return null;
+    }
 }
