@@ -50,10 +50,10 @@ class ActionDomainStatus
      * Allowed transitions between statuses.
      */
     private static array $transitions = [
-        'preparation' => ['engaged', 'stopped'],
+        'preparation' => ['engaged'],
         'engaged' => ['closed', 'stopped'],
-        'stopped' => ['engaged', 'preparation'],
-        'closed' => ['engaged', 'preparation'],
+        'stopped' => ['engaged', 'closed'],
+        'closed' => [],
     ];
 
     /**

@@ -25,7 +25,9 @@ return [
         'file_empty' => 'Le fichier est vide ou invalide.',
         'unexpected_error' => 'Une erreur inattendue est survenue lors de l\'importation des plans d\'action.',
 
-        'structure_not_found' => 'Structure introuvable (:abbreviation).',
+        'structure_missing' => 'Votre compte n\'est rattaché à aucune structure.',
+        'structure_not_operational' => 'Votre structure n\'est pas une structure opérationnelle autorisée pour cet import.',
+
         'responsible_not_found' => 'Responsable introuvable ou non rattaché à la structure (:email).',
         'already_exists' => 'Le plan d\'action ":name" existe déjà pour la structure ":structure".',
     ],

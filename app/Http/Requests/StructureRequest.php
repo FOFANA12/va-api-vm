@@ -24,6 +24,7 @@ class StructureRequest extends FormRequest
      */
     public function rules(): array
     {
+        $parentUuid = $this->input('parent');
 
         $rules = [
             'parent' => 'bail|nullable|exists:' . Structure::tableName() . ',uuid',
@@ -32,14 +33,48 @@ class StructureRequest extends FormRequest
         if ($this->isMethod('put')) {
             $structure = $this->route('structure');
             $rules += [
-                'abbreviation' => 'bail|required|string|max:20|unique:' . Structure::tableName() . ',abbreviation,' . $structure->id,
-                'name' => 'bail|required|string|max:100|unique:' . Structure::tableName() . ',name,' . $structure->id
+                'abbreviation' => [
+                    'bail',
+                    'required',
+                    'string',
+                    'max:20',
+                    Rule::unique(Structure::tableName(), 'abbreviation')
+                        ->where(fn($q) => $q->where('parent_uuid', $parentUuid))
+                        ->ignore($structure->id)
+                ],
+
+                'name' => [
+                    'bail',
+                    'required',
+                    'string',
+                    'max:100',
+                    Rule::unique(Structure::tableName(), 'name')
+                        ->where(fn($q) => $q->where('parent_uuid', $parentUuid))
+                        ->ignore($structure->id)
+                ],
             ];
         } else {
             $rules += [
+
                 'type' => ['bail', 'required', Rule::in(StructureType::codes())],
-                'abbreviation' => 'bail|required|string|max:20|unique:' . Structure::tableName() . ',abbreviation',
-                'name' => 'bail|required|string|max:100|unique:' . Structure::tableName() . ',name',
+
+                'abbreviation' => [
+                    'bail',
+                    'required',
+                    'string',
+                    'max:20',
+                    Rule::unique(Structure::tableName(), 'abbreviation')
+                        ->where(fn($q) => $q->where('parent_uuid', $parentUuid))
+                ],
+
+                'name' => [
+                    'bail',
+                    'required',
+                    'string',
+                    'max:100',
+                    Rule::unique(Structure::tableName(), 'name')
+                        ->where(fn($q) => $q->where('parent_uuid', $parentUuid))
+                ],
             ];
         }
 

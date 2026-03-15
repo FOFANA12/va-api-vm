@@ -20,5 +20,7 @@ return [
         'risk_level' => 'niveau de risque',
         'status' => 'statut',
         'invalid_status' => 'Le statut fourni est invalide.',
+        'start_date_outside_map' => "Date de début hors période de la carte stratégique.",
+        'end_date_outside_map' => "Date de fin hors période de la carte stratégique.",
     ],
 ];

@@ -47,10 +47,10 @@ class UpdateActionProgressJob implements ShouldQueue
             $target = $lastControl->forecast_percent ?? 0;
 
             if ($period && $period->isLast()) {
-                $state = $progress < $target ? 'risk' : 'achieved';
+                $state = $progress < $target ? 'bad_track' : 'achieved';
             } else {
-                if ($progress < ($target * 0.25)) {
-                    $state = 'risk';
+                if ($progress < ($target * 0.50)) {
+                    $state = 'bad_track';
                 } elseif ($progress < $target) {
                     $state = 'delayed';
                 } else {

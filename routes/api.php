@@ -69,6 +69,7 @@ use App\Http\Controllers\StrategicDomainStateController;
 use App\Http\Controllers\StrategicDomainStatusController;
 use App\Http\Controllers\StrategicElementController;
 use App\Http\Controllers\StrategicObjectiveAlignmentController;
+use App\Http\Controllers\StrategicObjectiveStatusController;
 use App\Http\Controllers\SupplierController;
 use App\Http\Controllers\SupplierEvaluationController;
 use App\Http\Controllers\TaskController;
@@ -415,6 +416,14 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::post('destroy', 'destroy');
     });
     Route::apiResource('strategic-objectives', StrategicObjectiveController::class)->only(['index', 'store', 'show', 'update']);
+
+    //Strategic objective statuses
+    Route::prefix('strategic-objective-statuses/{strategic_objective}')->controller(StrategicObjectiveStatusController::class)->group(function () {
+        Route::get('/', 'index');
+        Route::get('/requirements', 'requirements');
+        Route::post('/', 'store');
+        Route::post('/destroy', 'destroy');
+    });
 
     // Strategic objective Alignments
     Route::prefix('objective-alignments')->controller(StrategicObjectiveAlignmentController::class)->group(function () {

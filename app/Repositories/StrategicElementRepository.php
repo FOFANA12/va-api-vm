@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Helpers\ReferenceGenerator;
 use App\Http\Requests\StrategicElementRequest;
 use App\Http\Resources\StrategicElementResource;
 use App\Models\StrategicElement;
@@ -29,8 +30,8 @@ class StrategicElementRepository
      */
     public function index(Request $request)
     {
-        $searchable = ['name', 'abbreviation', 'strategic_map', 'structure', 'parent'];
-        $sortable = ['name', 'abbreviation', 'status', 'strategic_map', 'structure', 'order', 'parent'];
+        $searchable = ['name', 'abbreviation', 'strategic_map', 'structure', 'parent', 'reference'];
+        $sortable = ['name', 'abbreviation', 'status', 'strategic_map', 'structure', 'order', 'parent', 'reference'];
 
         $searchTerm = $request->input('searchTerm');
         $sortByInput = $request->input('sortBy');
@@ -48,6 +49,7 @@ class StrategicElementRepository
             'strategic_elements.type',
             'strategic_elements.abbreviation',
             'strategic_elements.name',
+            'strategic_elements.reference',
             'strategic_elements.description',
             'strategic_elements.status',
             'strategic_maps.name as strategic_map',
@@ -159,6 +161,14 @@ class StrategicElementRepository
         }
 
         $strategicElement = StrategicElement::create($data);
+
+        $strategicElement->update([
+            'reference' => ReferenceGenerator::generateStrategicElementReference(
+                $strategicElement->id,
+                $strategicElement->type,
+                $strategicElement->structure->abbreviation
+            ),
+        ]);
 
         $strategicElement->loadMissing([
             'strategicMap',

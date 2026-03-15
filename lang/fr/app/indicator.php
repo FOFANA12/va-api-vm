@@ -21,5 +21,7 @@ return [
         'unit' => 'unité de mesure',
 
         "invalid_status" => "Le statut fourni est invalide.",
+        "invalid_status" => "Le statut fourni est invalide.",
     ],
+    'document_not_editable_status' => 'Modification impossible car l’objectif n\'est plus engagé.',
 ];

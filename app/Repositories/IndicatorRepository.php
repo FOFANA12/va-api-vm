@@ -39,8 +39,8 @@ class IndicatorRepository
      */
     public function index(Request $request)
     {
-        $searchable = ['lead_structure', 'structure', 'reference', 'chart_type', 'unit'];
-        $sortable = ['lead_structure', 'structure', 'reference', 'chart_type', 'initial_value',  'final_target_value', 'achieved_value', 'status', 'state'];
+        $searchable = ['lead_structure', 'structure', 'reference', 'chart_type', 'unit', 'strategic_objective', 'indicator'];
+        $sortable = ['lead_structure', 'structure', 'reference', 'chart_type', 'initial_value',  'final_target_value', 'achieved_value', 'status', 'state', 'strategic_objective', 'indicator'];
 
         $searchTerm = $request->input('searchTerm');
         $sortByInput = $request->input('sortBy');
@@ -52,7 +52,7 @@ class IndicatorRepository
 
         $query = Indicator::join('structures as str', 'indicators.structure_uuid', '=', 'str.uuid')
             ->join('structures as strP', 'indicators.lead_structure_uuid', '=', 'strP.uuid')
-
+            ->join('strategic_objectives', 'indicators.strategic_objective_uuid', '=', 'strategic_objectives.uuid')
             ->select(
                 'indicators.id as id',
                 'indicators.uuid',
@@ -67,6 +67,8 @@ class IndicatorRepository
                 'indicators.status',
                 'indicators.state',
                 'indicators.is_planned',
+                'strategic_objectives.name as strategic_objective',
+                'indicators.name as indicator',
             );
 
         $allowed = $this->structureAccess->getAccessibleStructureUuids(Auth::user(), true, true);
@@ -96,6 +98,10 @@ class IndicatorRepository
                         $q->orWhere('str.name', 'LIKE', '%' . strtolower($searchTerm) . '%');
                     } else if ($column === 'lead_structure') {
                         $q->orWhere('strP.name', 'LIKE', '%' . strtolower($searchTerm) . '%');
+                    } else if ($column === 'strategic_objective') {
+                        $q->orWhere('strategic_objectives.name', 'LIKE', '%' . strtolower($searchTerm) . '%');
+                    } else if ($column === 'indicator') {
+                        $q->orWhere('indicators.name', 'LIKE', '%' . strtolower($searchTerm) . '%');
                     } else {
                         $q->orWhere("indicators.$column", 'LIKE', '%' . strtolower($searchTerm) . '%');
                     }
@@ -107,6 +113,10 @@ class IndicatorRepository
             $query->orderBy('str.name', $sortOrder);
         } else if ($sortBy === 'lead_structure') {
             $query->orderBy('strP.name', $sortOrder);
+        } else if ($sortBy === 'strategic_objective') {
+            $query->orderBy('strategic_objectives.name', $sortOrder);
+        } else if ($sortBy === 'indicator') {
+            $query->orderBy('indicators.name', $sortOrder);
         } else {
             $query->orderBy("indicators.$sortBy", $sortOrder);
         }

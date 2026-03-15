@@ -184,7 +184,7 @@ class ActionDomainRepository
             ]);
 
             $actionDomain->update([
-                'reference' => ReferenceGenerator::generateProgramReference($actionDomain->id),
+                'reference' => ReferenceGenerator::generateActionDomainReference($actionDomain->id),
                 'budget' => $totalBudget,
                 'status' => $status->status_code,
                 'status_changed_at' => $status->status_date,

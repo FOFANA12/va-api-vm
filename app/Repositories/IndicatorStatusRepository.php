@@ -2,10 +2,12 @@
 
 namespace App\Repositories;
 
+use App\Exceptions\DomainException;
 use App\Http\Resources\IndicatorStatusResource;
 use App\Models\Indicator;
 use App\Models\IndicatorStatus as ModelsIndicatorStatus;
 use App\Support\IndicatorStatus;
+use App\Support\StrategicObjectiveStatus;
 use RuntimeException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -52,6 +54,14 @@ class IndicatorStatusRepository
         DB::beginTransaction();
         try {
             $statusCode = $request->input('status');
+            $strategicObjective = $indicator->strategicObjective;
+
+            if ($strategicObjective->status !== StrategicObjectiveStatus::ENGAGED) {
+                throw new DomainException(
+                    __('app/indicator.document_not_editable_status')
+                );
+            }
+
             $this->applyStatusEffects($indicator, $statusCode);
 
             $status = ModelsIndicatorStatus::create([

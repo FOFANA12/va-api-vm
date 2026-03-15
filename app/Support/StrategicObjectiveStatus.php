@@ -55,6 +55,10 @@ class StrategicObjectiveStatus
         ],
     ];
 
+    public const ENGAGED = "engaged";
+    public const CLOSED = "closed";
+    public const STOPPED = "stopped";
+
     /**
      * Allowed transitions between statuses.
      */
@@ -135,7 +139,7 @@ class StrategicObjectiveStatus
     public static function severity(string $state): int
     {
         return match ($state) {
-            'off_track' => 1,
+            'bad_track' => 1,
             'delayed' => 2,
             'on_track' => 3,
             'achieved' => 4,

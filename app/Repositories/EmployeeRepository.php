@@ -32,8 +32,8 @@ class EmployeeRepository
      */
     public function index(Request $request)
     {
-        $searchable = ['job_title', 'name', 'email', 'phone', 'structure'];
-        $sortable = ['job_title', 'name', 'email', 'phone', 'structure', 'status'];
+        $searchable = ['job_title', 'name', 'email', 'phone', 'structure', 'role'];
+        $sortable = ['job_title', 'name', 'email', 'phone', 'structure', 'status', 'role'];
 
 
         $searchTerm = $request->input('searchTerm');
@@ -46,6 +46,7 @@ class EmployeeRepository
 
         $query = User::join('employees', 'users.uuid', '=', 'employees.user_uuid')
             ->join('structures', 'employees.structure_uuid', '=', 'structures.uuid')
+            ->leftJoin('roles', 'users.role_uuid', '=', 'roles.uuid')
             ->select(
                 'employees.id as id',
                 'employees.uuid',
@@ -54,7 +55,8 @@ class EmployeeRepository
                 'users.email',
                 'users.phone',
                 'users.status',
-                'structures.name as structure'
+                'structures.name as structure',
+                'roles.name as role'
             )
             ->where('employees.user_uuid', '<>', Auth::user()->uuid);
 
@@ -70,6 +72,8 @@ class EmployeeRepository
                 foreach ($searchable as $column) {
                     if ($column === 'structure') {
                         $q->orWhere('structures.name', 'LIKE', '%' . strtolower($searchTerm) . '%');
+                    } else if ($column === 'role') {
+                        $q->orWhere('structures.name', 'LIKE', '%' . strtolower($searchTerm) . '%');
                     } else if ($column === 'name' || $column === 'email' || $column === 'phone') {
                         $q->orWhere("users.$column", 'LIKE', '%' . strtolower($searchTerm) . '%');
                     } else {
@@ -81,6 +85,8 @@ class EmployeeRepository
 
         if ($sortBy === 'structure') {
             $query->orderBy('structures.name', $sortOrder);
+        } else if ($sortBy === 'role') {
+            $query->orderBy('roles.name', $sortOrder);
         } else if ($sortBy === 'name' || $sortBy === 'phone' || $sortBy === 'email') {
             $query->orderBy("users.$sortBy", $sortOrder);
         } else if ($sortBy === 'job_title') {

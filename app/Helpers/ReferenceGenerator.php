@@ -30,29 +30,29 @@ class ReferenceGenerator
     }
 
     /**
-     * Generate a unique reference for Program.
+     * Generate a unique reference for Action Domain.
      */
-    public static function generateProgramReference(int $id): string
+    public static function generateActionDomainReference(int $id): string
     {
 
-        return "PROG-" . str_pad((string) $id, 3, '0', STR_PAD_LEFT);
+        return "DOM_ACT-" . str_pad((string) $id, 3, '0', STR_PAD_LEFT);
     }
 
     /**
-     * Generate a unique reference for Program.
+     * Generate a unique reference for Strategic Domain.
      */
-    public static function generateProjectReference(int $id): string
+    public static function generateStrategicDomainReference(int $id): string
     {
 
-        return "PROJ-" . str_pad((string) $id, 3, '0', STR_PAD_LEFT);
+        return "DOM_STG-" . str_pad((string) $id, 3, '0', STR_PAD_LEFT);
     }
     /**
-     * Generate a unique reference for Activity.
+     * Generate a unique reference for Capability Domain.
      */
-    public static function generateActivityReference(int $id): string
+    public static function generateCapabilityDomainReference(int $id): string
     {
 
-        return "ACT-" . str_pad((string) $id, 3, '0', STR_PAD_LEFT);
+        return "DOM_CAP-" . str_pad((string) $id, 3, '0', STR_PAD_LEFT);
     }
 
     /**
@@ -61,7 +61,7 @@ class ReferenceGenerator
     public static function generateElementaryLevelReference(int $id): string
     {
 
-        return "EML-" . str_pad((string) $id, 3, '0', STR_PAD_LEFT);
+        return "NIV_ELE-" . str_pad((string) $id, 3, '0', STR_PAD_LEFT);
     }
 
     /**
@@ -109,5 +109,20 @@ class ReferenceGenerator
     {
 
         return $objectiveReference . "_IND" . str_pad((string) $id, 3, '0', STR_PAD_LEFT);
+    }
+
+    /**
+     * Generate a unique reference for strategic element.
+     */
+    public static function generateStrategicElementReference(
+        int $id,
+        string $type,
+        string $abbStructure,
+    ): string {
+
+        $prefix = $type === 'LEVER' ? 'LEV' : 'AX';
+
+        return $abbStructure . '_' . $prefix .
+            str_pad((string) $id, 3, '0', STR_PAD_LEFT);
     }
 }

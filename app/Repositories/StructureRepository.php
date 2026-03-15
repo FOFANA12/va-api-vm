@@ -143,29 +143,59 @@ class StructureRepository
         return ['structure' => new StructureResource($structure->loadMissing('parent'))];
     }
 
+
+    private function getParents(Structure $structure)
+    {
+        $parents = collect();
+
+        while ($structure->parent) {
+            $parents->prepend($structure->parent);
+            $structure = $structure->parent;
+        }
+
+        return $parents;
+    }
     /**
      * Get structure hierarchy formatted for vue3-tree-org.
      */
     public function getHierarchyForOrgChart(Structure $structure): array
     {
+        $structure->load([
+            'parent',
+            'children.children'
+        ]);
+
         $buildTree = function (Structure $node) use (&$buildTree) {
             return [
-                'id' => $node->abbreviation,
+                'id' => $node->id,
                 'label' => $node->name,
                 'type' => $node->type,
                 'children' => $node->children
                     ->where('status', true)
-                    ->map(function ($child) use ($buildTree) {
-                        return $buildTree($child);
-                    })
+                    ->map(fn($child) => $buildTree($child))
                     ->values()
                     ->toArray(),
             ];
         };
 
-        $structure->loadMissing('children.children');
+        // construire la chaîne des parents
+        $current = $structure;
+        $tree = $buildTree($structure);
 
-        return $buildTree($structure);
+        while ($current->parent) {
+            $parent = $current->parent;
+
+            $tree = [
+                'id' => $parent->id,
+                'label' => $parent->name,
+                'type' => $parent->type,
+                'children' => [$tree],
+            ];
+
+            $current = $parent;
+        }
+
+        return $tree;
     }
 
     /**

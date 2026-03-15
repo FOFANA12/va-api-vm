@@ -198,7 +198,7 @@ class StrategicDomainRepository
             ]);
 
             $strategicDomain->update([
-                'reference' => ReferenceGenerator::generateProjectReference($strategicDomain->id),
+                'reference' => ReferenceGenerator::generateStrategicDomainReference($strategicDomain->id),
                 'budget' => $totalBudget,
                 'status' => $status->status_code,
                 'status_changed_at' => $status->status_date,

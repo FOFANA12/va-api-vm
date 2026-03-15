@@ -14,6 +14,7 @@ return new class extends Migration
         Schema::create('strategic_elements', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid')->unique();
+            $table->string('reference', 100)->nullable()->unique();
             $table->uuid('structure_uuid');
             $table->uuid('strategic_map_uuid');
 

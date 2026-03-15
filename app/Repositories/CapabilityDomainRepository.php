@@ -199,7 +199,7 @@ class CapabilityDomainRepository
             ]);
 
             $capabilityDomain->update([
-                'reference' => ReferenceGenerator::generateActivityReference($capabilityDomain->id),
+                'reference' => ReferenceGenerator::generateCapabilityDomainReference($capabilityDomain->id),
                 'budget' => $totalBudget,
                 'status' => $status->status_code,
                 'status_changed_at' => $status->status_date,

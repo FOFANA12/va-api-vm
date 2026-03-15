@@ -2,7 +2,6 @@
 
 namespace App\Repositories;
 
-use App\Helpers\DateTimeFormatter;
 use App\Helpers\ReferenceGenerator;
 use App\Http\Requests\StrategicObjectiveRequest;
 use App\Http\Resources\StrategicObjectiveResource;
@@ -156,7 +155,7 @@ class StrategicObjectiveRepository
             ->where('status', true)
             ->whereIn('type', ['STRATEGIC', 'OPERATIONAL', 'VIRTUAL'])
             ->orderBy('id', 'desc')
-            ->select('uuid', 'name', 'type')
+            ->select('uuid', 'name', 'type', 'parent_uuid')
             ->get();
 
         $strategicMaps = StrategicMap::where('status', true)
@@ -307,44 +306,6 @@ class StrategicObjectiveRepository
         return (new StrategicObjectiveResource($strategicObjective))->additional([
             'mode' => $request->input('mode', 'edit')
         ]);
-    }
-
-    /**
-     * Retrieve available strategic objective statuses with localized labels.
-     */
-    public function getStatuses(StrategicObjective $strategicObjective)
-    {
-        $current = $strategicObjective->status;
-        $next = StrategicObjectiveStatus::next($current);
-
-        return [
-            'statuses' => collect($next)->map(function ($code) {
-                $status = StrategicObjectiveStatus::get($code, app()->getLocale());
-                return [
-                    'code'  => $status->code,
-                    'name'  => $status->label,
-                    'color' => $status->color,
-                ];
-            })->values(),
-        ];
-    }
-
-    /**
-     * Update the status of a specific strategic objective.
-     */
-    public function updateStatus(Request $request, StrategicObjective $strategicObjective)
-    {
-        $strategicObjective->status = $request->input('status');
-        $strategicObjective->status_changed_at = now();
-        $strategicObjective->status_changed_by = Auth::user()?->uuid;
-        $strategicObjective->timestamps = false;
-        $strategicObjective->save();
-
-        return [
-            'status' => StrategicObjectiveStatus::get($strategicObjective->status, app()->getLocale()),
-            'status_changed_at' => $strategicObjective->status_changed_at ? DateTimeFormatter::formatDatetime($strategicObjective->status_changed_at) : null,
-            'status_changed_by' => $strategicObjective->statusChangedBy?->name,
-        ];
     }
 
     /**

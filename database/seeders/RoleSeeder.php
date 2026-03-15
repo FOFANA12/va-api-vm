@@ -51,6 +51,10 @@ class RoleSeeder extends Seeder
             ['name' => 'UPDATE_STRATEGIC_OBJECTIVE', 'category' => 'Objectif stratégique', 'description' => 'Modifier un objectif'],
             ['name' => 'DELETE_STRATEGIC_OBJECTIVE', 'category' => 'Objectif stratégique', 'description' => 'Supprimer un objectif'],
 
+            // Strategic objective — Status
+            ['name' => 'OBJ_ACCESS_STATUS', 'category' => 'Objectif — Statut', 'description' => 'Accès au statut'],
+            ['name' => 'OBJ_MANAGE_STATUS', 'category' => 'Objectif — Statut', 'description' => 'Gérer le statut'],
+
             // Strategic objective — Alignment
             ['name' => 'OBJ_ACCESS_ALIGNMENT', 'category' => 'Objectif — Alignement', 'description' => 'Accès à l\'onglet'],
             ['name' => 'OBJ_MANAGE_ALIGNMENT', 'category' => 'Objectif — Alignement', 'description' => 'Gérer l\'alignement'],

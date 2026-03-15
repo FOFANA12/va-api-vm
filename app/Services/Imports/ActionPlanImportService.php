@@ -38,6 +38,27 @@ class ActionPlanImportService
             ];
         }
 
+        $structure = Auth::user()?->employee?->structure;
+        if (!$structure) {
+            return [
+                'success' => false,
+                'errors' => [[
+                    'row' => 0,
+                    'errors' => [__('app/action_plan.import.structure_missing')],
+                ]],
+            ];
+        }
+
+        if ($structure->type !== 'OPERATIONAL') {
+            return [
+                'success' => false,
+                'errors' => [[
+                    'row' => 0,
+                    'errors' => [__('app/action_plan.import.structure_not_operational')],
+                ]],
+            ];
+        }
+
         $errors = [];
         $imported = 0;
 
@@ -46,6 +67,9 @@ class ActionPlanImportService
         try {
             foreach ($rows as $index => $row) {
                 $lineNumber = $index + 2;
+
+                $row['date_debut'] = $this->normalizeDate($row['date_debut'] ?? null);
+                $row['date_fin']   = $this->normalizeDate($row['date_fin'] ?? null);
 
                 $validator = $this->validateRow($row);
 
@@ -66,34 +90,27 @@ class ActionPlanImportService
                     continue;
                 }
 
-                $structure = Structure::where('abbreviation', $row['structure'])->where('type', 'OPERATIONAL')->first();
-
-                if (!$structure) {
-                    $errors[] = [
-                        'row' => $lineNumber,
-                        'errors' => [
-                            __('app/action_plan.import.structure_not_found', [
-                                'abbreviation' => $row['structure'],
-                            ]),
-                        ],
-                    ];
-                    continue;
-                }
-
                 $responsible = null;
 
-                if (!empty($row['responsable_email'])) {
-                    $responsible = User::whereHas('employee')->where('email', $row['responsable_email'])->first();
+                if (!empty($row['responsable'])) {
+                    $responsible = User::where('email', $row['responsable'])
+                        ->whereHas('employee', function ($q) use ($structure) {
+                            $q->where('structure_uuid', $structure->uuid);
+                        })
+                        ->first();
 
-                    if (!$responsible && $responsible?->employee->structure_uuid === $structure->uuid) {
+                    if (!$responsible) {
                         $errors[] = [
                             'row' => $lineNumber,
                             'errors' => [
                                 __('app/action_plan.import.responsible_not_found', [
-                                    'email' => $row['responsable_email'],
+                                    'email' => $row['responsable'],
                                 ]),
                             ],
                         ];
+                        if (count($errors) >= self::MAX_ERRORS) {
+                            break;
+                        }
                         continue;
                     }
                 }
@@ -103,7 +120,7 @@ class ActionPlanImportService
                     ->first();
 
                 if ($existing) {
-                    if ($existing && !$updateActionPlanIfExists) {
+                    if (!$updateActionPlanIfExists) {
                         $errors[] = [
                             'row' => $lineNumber,
                             'errors' => [
@@ -113,6 +130,9 @@ class ActionPlanImportService
                                 ]),
                             ],
                         ];
+                        if (count($errors) >= self::MAX_ERRORS) {
+                            break;
+                        }
                         continue;
                     }
 
@@ -218,18 +238,34 @@ class ActionPlanImportService
     private function validateRow(array $row)
     {
         return Validator::make($row, [
-            'structure' => ['bail', 'required', 'max:20'],
             'nom' => ['bail', 'required', 'string', 'max:100'],
             'description' => ['nullable', 'string', 'max:1000'],
             'date_debut' => ['nullable', 'date_format:Y-m-d'],
             'date_fin' => ['nullable', 'date_format:Y-m-d', 'after_or_equal:date_debut'],
-            'responsable_email' => ['nullable', 'email'],
+            'responsable' => ['nullable', 'email'],
         ], [], [
-            'structure' => __('app/action_plan.request.structure'),
             'nom' => __('app/action_plan.request.name'),
             'date_debut' => __('app/action_plan.request.start_date'),
             'date_fin' => __('app/action_plan.request.end_date'),
-            'responsable_email' => __('app/action_plan.request.responsible'),
+            'responsable' => __('app/action_plan.request.responsible'),
         ]);
+    }
+
+    private function normalizeDate(?string $date): ?string
+    {
+        if (!$date) {
+            return null;
+        }
+
+        $formats = ['d/m/Y', 'Y-m-d', 'd-m-Y'];
+
+        foreach ($formats as $format) {
+            try {
+                return \Carbon\Carbon::createFromFormat($format, $date)->format('Y-m-d');
+            } catch (\Exception $e) {
+            }
+        }
+
+        return $date;
     }
 }

@@ -109,4 +109,9 @@ class Indicator extends Model
     {
         return $this->belongsTo(User::class, 'status_changed_by', 'uuid');
     }
+
+    public function statuses(): HasMany
+    {
+        return $this->hasMany(IndicatorStatus::class, 'indicator_uuid', 'uuid');
+    }
 }

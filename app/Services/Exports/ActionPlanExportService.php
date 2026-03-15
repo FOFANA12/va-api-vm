@@ -9,6 +9,7 @@ use PhpOffice\PhpSpreadsheet\IOFactory;
 use PhpOffice\PhpSpreadsheet\Style\Alignment;
 use PhpOffice\PhpSpreadsheet\Style\Border;
 use Illuminate\Filesystem\Filesystem;
+use Illuminate\Support\Facades\Auth;
 use PhpOffice\PhpSpreadsheet\Cell\Coordinate;
 use PhpOffice\PhpSpreadsheet\Cell\DataType;
 
@@ -26,12 +27,18 @@ class ActionPlanExportService
      */
     public function exportAll()
     {
-        $actionPlans = ActionPlan::with([
+        $structure = Auth::user()?->employee?->structure;
+
+        $query = ActionPlan::with([
             'structure',
             'responsible',
-        ])
-            ->orderBy('created_at')
-            ->get();
+        ])->orderBy('created_at');
+
+        if ($structure) {
+            $query->where('structure_uuid', $structure->uuid);
+        }
+
+        $actionPlans = $query->get();
 
         $filename = __('app/action_plan.export.filename_all');
 

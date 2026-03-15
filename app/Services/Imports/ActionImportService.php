@@ -88,6 +88,29 @@ class ActionImportService
             ];
         }
 
+        $structure = Auth::user()?->employee?->structure;
+        if (!$structure) {
+            return [
+                'success' => false,
+                'errors' => [[
+                    'row' => 0,
+                    'errors' => [__('app/action.import.structure_missing')],
+                ]],
+            ];
+        }
+
+        if ($structure->type !== 'OPERATIONAL') {
+            return [
+                'success' => false,
+                'errors' => [[
+                    'row' => 0,
+                    'errors' => [__('app/action.import.structure_not_operational')],
+                ]],
+            ];
+        }
+
+        $structure->load(['parent', 'children']);
+
         $errors = [];
         $imported = 0;
 
@@ -96,13 +119,12 @@ class ActionImportService
         try {
             foreach ($rows as $index => $row) {
                 $lineNumber = $index + 2;
-
                 $validator = $this->validateRow($row);
 
 
                 if ($validator->fails()) {
-                    $field = array_key_first($validator->errors()->messages());
 
+                    $field = array_key_first($validator->errors()->messages());
                     $message = $validator->errors()->first($field);
 
                     $errors[] = [
@@ -117,28 +139,11 @@ class ActionImportService
                     continue;
                 }
 
-                $structure = Structure::with(['parent', 'children'])
-                    ->where('abbreviation', $row['structure_abbreviation'])
-                    ->where('type', 'OPERATIONAL')
-                    ->first();
-
-                if (!$structure) {
-                    $errors[] = [
-                        'row' => $lineNumber,
-                        'errors' => [
-                            __('app/action.import.structure_not_found', [
-                                'abbreviation' => $row['structure_abbreviation'],
-                            ]),
-                        ],
-                    ];
-                    continue;
-                }
-
                 $responsibleStructureUuid = null;
-                if (!empty($row['structure_responsable_abbreviation'])) {
+                if (!empty($row['structure_pilote'])) {
                     $allowed = $this->getDescendantStructureUuids($structure);
 
-                    $responsibleStructure = Structure::where('abbreviation', $row['structure_responsable_abbreviation'])
+                    $responsibleStructure = Structure::where('abbreviation', $row['structure_pilote'])
                         ->whereIn('uuid', $allowed)
                         ->first();
 
@@ -148,10 +153,14 @@ class ActionImportService
                             'errors' => [__(
                                 'app/action.import.responsible_structure_invalid',
                                 [
-                                    'abbreviation' => $row['structure_responsable_abbreviation'],
+                                    'abbreviation' => $row['structure_pilote'],
                                 ]
                             )],
                         ];
+
+                        if (count($errors) >= self::MAX_ERRORS) {
+                            break;
+                        }
                         continue;
                     }
 
@@ -159,20 +168,21 @@ class ActionImportService
                 }
 
                 $responsibleUuid = null;
-                if (!empty($row['responsable_email'])) {
+                if (!empty($row['responsable'])) {
                     if (!$responsibleStructureUuid) {
                         $errors[] = [
                             'row' => $lineNumber,
-                            'errors' => [__('app/action.import.responsible_structure_required')],
+                            'errors' => [__('app/action.import.pilot_structure_required')],
                         ];
+                        if (count($errors) >= self::MAX_ERRORS) {
+                            break;
+                        }
                         continue;
                     }
 
-                    $responsible = User::where('email', $row['responsable_email'])
+                    $responsible = User::where('email', $row['responsable'])
                         ->whereHas('employee', function ($q) use ($responsibleStructureUuid) {
-                            if ($responsibleStructureUuid) {
-                                $q->where('structure_uuid', $responsibleStructureUuid);
-                            }
+                            $q->where('structure_uuid', $responsibleStructureUuid);
                         })
                         ->first();
 
@@ -180,16 +190,20 @@ class ActionImportService
                         $errors[] = [
                             'row' => $lineNumber,
                             'errors' => [__('app/action.import.responsible_not_found', [
-                                'abbreviation' => $row['structure_responsable_abbreviation'],
+                                'abbreviation' => $row['structure_pilote'],
                             ])],
                         ];
+                        if (count($errors) >= self::MAX_ERRORS) {
+                            break;
+                        }
                         continue;
                     }
 
                     $responsibleUuid = $responsible->uuid;
                 }
 
-                $actionPlan = ActionPlan::where('name', $row['plan_action'])
+
+                $actionPlan = ActionPlan::where('reference', $row['plan_action'])
                     ->where('structure_uuid', $structure->uuid)
                     ->first();
 
@@ -199,10 +213,13 @@ class ActionImportService
                         'errors' => [
                             __('app/action.import.action_plan_not_found', [
                                 'name' => $row['plan_action'],
-                                'structure' => $row['structure_abbreviation'],
+                                'structure' => $structure->abbreviation,
                             ]),
                         ],
                     ];
+                    if (count($errors) >= self::MAX_ERRORS) {
+                        break;
+                    }
                     continue;
                 }
 
@@ -219,6 +236,9 @@ class ActionImportService
                             ]),
                         ],
                     ];
+                    if (count($errors) >= self::MAX_ERRORS) {
+                        break;
+                    }
                     continue;
                 }
                 $priorityCode = $priority->code;
@@ -235,6 +255,9 @@ class ActionImportService
                             ]),
                         ],
                     ];
+                    if (count($errors) >= self::MAX_ERRORS) {
+                        break;
+                    }
                     continue;
                 }
                 $riskLevelCode = $risk->code;
@@ -251,6 +274,9 @@ class ActionImportService
                             ]),
                         ],
                     ];
+                    if (count($errors) >= self::MAX_ERRORS) {
+                        break;
+                    }
                     continue;
                 }
                 $planTypeCode = $planType->code;
@@ -267,6 +293,9 @@ class ActionImportService
                             ]),
                         ],
                     ];
+                    if (count($errors) >= self::MAX_ERRORS) {
+                        break;
+                    }
                     continue;
                 }
 
@@ -289,6 +318,9 @@ class ActionImportService
                             ]),
                         ],
                     ];
+                    if (count($errors) >= self::MAX_ERRORS) {
+                        break;
+                    }
                     continue;
                 }
 
@@ -302,10 +334,13 @@ class ActionImportService
                         'errors' => [
                             __('app/action.import.delegated_project_owner_not_found', [
                                 'name' => $row['maitre_ouvrage_delegue'],
-                                'project_owner' => $row['project_owner'],
+                                'project_owner' => $row['maitre_ouvrage'],
                             ]),
                         ],
                     ];
+                    if (count($errors) >= self::MAX_ERRORS) {
+                        break;
+                    }
                     continue;
                 }
 
@@ -324,6 +359,9 @@ class ActionImportService
                             'row' => $lineNumber,
                             'errors' => [__('app/action.import.action_domain_not_found')],
                         ];
+                        if (count($errors) >= self::MAX_ERRORS) {
+                            break;
+                        }
                         continue;
                     }
 
@@ -336,6 +374,9 @@ class ActionImportService
                             'row' => $lineNumber,
                             'errors' => [__('app/action.import.action_domain_required')],
                         ];
+                        if (count($errors) >= self::MAX_ERRORS) {
+                            break;
+                        }
                         continue;
                     }
 
@@ -349,6 +390,9 @@ class ActionImportService
                             'row' => $lineNumber,
                             'errors' => [__('app/action.import.strategic_domain_not_found')],
                         ];
+                        if (count($errors) >= self::MAX_ERRORS) {
+                            break;
+                        }
                         continue;
                     }
 
@@ -361,6 +405,9 @@ class ActionImportService
                             'row' => $lineNumber,
                             'errors' => [__('app/action.import.strategic_domain_required')],
                         ];
+                        if (count($errors) >= self::MAX_ERRORS) {
+                            break;
+                        }
                         continue;
                     }
 
@@ -374,6 +421,9 @@ class ActionImportService
                             'row' => $lineNumber,
                             'errors' => [__('app/action.import.capability_domain_not_found')],
                         ];
+                        if (count($errors) >= self::MAX_ERRORS) {
+                            break;
+                        }
                         continue;
                     }
 
@@ -386,6 +436,9 @@ class ActionImportService
                             'row' => $lineNumber,
                             'errors' => [__('app/action.import.capability_domain_required')],
                         ];
+                        if (count($errors) >= self::MAX_ERRORS) {
+                            break;
+                        }
                         continue;
                     }
 
@@ -399,6 +452,9 @@ class ActionImportService
                             'row' => $lineNumber,
                             'errors' => [__('app/action.import.elementary_level_not_found')],
                         ];
+                        if (count($errors) >= self::MAX_ERRORS) {
+                            break;
+                        }
                         continue;
                     }
 
@@ -419,6 +475,9 @@ class ActionImportService
                             'row' => $lineNumber,
                             'errors' => [__('app/action.import.region_not_found')],
                         ];
+                        if (count($errors) >= self::MAX_ERRORS) {
+                            break;
+                        }
                         continue;
                     }
 
@@ -431,6 +490,9 @@ class ActionImportService
                             'row' => $lineNumber,
                             'errors' => [__('app/action.import.region_required')],
                         ];
+                        if (count($errors) >= self::MAX_ERRORS) {
+                            break;
+                        }
                         continue;
                     }
 
@@ -444,6 +506,9 @@ class ActionImportService
                             'row' => $lineNumber,
                             'errors' => [__('app/action.import.department_not_found')],
                         ];
+                        if (count($errors) >= self::MAX_ERRORS) {
+                            break;
+                        }
                         continue;
                     }
 
@@ -456,6 +521,9 @@ class ActionImportService
                             'row' => $lineNumber,
                             'errors' => [__('app/action.import.department_required')],
                         ];
+                        if (count($errors) >= self::MAX_ERRORS) {
+                            break;
+                        }
                         continue;
                     }
 
@@ -469,6 +537,9 @@ class ActionImportService
                             'row' => $lineNumber,
                             'errors' => [__('app/action.import.municipality_not_found')],
                         ];
+                        if (count($errors) >= self::MAX_ERRORS) {
+                            break;
+                        }
                         continue;
                     }
 
@@ -627,9 +698,8 @@ class ActionImportService
             'impacts_attendus' => ['bail', 'nullable', 'string', 'max:1000'],
             'risques_identifies' => ['bail', 'nullable', 'string', 'max:1000'],
 
-            'structure_abbreviation' => ['bail', 'required', 'max:20'],
-            'structure_responsable_abbreviation' => ['bail', 'nullable', 'max:20'],
-            'responsable_email' => ['nullable', 'email'],
+            'structure_pilote' => ['bail', 'nullable', 'max:20'],
+            'responsable' => ['nullable', 'email'],
 
             'plan_action' => ['bail', 'required', 'max:100'],
             'priorite' => ['bail', 'required'],
@@ -655,11 +725,8 @@ class ActionImportService
             'conditions_prealables' => __('app/action.request.prerequisites'),
             'impacts_attendus' => __('app/action.request.impacts'),
             'risques_identifies' => __('app/action.request.risks'),
-
-            'structure_abbreviation' => __('app/action.request.structure'),
-            'structure_responsable_abbreviation' => __('app/action.request.responsible_structure'),
-            'responsable_email' => __('app/action.request.responsible'),
-
+            'structure_pilote' => __('app/action.request.structure_pilot'),
+            'responsable' => __('app/action.request.responsible'),
             'plan_action' => __('app/action.request.action_plan'),
             'priorite' => __('app/action.request.priority'),
             'risque' => __('app/action.request.risk_level'),

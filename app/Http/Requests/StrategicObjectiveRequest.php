@@ -78,6 +78,42 @@ class StrategicObjectiveRequest extends FormRequest
         return $rules;
     }
 
+    public function withValidator($validator)
+    {
+        $validator->after(function ($validator) {
+
+            if (!$this->strategic_map || !$this->start_date || !$this->end_date) {
+                return;
+            }
+
+            $strategicMap = StrategicMap::where('uuid', $this->strategic_map)->first();
+
+            if (!$strategicMap) {
+                return;
+            }
+
+            $mapStart = $strategicMap->start_date;
+            $mapEnd = $strategicMap->end_date;
+
+            $objectiveStart = $this->start_date;
+            $objectiveEnd = $this->end_date;
+
+            if ($objectiveStart < $mapStart) {
+                $validator->errors()->add(
+                    'start_date',
+                    __('app/strategic_objective.request.start_date_outside_map')
+                );
+            }
+
+            if ($objectiveEnd > $mapEnd) {
+                $validator->errors()->add(
+                    'end_date',
+                    __('app/strategic_objective.request.end_date_outside_map')
+                );
+            }
+        });
+    }
+
     /**
      * Get custom attribute names for translations.
      */

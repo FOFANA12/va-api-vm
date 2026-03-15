@@ -91,4 +91,9 @@ class StrategicObjective extends Model
     {
         return $this->belongsToMany(Action::class, 'action_objective_alignments', 'objective_uuid', 'action_uuid', 'uuid', 'uuid');
     }
+
+    public function statuses(): HasMany
+    {
+        return $this->hasMany(StrategicObjectiveStatus::class, 'strategic_objective_uuid', 'uuid');
+    }
 }

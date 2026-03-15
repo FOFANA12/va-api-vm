@@ -38,6 +38,8 @@ class IndicatorResource extends JsonResource
             'final_target_value' => $this->final_target_value,
             'achieved_value' => $this->achieved_value,
             'unit' => $this->unit,
+            'strategic_objective' => $this->strategic_objective,
+            'indicator' => $this->indicator,
             'is_planned' => $this->is_planned,
             'status' => IndicatorStatus::get($this->status, $currentLang),
             'state' => StrategicState::get($this->state, $currentLang),

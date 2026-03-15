@@ -18,7 +18,7 @@ class StrategicObjectiveResource extends JsonResource
 
         return match ($mode) {
             'list' => $this->forList(),
-            'edit' => $this->forEdit(),
+            'edit', 'copy' => $this->forEdit(),
             default => $this->forView(),
         };
     }

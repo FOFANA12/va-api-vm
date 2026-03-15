@@ -14,14 +14,17 @@ return new class extends Migration
         Schema::create('structures', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid')->unique();
-            $table->string('abbreviation', 20)->unique();
-            $table->string('name', 100)->unique();
+            $table->string('abbreviation', 20);
+            $table->string('name', 100);
             $table->uuid('parent_uuid')->nullable();
             $table->string('type', 50);
             $table->boolean('status')->default(true);
             $table->uuid('created_by')->nullable();
             $table->uuid('updated_by')->nullable();
             $table->timestamps();
+
+            $table->unique(['parent_uuid', 'abbreviation']);
+            $table->unique(['parent_uuid', 'name']);
         });
 
         Schema::table('structures', function (Blueprint $table) {

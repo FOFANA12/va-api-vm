@@ -59,6 +59,7 @@ class StrategicObjectiveAlignmentRepository
                 'actions.total_receipt_fund',
                 'actions.total_disbursement_fund',
                 'actions.is_planned',
+                'actions.chart_type',
 
             )
             ->where('strategic_objectives.id', $objectiveId);
@@ -93,9 +94,45 @@ class StrategicObjectiveAlignmentRepository
     /**
      * Retrieve all active structures.
      */
-    public function getStructures()
+    public function getStructures(Request $request)
     {
-        $structures = Structure::where('status', true)
+        $objectiveId = $request->objective_id;
+
+        if (!$objectiveId) {
+            return [
+                "structures" => []
+            ];
+        }
+
+        $objective = StrategicObjective::with('structure.children')
+            ->find($objectiveId);
+
+        if (!$objective || !$objective->structure) {
+            return [
+                "structures" => []
+            ];
+        }
+
+        $structure = $objective->structure;
+
+        $allStructures = [$structure];
+
+        $collect = function ($s) use (&$allStructures, &$collect) {
+            foreach ($s->children as $child) {
+                if ($child->status) {
+                    $allStructures[] = $child;
+                    $collect($child);
+                }
+            }
+        };
+
+        $collect($structure);
+
+        $structureUuids = collect($allStructures)->pluck('uuid')->unique();
+
+        $structures = Structure::whereIn('uuid', $structureUuids)
+            ->where('status', true)
+            ->where('type', 'OPERATIONAL')
             ->whereHas('actionPlans', function ($q) {
                 $q->where('status', true);
             })

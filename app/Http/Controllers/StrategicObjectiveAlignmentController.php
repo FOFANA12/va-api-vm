@@ -47,10 +47,10 @@ class StrategicObjectiveAlignmentController extends Controller
     /**
      * Retrieve all active structures.
      */
-    public function getStructures()
+    public function getStructures(Request $request)
     {
         return response()->json(
-            $this->repository->getStructures()
+            $this->repository->getStructures($request)
         )->setStatusCode(Response::HTTP_OK);
     }
 

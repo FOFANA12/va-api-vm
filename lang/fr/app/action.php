@@ -14,6 +14,7 @@ return [
         'status' => 'statut de l\'action',
 
         'structure' => 'structure concernée',
+        'structure_pilot' => 'structure pilote',
         'action_plan' => 'plan d\'action',
         'project_owner' => 'maître d\'ouvrage',
         'delegated_project_owner' => 'maître d\'ouvrage délégué',
@@ -27,7 +28,7 @@ return [
         'municipality' => 'commune',
         'chart_type' => 'type de graphique',
 
-        'responsible_structure' => 'structure responsable',
+        'responsible_structure' => 'structure pilote',
         'responsible' => 'responsable',
 
         'description' => 'description',
@@ -48,10 +49,12 @@ return [
         'file_empty' => 'Le fichier est vide ou invalide.',
         'unexpected_error' => 'Une erreur inattendue est survenue lors de l\'importation des actions.',
 
-        'structure_not_found' => 'Structure introuvable (:abbreviation).',
-        'responsible_structure_invalid' => 'La structure responsable est invalide (:abbreviation) ou n\'est pas un enfant de la structure.',
-        'responsible_structure_required' => 'La structure responsable est obligatoire lorsque le responsable est renseigné.',
-        'responsible_not_found' => 'Responsable introuvable ou non rattaché à la structure responsable (:abbreviation).',
+        'structure_missing' => 'Votre compte n\'est rattaché à aucune structure.',
+        'structure_not_operational' => 'Votre structure n\'est pas une structure opérationnelle autorisée pour cet import.',
+
+        'responsible_structure_invalid' => 'La structure pilote est invalide (:abbreviation) ou n\'est pas un enfant de la structure.',
+        'pilot_structure_required' => 'La structure pilote est obligatoire lorsque le responsable est renseigné.',
+        'responsible_not_found' => 'Responsable introuvable ou non rattaché à la structure pilote (:abbreviation).',
 
         'action_plan_not_found' => 'Le plan d\'action ":name" est introuvable pour la structure ":structure".',
 

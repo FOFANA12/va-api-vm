@@ -255,10 +255,10 @@ class IndicatorControlRepository
             $target = $lastControl->target_value ?? 0;
 
             if ($period && $period->isLast()) {
-                $state = $achieved < $target ? 'risk' : 'achieved';
+                $state = $achieved < $target ? 'bad_track' : 'achieved';
             } else {
-                if ($achieved < ($target * 0.25)) {
-                    $state = 'risk';
+                if ($achieved < ($target * 0.50)) {
+                    $state = 'bad_track';
                 } elseif ($achieved < $target) {
                     $state = 'delayed';
                 } else {
