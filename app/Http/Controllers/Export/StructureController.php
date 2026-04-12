@@ -33,7 +33,7 @@ class StructureController extends Controller
 
         $allStructures = [];
         $collectStructures($structure, $allStructures);
-
+        
         $styleArray = [
             'font' => ['bold' => false, 'size' => 11, 'name' => 'Calibri'],
             'alignment' => [

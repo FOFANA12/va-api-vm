@@ -1,66 +1,203 @@
-<p align="center"><a href="https://laravel.com" target="_blank"><img src="https://raw.githubusercontent.com/laravel/art/master/logo-lockup/5%20SVG/2%20CMYK/1%20Full%20Color/laravel-logolockup-cmyk-red.svg" width="400" alt="Laravel Logo"></a></p>
+# VA API
 
-<p align="center">
-<a href="https://github.com/laravel/framework/actions"><img src="https://github.com/laravel/framework/workflows/tests/badge.svg" alt="Build Status"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/dt/laravel/framework" alt="Total Downloads"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/v/laravel/framework" alt="Latest Stable Version"></a>
-<a href="https://packagist.org/packages/laravel/framework"><img src="https://img.shields.io/packagist/l/laravel/framework" alt="License"></a>
-</p>
+API backend du projet **VA** (Value Assessment) — développée avec **Laravel 11**, sécurisée par **Laravel Sanctum**, et documentée via **Scribe**.
 
-## About Laravel
+---
 
-Laravel is a web application framework with expressive, elegant syntax. We believe development must be an enjoyable and creative experience to be truly fulfilling. Laravel takes the pain out of development by easing common tasks used in many web projects, such as:
+## Prérequis
 
-- [Simple, fast routing engine](https://laravel.com/docs/routing).
-- [Powerful dependency injection container](https://laravel.com/docs/container).
-- Multiple back-ends for [session](https://laravel.com/docs/session) and [cache](https://laravel.com/docs/cache) storage.
-- Expressive, intuitive [database ORM](https://laravel.com/docs/eloquent).
-- Database agnostic [schema migrations](https://laravel.com/docs/migrations).
-- [Robust background job processing](https://laravel.com/docs/queues).
-- [Real-time event broadcasting](https://laravel.com/docs/broadcasting).
+| Outil | Version minimale |
+|-------|-----------------|
+| PHP | 8.2+ |
+| Composer | 2.x |
+| MySQL | 8.x |
+| Node.js | 18+ (optionnel, pour les assets) |
 
-Laravel is accessible, powerful, and provides tools required for large, robust applications.
+---
 
-## Learning Laravel
+## Installation
 
-Laravel has the most extensive and thorough [documentation](https://laravel.com/docs) and video tutorial library of all modern web application frameworks, making it a breeze to get started with the framework.
+### 1. Cloner le dépôt
 
-You may also try the [Laravel Bootcamp](https://bootcamp.laravel.com), where you will be guided through building a modern Laravel application from scratch.
+```bash
+git clone <url-du-repo> va-mdn-api
+cd va-mdn-api
+```
 
-If you don't feel like reading, [Laracasts](https://laracasts.com) can help. Laracasts contains thousands of video tutorials on a range of topics including Laravel, modern PHP, unit testing, and JavaScript. Boost your skills by digging into our comprehensive video library.
+### 2. Installer les dépendances PHP
 
-## Laravel Sponsors
+```bash
+composer install
+```
 
-We would like to extend our thanks to the following sponsors for funding Laravel development. If you are interested in becoming a sponsor, please visit the [Laravel Partners program](https://partners.laravel.com).
+### 3. Configurer l'environnement
 
-### Premium Partners
+```bash
+cp .env.example .env
+php artisan key:generate
+```
 
-- **[Vehikl](https://vehikl.com/)**
-- **[Tighten Co.](https://tighten.co)**
-- **[WebReinvent](https://webreinvent.com/)**
-- **[Kirschbaum Development Group](https://kirschbaumdevelopment.com)**
-- **[64 Robots](https://64robots.com)**
-- **[Curotec](https://www.curotec.com/services/technologies/laravel/)**
-- **[Cyber-Duck](https://cyber-duck.co.uk)**
-- **[DevSquad](https://devsquad.com/hire-laravel-developers)**
-- **[Jump24](https://jump24.co.uk)**
-- **[Redberry](https://redberry.international/laravel/)**
-- **[Active Logic](https://activelogic.com)**
-- **[byte5](https://byte5.de)**
-- **[OP.GG](https://op.gg)**
+Editer `.env` et renseigner au minimum :
 
-## Contributing
+```env
+APP_URL=http://127.0.0.1:8000
+APP_URL_FRONT=http://127.0.0.1:5170
 
-Thank you for considering contributing to the Laravel framework! The contribution guide can be found in the [Laravel documentation](https://laravel.com/docs/contributions).
+DB_CONNECTION=mysql
+DB_HOST=127.0.0.1
+DB_PORT=3306
+DB_DATABASE=va_db
+DB_USERNAME=root
+DB_PASSWORD=
 
-## Code of Conduct
+SANCTUM_STATEFUL_DOMAINS=localhost:5170,127.0.0.1:5170
+```
 
-In order to ensure that the Laravel community is welcoming to all, please review and abide by the [Code of Conduct](https://laravel.com/docs/contributions#code-of-conduct).
+### 4. Créer la base de données et exécuter les migrations
 
-## Security Vulnerabilities
+```bash
+php artisan migrate
+```
 
-If you discover a security vulnerability within Laravel, please send an e-mail to Taylor Otwell via [taylor@laravel.com](mailto:taylor@laravel.com). All security vulnerabilities will be promptly addressed.
+### 5. (Optionnel) Alimenter la base avec les données de démarrage
 
-## License
+```bash
+php artisan db:seed
+```
 
-The Laravel framework is open-sourced software licensed under the [MIT license](https://opensource.org/licenses/MIT).
+### 6. Lancer le serveur de développement
+
+```bash
+php artisan serve
+```
+
+L'API est accessible sur `http://127.0.0.1:8000`.
+
+---
+
+## Structure du projet
+
+```
+app/
+├── Http/
+│   ├── Controllers/
+│   │   ├── Auth/              # Authentification (login, profil, mot de passe)
+│   │   ├── Settings/          # Référentiels (devises, régions, rôles, etc.)
+│   │   ├── Export/            # Export Excel / Word
+│   │   ├── Report/            # Rapports & tableaux de bord
+│   │   └── ...                # Contrôleurs métier
+│   ├── Resources/             # Transformations JSON (API Resources)
+│   └── Requests/              # Validation des requêtes
+├── Models/                    # Modèles Eloquent
+├── Repositories/              # Couche d'accès aux données
+└── Console/Commands/          # Commandes Artisan personnalisées
+
+database/
+├── migrations/                # Migrations (schéma complet)
+└── seeders/
+
+routes/
+└── api.php                    # Toutes les routes API
+```
+
+---
+
+## Authentification
+
+L'API supporte deux modes d'authentification via **Laravel Sanctum** :
+
+| Mode | Préfixe | Usage |
+|------|---------|-------|
+| Token (API) | `/api-auth` | Applications mobiles / clients externes |
+| Session (SPA) | `/spa-auth` | Frontend Vue/React sur le même domaine |
+
+### Connexion (token)
+
+```http
+POST /api-auth/login
+Content-Type: application/json
+
+{
+  "email": "user@example.com",
+  "password": "password"
+}
+```
+
+Toutes les routes protégées requièrent le header :
+
+```http
+Authorization: Bearer <token>
+```
+
+### Déconnexion
+
+```http
+POST /api-auth/logout
+Authorization: Bearer <token>
+```
+
+Toutes les routes sont préfixées par `/api`.
+
+
+## Packages clés
+
+| Package | Rôle |
+|---------|------|
+| `laravel/sanctum` | Authentification API / SPA |
+| `phpoffice/phpspreadsheet` | Export Excel |
+| `phpoffice/phpword` | Export Word |
+| `spatie/laravel-activitylog` | Journal d'audit |
+| `laravel-lang/common` | Traductions (fr / en / ar) |
+
+---
+
+## Localisation
+
+L'application supporte trois langues. La locale se définit dans `.env` :
+
+```env
+APP_LOCALE=fr
+SUPPORTED_LOCALES=fr,en,ar
+```
+
+---
+
+## Tests
+
+```bash
+php artisan test
+```
+
+---
+
+## Commandes Artisan utiles
+
+```bash
+# Vider tous les caches
+php artisan optimize:clear
+
+# Lister les routes
+php artisan route:list
+
+# Lancer les queues
+php artisan queue:work
+
+```
+
+---
+
+## Variables d'environnement importantes
+
+| Variable | Description | Exemple |
+|----------|-------------|---------|
+| `APP_URL` | URL de l'API | `http://127.0.0.1:8000` |
+| `APP_URL_FRONT` | URL du frontend | `http://127.0.0.1:5170` |
+| `SANCTUM_STATEFUL_DOMAINS` | Domaines SPA autorisés | `localhost:5170` |
+| `DB_DATABASE` | Nom de la base MySQL | `va_db` |
+| `SESSION_LIFETIME` | Durée de session (minutes) | `600` |
+
+---
+
+## Développé par
+
+**LEADERTECH-SOLUTIONS**

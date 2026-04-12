@@ -175,14 +175,33 @@ class ActionRepository
             ];
         }
 
-        $structures = Structure::query()
-            ->where('status', true)
-            // ->whereIn('type', ['DIRECTION'])
-            ->orderBy('id', 'desc')
-            ->select('uuid', 'name', 'type', 'parent_uuid')
-            ->get();
+        $user = Auth::user()?->load('employee.structure');
 
-        $directionUuids = $structures->pluck('uuid')->toArray();
+        if ($user?->employee && $user->employee->structure) {
+            $structure = $user->employee->structure;
+
+            if ($structure->status) {
+                $structures = collect([
+                    [
+                        'uuid' => $structure->uuid,
+                        'name' => $structure->name,
+                        'type' => $structure->type,
+                        'parent_uuid' => $structure->parent_uuid,
+                    ]
+                ]);
+            } else {
+                $structures = collect();
+            }
+        } elseif (!$user?->employee) {
+            $structures = Structure::query()
+                ->where('status', true)
+                ->orderBy('id', 'desc')
+                ->select('uuid', 'name', 'type', 'parent_uuid')
+                ->get();
+        }
+
+
+        $directionUuids = collect($structures)->pluck('uuid')->toArray();
 
         $users = User::select('uuid', 'name', 'email')
             ->where('status', true)
@@ -201,7 +220,6 @@ class ActionRepository
 
 
         $actionPlans = ActionPlan::query()
-            ->where('status', true)
             ->whereIn('structure_uuid', $directionUuids)
             ->orderBy('id', 'desc')
             ->select('uuid', 'name', 'structure_uuid')

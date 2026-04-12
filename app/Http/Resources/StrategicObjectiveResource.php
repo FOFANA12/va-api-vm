@@ -40,6 +40,7 @@ class StrategicObjectiveResource extends JsonResource
             'structure' => $this->structure,
             'status' => StrategicObjectiveStatus::get($this->status, $currentLang),
             'state' => StrategicState::get($this->state, $currentLang),
+            'strategic_map' => $this->strategic_map,
         ];
 
         if ($this->obj_id) {

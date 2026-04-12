@@ -37,8 +37,8 @@ class StrategicObjectiveRepository
      */
     public function index(Request $request)
     {
-        $searchable = ['reference', 'name', 'lead_structure'];
-        $sortable = ['reference', 'name', 'priority', 'risk_level', 'lead_structure', 'structure', 'end_date', 'start_date', 'status', 'state'];
+        $searchable = ['reference', 'name', 'lead_structure', 'strategic_map'];
+        $sortable = ['reference', 'name', 'priority', 'risk_level', 'lead_structure', 'structure', 'end_date', 'start_date', 'status', 'state', 'strategic_map'];
 
         $searchTerm = $request->input('searchTerm');
         $sortByInput = $request->input('sortBy');
@@ -50,6 +50,7 @@ class StrategicObjectiveRepository
 
         $query = StrategicObjective::join('structures as lst', 'strategic_objectives.lead_structure_uuid', '=', 'lst.uuid')
             ->join('structures as st', 'strategic_objectives.structure_uuid', '=', 'st.uuid')
+            ->join('strategic_maps', 'strategic_objectives.strategic_map_uuid', '=', 'strategic_maps.uuid')
             ->select(
                 'strategic_objectives.id as id',
                 'strategic_objectives.uuid',
@@ -63,6 +64,7 @@ class StrategicObjectiveRepository
                 'st.name as structure',
                 'strategic_objectives.status',
                 'strategic_objectives.state',
+                'strategic_maps.name as strategic_map',
             );
 
         $allowed = $this->structureAccess->getAccessibleStructureUuids(Auth::user(), true, true);
@@ -96,6 +98,8 @@ class StrategicObjectiveRepository
                         $q->orWhere('st.name', 'LIKE', '%' . strtolower($searchTerm) . '%');
                     } else if ($column === 'lead_structure') {
                         $q->orWhere('lst.name', 'LIKE', '%' . strtolower($searchTerm) . '%');
+                    } else if ($column === 'strategic_map') {
+                        $q->orWhere('strategic_maps.name', 'LIKE', '%' . strtolower($searchTerm) . '%');
                     } else {
                         $q->orWhere("strategic_objectives.$column", 'LIKE', '%' . strtolower($searchTerm) . '%');
                     }
@@ -107,6 +111,8 @@ class StrategicObjectiveRepository
             $query->orderBy('lst.name', $sortOrder);
         } else if ($sortBy === 'structure') {
             $query->orderBy('st.name', $sortOrder);
+        } else if ($sortBy === 'strategic_map') {
+            $query->orderBy('strategic_maps.name', $sortOrder);
         } else {
             $query->orderBy("strategic_objectives.$sortBy", $sortOrder);
         }
@@ -144,13 +150,31 @@ class StrategicObjectiveRepository
             ];
         }
 
-        $ownerStructures = Structure::query()
-            ->where('status', true)
-            ->whereIn('type', ['STATE', 'STRATEGIC'])
-            ->orderBy('id', 'desc')
-            ->select('uuid', 'name', 'type')
-            ->get();
+        $user = Auth::user()?->load('employee.structure');
+        $ownerStructures = [];
+        if ($user?->employee && $user->employee->structure) {
+            $structure = $user->employee->structure;
 
+            if (in_array($structure->type, ['STATE', 'STRATEGIC']) && $structure->status) {
+                $ownerStructures = collect([
+                    [
+                        'uuid' => $structure->uuid,
+                        'name' => $structure->name,
+                        'type' => $structure->type,
+                    ]
+                ]);
+            } else {
+                $ownerStructures = collect();
+            }
+        } elseif (!$user?->employee) {
+            $ownerStructures = Structure::query()
+                ->where('status', true)
+                ->whereIn('type', ['STATE', 'STRATEGIC'])
+                ->orderBy('id', 'desc')
+                ->select('uuid', 'name', 'type')
+                ->get();
+        } 
+        
         $leadStructures = Structure::query()
             ->where('status', true)
             ->whereIn('type', ['STRATEGIC', 'OPERATIONAL', 'VIRTUAL'])

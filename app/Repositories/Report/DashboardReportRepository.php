@@ -32,7 +32,7 @@ class DashboardReportRepository
         };
         $collect($structure);
 
-        $structureUuids = collect($structures)->pluck('uuid');
+        $structureUuids = collect($structures)->unique()->values();
         $structureCount = count($structureUuids);
 
         $strategicMaps = StrategicMap::with(['elements.objectives', 'objectives'])
@@ -88,8 +88,8 @@ class DashboardReportRepository
                 $count = $objectives->where('status', $code)->count();
 
                 return [
-                    'code'  => $code,
-                    'name'  => StrategicObjectiveStatus::name($code, $locale),
+                    'code' => $code,
+                    'name' => StrategicObjectiveStatus::name($code, $locale),
                     'color' => StrategicObjectiveStatus::get($code, $locale)->color,
                     'value' => $leadObjectivesCount > 0
                         ? round(($count / $leadObjectivesCount) * 100, 2)

@@ -85,15 +85,39 @@ class StrategicMapRepository
      */
     public function requirements()
     {
-        $structures = Structure::query()
-            ->where('status', true)
-            ->whereIn('type', ['STATE', 'STRATEGIC'])
-            ->orderBy('id', 'desc')
-            ->select('uuid', 'name', 'type')
-            ->get();
+        $user = Auth::user()?->load('employee.structure');
+
+        if ($user?->employee && $user->employee->structure) {
+            $structure = $user->employee->structure;
+
+            if (in_array($structure->type, ['STATE', 'STRATEGIC']) && $structure->status) {
+                return [
+                    'structures' => collect([
+                        [
+                            'uuid' => $structure->uuid,
+                            'name' => $structure->name,
+                            'type' => $structure->type,
+                        ]
+                    ])
+                ];
+            }
+        }
+
+        if (!$user?->employee) {
+            $structures = Structure::query()
+                ->where('status', true)
+                ->whereIn('type', ['STATE', 'STRATEGIC'])
+                ->orderBy('id', 'desc')
+                ->select('uuid', 'name', 'type')
+                ->get();
+
+            return [
+                'structures' => $structures,
+            ];
+        }
 
         return [
-            'structures' => $structures,
+            'structures' => [],
         ];
     }
 

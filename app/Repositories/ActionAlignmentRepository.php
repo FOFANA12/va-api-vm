@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Helpers\DateTimeFormatter;
+use App\Helpers\Utils;
 use App\Http\Requests\ActionAlignmentRequest;
 use App\Jobs\EvaluateActionJob;
 use App\Jobs\UpdateActionAlignmentMetricsJob;
@@ -96,23 +97,14 @@ class ActionAlignmentRepository
         $alreadyAlignedObjectiveUuids = $action->objectives()->pluck('strategic_objectives.uuid')->toArray();
 
         $structure = $action->structure;
-        $department = $structure->parent;
+        $targetUuids = Utils::getStructureAndParents($structure);
 
         $actionStart = $action->start_date ? Carbon::parse($action->start_date) : null;
         $actionEnd = $action->end_date ? Carbon::parse($action->end_date) : null;
         $hasActionDates = $actionStart && $actionEnd;
 
-        $targetUuids = collect();
-
-        if ($department && $department->type != 'STATE') {
-            $targetUuids->push($department->uuid);
-        }
-
-        $targetUuids = $targetUuids->merge(
-            Structure::where('type', 'STATE')->pluck('uuid')
-        );
-
         $structures = Structure::whereIn('uuid', $targetUuids)
+            ->whereIn('type', ['STATE', 'STRATEGIC'])
             ->with(['strategicMaps' => function ($q) {
                 $q->where('status', true)
                     ->with(['elements.objectives', 'elements.parent']);

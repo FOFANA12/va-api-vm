@@ -101,12 +101,31 @@ class ActionPlanRepository
      */
     public function requirements()
     {
-        $structures = Structure::query()
-            ->where('status', true)
-            ->whereIn('type', ['OPERATIONAL'])
-            ->orderBy('id', 'desc')
-            ->select('uuid', 'name', 'type')
-            ->get();
+        $user = Auth::user()?->load('employee.structure');
+        $structures = [];
+
+        if ($user?->employee && $user->employee->structure) {
+            $structure = $user->employee->structure;
+
+            if ($structure->type === 'OPERATIONAL' && $structure->status) {
+                $structures = collect([
+                    [
+                        'uuid' => $structure->uuid,
+                        'name' => $structure->name,
+                        'type' => $structure->type,
+                    ]
+                ]);
+            } else {
+                $structures = collect();
+            }
+        } elseif (!$user?->employee) {
+            $structures = Structure::query()
+                ->where('status', true)
+                ->whereIn('type', ['OPERATIONAL'])
+                ->orderBy('id', 'desc')
+                ->select('uuid', 'name', 'type')
+                ->get();
+        }
 
         $users = User::select('uuid', 'name', 'email')
             ->where('status', true)

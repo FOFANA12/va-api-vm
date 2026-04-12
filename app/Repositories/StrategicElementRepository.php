@@ -102,7 +102,10 @@ class StrategicElementRepository
      */
     public function requirements()
     {
-        $structures = Structure::where('status', true)
+        $user = Auth::user()?->load('employee.structure');
+
+        $baseQuery = Structure::where('status', true)
+            ->whereIn('type', ['STATE', 'STRATEGIC'])
             ->with(['strategicMaps' => function ($query) {
                 $query->where('status', true)
                     ->select('uuid', 'structure_uuid', 'name')
@@ -123,12 +126,34 @@ class StrategicElementRepository
                         },
                     ]);
             }])
-            ->orderBy('id', 'desc')
-            ->select('uuid', 'name', 'abbreviation', 'type')
-            ->get();
+            ->select('uuid', 'name', 'abbreviation', 'type');
+
+        if ($user?->employee && $user->employee->structure) {
+            $structure = $user->employee->structure;
+
+            if (in_array($structure->type, ['STATE', 'STRATEGIC']) && $structure->status) {
+                $structures = (clone $baseQuery)
+                    ->where('uuid', $structure->uuid)
+                    ->get();
+
+                return [
+                    'structures' => $structures,
+                ];
+            }
+        }
+
+        if (!$user?->employee) {
+            $structures = (clone $baseQuery)
+                ->orderBy('id', 'desc')
+                ->get();
+
+            return [
+                'structures' => $structures,
+            ];
+        }
 
         return [
-            'structures' => $structures,
+            'structures' => collect(),
         ];
     }
 
