@@ -5,6 +5,10 @@ return [
         'message_success_created' => 'Le décaissement a été créé avec succès.',
         'message_success_updated' => 'Le décaissement a été mis à jour avec succès.',
     ],
+
+    'errors' => [
+        'action_locked' => "Les décaissements ne sont autorisés que lorsque l'action est en réalisation.",
+    ],
     'request' => [
         'action' => 'action liée',
         'operation_number' => 'numéro de l\'opération',

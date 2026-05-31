@@ -7,7 +7,6 @@ use Illuminate\Http\Response;
 use App\Http\Controllers\Controller;
 use App\Models\Indicator;
 use App\Repositories\IndicatorStatusRepository;
-use App\Support\IndicatorStatus;
 
 class IndicatorStatusController extends Controller
 {
@@ -43,7 +42,7 @@ class IndicatorStatusController extends Controller
      */
     public function store(Request $request, Indicator $indicator)
     {
-        $validStatuses = IndicatorStatus::codes();
+        $validStatuses = $this->repository->allowedNextStatuses($indicator);
 
         $status = $request->input('status');
 

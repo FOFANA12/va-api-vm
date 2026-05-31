@@ -57,6 +57,9 @@ class ActionFundDisbursement extends Model
     protected function casts(): array
     {
         return [
+            'signature_date' => 'date',
+            'execution_date' => 'date',
+            'payment_date' => 'date',
             'payment_amount' => 'float',
         ];
     }

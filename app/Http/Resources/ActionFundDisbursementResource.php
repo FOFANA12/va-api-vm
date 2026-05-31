@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Helpers\DateTimeFormatter;
+use App\Support\ActionStatus;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\URL;
@@ -41,6 +42,7 @@ class ActionFundDisbursementResource extends JsonResource
                 'reference' => $this->action_reference,
                 'name' => $this->action_name,
                 'id' => $this->action_id,
+                'status' => ActionStatus::get($this->action_status, app()->getLocale()),
             ],
             'export_word_url'  => $this->id
                 ? URL::route('actionFundDisbursement.exportToWord', ['actionFundDisbursement' => $this->id])
@@ -59,9 +61,9 @@ class ActionFundDisbursementResource extends JsonResource
             'uuid' => $this->uuid,
             'reference' => $this->reference,
             'operation_number' => $this->operation_number,
-            'signature_date' => $this->signature_date,
-            'execution_date' => $this->execution_date,
-            'payment_date' => $this->payment_date,
+            'signature_date' => $this->signature_date?->toDateString(),
+            'execution_date' => $this->execution_date?->toDateString(),
+            'payment_date' => $this->payment_date?->toDateString(),
             'payment_amount' => $this->payment_amount,
             'cheque_reference' => $this->cheque_reference,
             'description' => $this->description,
@@ -72,6 +74,7 @@ class ActionFundDisbursementResource extends JsonResource
                 'phases' => $this->action->phases,
                 'currency' => $this->action->currency,
                 'contract_type_uuid' => $this->action->contract_type_uuid,
+                'status' => ActionStatus::get($this->action->status, app()->getLocale()),
             ]),
             'payment_mode' => $this->payment_mode_uuid,
             'budget_type' => $this->budget_type_uuid,
@@ -107,6 +110,7 @@ class ActionFundDisbursementResource extends JsonResource
                 'reference' => $this->action->reference,
                 'name' => $this->action->name,
                 'currency' => $this->action->currency,
+                'status' => ActionStatus::get($this->action->status, app()->getLocale()),
             ]),
             'payment_mode' => $this->whenLoaded('paymentMode', fn() => $this->paymentMode->name),
             'budget_type' => $this->whenLoaded('budgetType', fn() => $this->budgetType->name),

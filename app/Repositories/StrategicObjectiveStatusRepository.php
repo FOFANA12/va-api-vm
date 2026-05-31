@@ -3,8 +3,10 @@
 namespace App\Repositories;
 
 use App\Http\Resources\StrategicObjectiveStatusResource;
+use App\Models\IndicatorStatus as ModelsIndicatorStatus;
 use App\Models\StrategicObjective;
 use App\Models\StrategicObjectiveStatus as ModelsStrategicObjectiveStatus;
+use App\Support\IndicatorStatus;
 use App\Support\StrategicObjectiveStatus;
 use RuntimeException;
 use Illuminate\Http\Request;
@@ -32,6 +34,13 @@ class StrategicObjectiveStatusRepository
         $current = $objective->status;
         $next = StrategicObjectiveStatus::next($current);
 
+        if (!$this->canStopObjective($objective)) {
+            $next = array_values(array_filter(
+                $next,
+                fn($code) => $code !== StrategicObjectiveStatus::STOPPED
+            ));
+        }
+
         return [
             'statuses' => collect($next)->map(function ($code) {
                 $status = StrategicObjectiveStatus::get($code, app()->getLocale());
@@ -52,6 +61,13 @@ class StrategicObjectiveStatusRepository
         DB::beginTransaction();
         try {
             $statusCode = $request->input('status');
+
+            if (
+                $statusCode === StrategicObjectiveStatus::STOPPED
+                && !$this->canStopObjective($objective)
+            ) {
+                throw new \Exception(__('app/strategic_objective.request.invalid_status'));
+            }
 
             $status = ModelsStrategicObjectiveStatus::create([
                 'strategic_objective_uuid' => $objective->uuid,
@@ -74,12 +90,7 @@ class StrategicObjectiveStatusRepository
                 StrategicObjectiveStatus::CLOSED,
                 StrategicObjectiveStatus::STOPPED
             ])) {
-
-                $objective->indicators()->update([
-                    'status' => $statusCode,
-                    'status_changed_at' => now(),
-                    'status_changed_by' => Auth::user()?->uuid,
-                ]);
+                $this->propagateStatusToIndicators($objective, $statusCode, $status->status_date);
             }
 
             $this->updateObjectiveState($objective);
@@ -91,6 +102,14 @@ class StrategicObjectiveStatusRepository
             DB::rollBack();
             throw $e;
         }
+    }
+
+    private function canStopObjective(StrategicObjective $objective): bool
+    {
+        $userStructureUuid = Auth::user()?->employee?->structure_uuid;
+
+        return $userStructureUuid !== null
+            && $userStructureUuid === $objective->structure_uuid;
     }
 
 
@@ -150,5 +169,42 @@ class StrategicObjectiveStatusRepository
         $objective->update([
             'state' => $worstState ?? 'none',
         ]);
+    }
+
+    protected function propagateStatusToIndicators(StrategicObjective $objective, string $statusCode, string $statusDate): void
+    {
+        $indicators = $objective->indicators()->get();
+
+        foreach ($indicators as $indicator) {
+            $this->applyIndicatorStatusEffects($indicator, $statusCode, $statusDate);
+
+            ModelsIndicatorStatus::create([
+                'indicator_uuid' => $indicator->uuid,
+                'indicator_id' => $indicator->id,
+                'status_code' => $statusCode,
+                'status_date' => $statusDate,
+                'created_by' => Auth::user()?->uuid,
+                'updated_by' => Auth::user()?->uuid,
+            ]);
+
+            $indicator->status = $statusCode;
+            $indicator->status_changed_at = $statusDate;
+            $indicator->status_changed_by = Auth::user()?->uuid;
+            $indicator->timestamps = false;
+            $indicator->save();
+        }
+    }
+
+    protected function applyIndicatorStatusEffects($indicator, string $statusCode, string $statusDate): void
+    {
+        switch ($statusCode) {
+            case IndicatorStatus::STOPPED:
+                $indicator->actual_end_date = null;
+                break;
+
+            case IndicatorStatus::CLOSED:
+                $indicator->actual_end_date = $statusDate;
+                break;
+        }
     }
 }

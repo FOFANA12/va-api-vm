@@ -39,6 +39,7 @@ class UpdateStructureAlignmentMetricsJob implements ShouldQueue
         StructureMetric::updateOrCreate(
             ['structure_uuid' => $structure->uuid],
             [
+                'structure_id' => $structure->id,
                 'aligned_maps_count' => $alignedMapsCount,
                 'aligned_axes_count' => $alignedAxesCount,
                 'aligned_objectives_count' => $alignedObjectivesCount,

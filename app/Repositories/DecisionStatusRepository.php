@@ -12,6 +12,7 @@ use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\DecisionStatusRequest;
 use App\Http\Resources\DecisionStatusResource;
 use App\Models\Decision;
+use App\Models\StrategicObjective;
 use App\Support\DecisionStatus as SupportDecisionStatus;
 
 class DecisionStatusRepository
@@ -71,6 +72,13 @@ class DecisionStatusRepository
         $current = $decision->status;
         $next = SupportDecisionStatus::next($current);
 
+        if (!$this->canCancelDecision($decision)) {
+            $next = array_values(array_filter(
+                $next,
+                fn($code) => $code !== 'cancelled'
+            ));
+        }
+
         $decisionStatuses =  collect($next)->map(function ($code) {
             $status = SupportDecisionStatus::get($code, app()->getLocale());
             return [
@@ -93,6 +101,13 @@ class DecisionStatusRepository
         $identifier = null;
         DB::beginTransaction();
         try {
+            if (
+                $request->input('status') === 'cancelled'
+                && !$this->canCancelDecision($decision)
+            ) {
+                throw new \Exception(__('app/decision_status.request.status'));
+            }
+
             $request->merge([
                 'status_date' => now(),
                 "created_by" => Auth::user()?->uuid,
@@ -217,5 +232,19 @@ class DecisionStatusRepository
             }
             throw new \Exception(__('app/common.repository.error'));
         }
+    }
+
+    private function canCancelDecision(Decision $decision): bool
+    {
+        if ($decision->decidable_type !== StrategicObjective::tableName()) {
+            return true;
+        }
+
+        $objective = $decision->decidable;
+        $userStructureUuid = Auth::user()?->employee?->structure_uuid;
+
+        return $objective instanceof StrategicObjective
+            && $userStructureUuid !== null
+            && $userStructureUuid === $objective->structure_uuid;
     }
 }

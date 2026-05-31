@@ -47,6 +47,17 @@ class StrategicObjective extends Model
             ->dontSubmitEmptyLogs();
     }
 
+    protected function casts(): array
+    {
+        return [
+            'start_date' => 'date',
+            'end_date' => 'date',
+            'status_changed_at' => 'datetime',
+            'failed' => 'boolean',
+            'alert' => 'boolean',
+        ];
+    }
+
     public function structure(): BelongsTo
     {
         return $this->belongsTo(Structure::class, 'structure_uuid', 'uuid');

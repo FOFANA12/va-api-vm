@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Helpers\DateTimeFormatter;
+use Carbon\Carbon;
 use App\Support\ChartType;
 use App\Support\FrequencyUnit;
 use App\Support\IndicatorStatus;
@@ -33,6 +34,8 @@ class IndicatorResource extends JsonResource
             'lead_structure' => $this->lead_structure,
             'structure' => $this->structure,
             'reference' => $this->reference,
+            'start_date' => $this->start_date ? DateTimeFormatter::formatDate($this->start_date) : null,
+            'end_date' => $this->end_date ? DateTimeFormatter::formatDate($this->end_date) : null,
             'chart_type' => ChartType::get($this->chart_type, $currentLang),
             'initial_value' => $this->initial_value,
             'final_target_value' => $this->final_target_value,
@@ -89,6 +92,8 @@ class IndicatorResource extends JsonResource
             'reference' => $this->reference,
             'name' => $this->name,
             'description' => $this->description,
+            'start_date' => $this->start_date ? Carbon::parse($this->start_date)->toDateString() : null,
+            'end_date' => $this->end_date ? Carbon::parse($this->end_date)->toDateString() : null,
             'chart_type' => $this->chart_type,
             'frequency_unit' => $this->frequency_unit,
             'frequency_value' => $this->frequency_value,
@@ -126,6 +131,8 @@ class IndicatorResource extends JsonResource
             'reference' => $this->reference,
             'name' => $this->name,
             'description' => $this->description,
+            'start_date' => $this->start_date ? DateTimeFormatter::formatDate($this->start_date) : null,
+            'end_date' => $this->end_date ? DateTimeFormatter::formatDate($this->end_date) : null,
             'chart_type' => ChartType::name($this->chart_type, $currentLang),
             'frequency_unit' => $this->frequency_unit ? FrequencyUnit::name($this->frequency_unit) : null,
             'frequency_value' => $this->frequency_value,

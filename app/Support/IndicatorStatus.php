@@ -4,12 +4,18 @@ namespace App\Support;
 
 class IndicatorStatus
 {
+    public const CREATED = 'created';
+    public const PLANNED = 'planned';
+    public const IN_PROGRESS = 'in_progress';
+    public const CLOSED = 'closed';
+    public const STOPPED = 'stopped';
+
     /**
      * List of available statuses with their localized names and display colors.
      */
     private static array $statuses = [
         [
-            'code' => 'created',
+            'code' => self::CREATED,
             'color' => '#42a5f5',
             'name' => [
                 'fr' => 'Créé',
@@ -18,7 +24,7 @@ class IndicatorStatus
             ],
         ],
         [
-            'code' => 'planned',
+            'code' => self::PLANNED,
             'color' => '#7e57c2',
             'name' => [
                 'fr' => 'Planifié',
@@ -27,7 +33,7 @@ class IndicatorStatus
             ],
         ],
         [
-            'code' => 'in_progress',
+            'code' => self::IN_PROGRESS,
             'color' => '#2196f3',
             'name' => [
                 'fr' => 'En réalisation',
@@ -36,7 +42,7 @@ class IndicatorStatus
             ],
         ],
         [
-            'code' => 'closed',
+            'code' => self::CLOSED,
             'color' => '#4caf50',
             'name' => [
                 'fr' => 'Clôturé',
@@ -45,7 +51,7 @@ class IndicatorStatus
             ],
         ],
         [
-            'code' => 'stopped',
+            'code' => self::STOPPED,
             'color' => '#f44336',
             'name' => [
                 'fr' => 'En arrêt',
@@ -59,11 +65,27 @@ class IndicatorStatus
      * Allowed transitions between statuses.
      */
     private static array $transitions = [
-        'created' => ['planned'],           // Créé → Planifié
-        'planned' => ['in_progress'],       // Planifié → En réalisation
-        'in_progress' => ['stopped', 'closed'], // En réalisation → Arrêt ou Clôturé
-        'stopped' => ['in_progress', 'closed'], // Arrêt → Reprise ou Clôturé
-        'closed' => [],
+        self::CREATED => [self::PLANNED],           // Créé → Planifié
+        self::PLANNED => [self::IN_PROGRESS],       // Planifié → En réalisation
+        self::IN_PROGRESS => [self::STOPPED, self::CLOSED], // En réalisation → Arrêt ou Clôturé
+        self::STOPPED => [self::IN_PROGRESS, self::CLOSED], // Arrêt → Reprise ou Clôturé
+        self::CLOSED => [],
+    ];
+
+    private static array $objectiveStatusMatrix = [
+        StrategicObjectiveStatus::DECLARED => [
+            self::CREATED,
+            self::PLANNED,
+        ],
+        StrategicObjectiveStatus::ENGAGED => [
+            self::CREATED,
+            self::PLANNED,
+            self::IN_PROGRESS,
+            self::CLOSED,
+            self::STOPPED,
+        ],
+        StrategicObjectiveStatus::CLOSED => [],
+        StrategicObjectiveStatus::STOPPED => [],
     ];
 
     /**
@@ -72,6 +94,14 @@ class IndicatorStatus
     public static function all(): array
     {
         return self::$statuses;
+    }
+
+    /**
+     * Get the initial status code for a new indicator.
+     */
+    public static function initial(): string
+    {
+        return self::CREATED;
     }
 
     /**
@@ -124,10 +154,27 @@ class IndicatorStatus
     }
 
     /**
+     * Get statuses that can be selected manually.
+     */
+    public static function manualNext(string $code): array
+    {
+        return array_values(array_filter(
+            self::next($code),
+            fn(string $nextCode) => $nextCode !== self::PLANNED
+        ));
+    }
+
+    /**
      * Check if transition is allowed.
      */
     public static function canTransition(string $from, string $to): bool
     {
         return in_array($to, self::$transitions[$from] ?? [], true);
     }
+
+    public static function isAllowedForObjectiveStatus(string $indicatorStatus, ?string $objectiveStatus): bool
+    {
+        return in_array($indicatorStatus, self::$objectiveStatusMatrix[$objectiveStatus] ?? [], true);
+    }
+
 }

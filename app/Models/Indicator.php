@@ -26,6 +26,8 @@ class Indicator extends Model
                 'reference',
                 'name',
                 'description',
+                'start_date',
+                'end_date',
                 'chart_type',
                 'frequency_unit',
                 'frequency_value',
@@ -59,6 +61,10 @@ class Indicator extends Model
     protected function casts(): array
     {
         return [
+            'start_date' => 'date',
+            'end_date' => 'date',
+            'actual_start_date' => 'date',
+            'actual_end_date' => 'date',
             'frequency_value' => 'integer',
             'initial_value' => 'float',
             'final_target_value' => 'float',

@@ -23,6 +23,8 @@ class ActionPeriod extends Model
     protected function casts(): array
     {
         return [
+            'start_date' => 'date',
+            'end_date' => 'date',
             'progress_percent' => 'float',
             'actual_progress_percent' => 'float',
         ];

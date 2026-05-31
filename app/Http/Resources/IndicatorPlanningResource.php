@@ -21,11 +21,9 @@ class IndicatorPlanningResource extends JsonResource
 
     protected function forEdit(): array
     {
-        $objective = $this->whenLoaded('strategicObjective');
-
         return [
-            'start_date' => $objective?->start_date ? $objective->start_date : null,
-            'end_date' => $objective?->end_date ? $objective->end_date : null,
+            'start_date' => $this->start_date ? DateTimeFormatter::formatDate($this->start_date) : null,
+            'end_date' => $this->end_date ? DateTimeFormatter::formatDate($this->end_date) : null,
             'initial_value' => $this->initial_value,
             'final_target_value' => $this->final_target_value,
             'unit' => $this->unit,
@@ -38,8 +36,8 @@ class IndicatorPlanningResource extends JsonResource
                 $periods->map(fn($period) => [
                     'id' => $period->id,
                     'uuid' => $period->uuid,
-                    'start_date' => $period->start_date,
-                    'end_date' => $period->end_date,
+                    'start_date' => $period->start_date?->toDateString(),
+                    'end_date' => $period->end_date?->toDateString(),
                     'target_value' => $period->target_value,
                     'achieved_value' => $period->achieved_value,
                 ])->values()
@@ -50,11 +48,10 @@ class IndicatorPlanningResource extends JsonResource
     protected function forView(): array
     {
         $currentLang = app()->getLocale();
-        $objective = $this->whenLoaded('strategicObjective');
 
         return [
-            'start_date' => $objective?->start_date ? DateTimeFormatter::formatDate($objective->start_date) : null,
-            'end_date' => $objective?->end_date ? DateTimeFormatter::formatDate($objective->end_date) : null,
+            'start_date' => $this->start_date ? DateTimeFormatter::formatDate($this->start_date) : null,
+            'end_date' => $this->end_date ? DateTimeFormatter::formatDate($this->end_date) : null,
             'initial_value' => $this->initial_value,
             'final_target_value' => $this->final_target_value,
             'unit' => $this->unit,
@@ -67,8 +64,8 @@ class IndicatorPlanningResource extends JsonResource
                 $periods->map(fn($period) => [
                     'id' => $period->id,
                     'uuid' => $period->uuid,
-                    'start_date' => $period->start_date,
-                    'end_date' => $period->end_date,
+                    'start_date' => DateTimeFormatter::formatDate($period->start_date),
+                    'end_date' => DateTimeFormatter::formatDate($period->end_date),
                     'target_value' => $period->target_value,
                     'achieved_value' => $period->achieved_value,
                 ])->values()

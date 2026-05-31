@@ -49,6 +49,8 @@ class ActionResource extends JsonResource
             'start_date' => $this->start_date ? DateTimeFormatter::formatDate($this->start_date) : null,
             'end_date' => $this->end_date ? DateTimeFormatter::formatDate($this->end_date) : null,
             'total_budget' => $this->total_budget,
+            'total_receipt_fund' => $this->total_receipt_fund,
+            'total_disbursement_fund' => $this->total_disbursement_fund,
             'disbursement_rate' =>  $this->total_receipt_fund > 0
                 ? round(($this->total_disbursement_fund / $this->total_receipt_fund) * 100, 2)
                 : 0
@@ -121,6 +123,8 @@ class ActionResource extends JsonResource
             'author' => $author,
             'is_planned' => $this->is_planned,
             'actual_progress_percent' => $this->actual_progress_percent,
+            'total_receipt_fund' => $this->total_receipt_fund,
+            'total_disbursement_fund' => $this->total_disbursement_fund,
             'download_selection_mode_url'  => URL::route('templates.selection-mode.download'),
         ];
     }

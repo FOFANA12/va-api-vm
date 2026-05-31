@@ -4,6 +4,13 @@ namespace App\Support;
 
 class ActionStatus
 {
+    public const DRAFT = 'draft';
+    public const CREATED = 'created';
+    public const PLANNED = 'planned';
+    public const IN_PROGRESS = 'in_progress';
+    public const STOPPED = 'stopped';
+    public const CLOSED = 'closed';
+
     /**
      * List of available statuses with their localized names and display colors.
      */
@@ -131,6 +138,33 @@ class ActionStatus
     public static function next(string $code): array
     {
         return self::$transitions[$code] ?? [];
+    }
+
+    /**
+     * Get statuses that can be selected manually (excludes planned, set automatically via planning).
+     */
+    public static function manualNext(string $code): array
+    {
+        return array_values(array_filter(
+            self::next($code),
+            fn(string $nextCode) => $nextCode !== self::PLANNED
+        ));
+    }
+
+    /**
+     * Get statuses that prevent financial movements on an action.
+     */
+    public static function fundMovementBlockedStatuses(): array
+    {
+        return [self::DRAFT, self::CREATED, self::PLANNED, self::STOPPED, self::CLOSED];
+    }
+
+    /**
+     * Check whether receipts and disbursements are locked for a status.
+     */
+    public static function blocksFundMovements(?string $status): bool
+    {
+        return in_array($status, self::fundMovementBlockedStatuses(), true);
     }
 
     /**

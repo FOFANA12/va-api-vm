@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Exceptions\DomainException;
 use App\Http\Resources\ActionStatusResource;
 use App\Models\Action;
 use App\Models\ActionStatus as ModelActionStatus;
@@ -30,7 +31,7 @@ class ActionStatusRepository
     public function requirements(Action $action)
     {
         $current = $action->status;
-        $next = ActionStatus::next($current);
+        $next = ActionStatus::manualNext($current);
 
         return [
             'statuses' => collect($next)->map(function ($code) {
@@ -52,6 +53,19 @@ class ActionStatusRepository
         DB::beginTransaction();
         try {
             $statusCode = $request->input('status');
+
+            if ($statusCode === ActionStatus::PLANNED) {
+                throw new DomainException(
+                    __('app/action.request.invalid_status')
+                );
+            }
+
+            if (!ActionStatus::canTransition($action->status, $statusCode)) {
+                throw new DomainException(
+                    __('app/action.request.invalid_status')
+                );
+            }
+
             $this->applyStatusEffects($action, $statusCode);
 
             $status = ModelActionStatus::create([

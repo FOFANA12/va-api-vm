@@ -10,7 +10,9 @@ return [
         'type' => 'type de structure',
         'abbreviation' => 'abréviation',
         'parent' => 'structure parente',
-
+    ],
+    'validation' => [
         'state_no_parent' => 'Une structure de type STATE ne peut pas avoir une structure parente.',
+        'parent_cycle' => 'Cette relation parente créerait ou prolongerait une boucle dans la hiérarchie des structures.',
     ],
 ];

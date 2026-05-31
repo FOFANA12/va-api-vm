@@ -30,7 +30,7 @@ class StructureRequest extends FormRequest
             'parent' => 'bail|nullable|exists:' . Structure::tableName() . ',uuid',
         ];
 
-        if ($this->isMethod('put')) {
+        if ($this->isMethod('put') || $this->isMethod('patch')) {
             $structure = $this->route('structure');
             $rules += [
                 'abbreviation' => [
@@ -86,17 +86,43 @@ class StructureRequest extends FormRequest
      */
     public function withValidator($validator): void
     {
-        if (!$this->isMethod('post')) {
-            return;
-        }
-
         $validator->after(function ($validator) {
-            $type = strtoupper($this->input('type'));
             $parentUuid = $this->input('parent');
+            $structure = ($this->isMethod('put') || $this->isMethod('patch'))
+                ? $this->route('structure')
+                : null;
+            $type = strtoupper($this->input('type', $structure?->type ?? ''));
 
             if ($type === 'STATE' && !empty($parentUuid)) {
                 $validator->errors()->add('parent', __('app/structure.validation.state_no_parent'));
                 return;
+            }
+
+            if (empty($parentUuid)) {
+                return;
+            }
+
+            $visited = [];
+            $parent = Structure::where('uuid', $parentUuid)->first();
+
+            while ($parent) {
+                if ($structure && $parent->uuid === $structure->uuid) {
+                    $validator->errors()->add('parent', __('app/structure.validation.parent_cycle'));
+                    return;
+                }
+
+                if (isset($visited[$parent->uuid])) {
+                    $validator->errors()->add('parent', __('app/structure.validation.parent_cycle'));
+                    return;
+                }
+
+                $visited[$parent->uuid] = true;
+
+                if (empty($parent->parent_uuid)) {
+                    return;
+                }
+
+                $parent = Structure::where('uuid', $parent->parent_uuid)->first();
             }
         });
     }

@@ -83,6 +83,21 @@ class ActionPlanningRequest extends FormRequest
             if ((int) round($last) !== 100) {
                 $validator->errors()->add('periods', __('app/action_planning.plannings_error.last_not_100'));
             }
+
+            for ($i = 1; $i < count($periods); $i++) {
+                $prevEnd   = $periods[$i - 1]['end_date'] ?? null;
+                $currStart = $periods[$i]['start_date'] ?? null;
+
+                if ($prevEnd && $currStart && $currStart < $prevEnd) {
+                    $validator->errors()->add(
+                        "periods.$i.start_date",
+                        __('app/action_planning.plannings_error.periods_overlap', [
+                            'line' => $i + 1,
+                        ]) . ' (' . __('app/common.request.line_number', ['line' => $i + 1]) . ')'
+                    );
+                    break;
+                }
+            }
         });
     }
 

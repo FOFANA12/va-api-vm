@@ -48,8 +48,8 @@ class MatrixPeriodResource extends JsonResource
         return [
             'id' => $this->id,
             'uuid' => $this->uuid,
-            'start_date' => $this->start_date,
-            'end_date' => $this->end_date,
+            'start_date' => $this->start_date ? \Carbon\Carbon::parse($this->start_date)->toDateString() : null,
+            'end_date' => $this->end_date ? \Carbon\Carbon::parse($this->end_date)->toDateString() : null,
         ];
     }
 

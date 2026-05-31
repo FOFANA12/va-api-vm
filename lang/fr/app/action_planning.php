@@ -20,5 +20,6 @@ return [
         'required' => 'vous devez avoir des périodes dans votre planification',
         'not_strictly_increasing' => 'Désolé, cette planification est invalide. Les prévisions doivent être strictement croissantes et sans doublon.',
         'last_not_100' => 'Désolé, cette planification est invalide. La dernière prévision doit être à 100 %.',
+        'periods_overlap' => 'Les périodes ne doivent pas se chevaucher. La période :line commence avant la fin de la précédente.',
     ],
 ];

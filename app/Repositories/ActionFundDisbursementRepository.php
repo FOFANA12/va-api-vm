@@ -2,12 +2,15 @@
 
 namespace App\Repositories;
 
+use App\Exceptions\DomainException;
 use App\Helpers\FileHelper;
 use App\Helpers\ReferenceGenerator;
 use App\Http\Requests\ActionFundDisbursementRequest;
 use App\Http\Resources\ActionFundDisbursementResource;
+use App\Jobs\UpdateActionTotalsJob;
 use App\Models\Action;
 use App\Models\ActionFundDisbursement;
+use App\Support\ActionStatus;
 use App\Models\BudgetType;
 use App\Models\ExpenseType;
 use App\Models\PaymentMode;
@@ -67,6 +70,7 @@ class ActionFundDisbursementRepository
                 'actions.reference as action_reference',
                 'actions.currency',
                 'actions.name as action_name',
+                'actions.status as action_status',
                 'actions.id as action_id',
 
                 'action_phases.name as phase',
@@ -171,10 +175,16 @@ class ActionFundDisbursementRepository
                                 ->select('id', 'uuid', 'phase_uuid', 'title', 'start_date', 'end_date');
                         }]);
                 }
-            ])->where('status', 'in_progress')
+            ])->where('status', ActionStatus::IN_PROGRESS)
                 ->orderBy('id', 'desc')
                 ->select('uuid', 'name', 'reference', 'currency')
-                ->get();
+                ->get()
+                ->each(function (Action $action) {
+                    $action->setAttribute(
+                        'label',
+                        $action->reference ? "{$action->reference} - {$action->name}" : $action->name
+                    );
+                });
 
             return [
                 'actions' => $actions,
@@ -198,6 +208,12 @@ class ActionFundDisbursementRepository
      */
     public function store(ActionFundDisbursementRequest $request)
     {
+        $action = Action::where('uuid', $request->input('action'))->firstOrFail();
+
+        if (ActionStatus::blocksFundMovements($action->status)) {
+            throw new DomainException(__('app/action_fund_disbursement.errors.action_locked'));
+        }
+
         $identifier = null;
         DB::beginTransaction();
         try {
@@ -264,6 +280,7 @@ class ActionFundDisbursementRepository
             $actionFundDisbursement->expenseTypes()->sync($validExpenseTypes);
 
             $this->updateActionTotalDisbursementFund($actionFundDisbursement->action_uuid);
+            dispatch(new UpdateActionTotalsJob($actionFundDisbursement->action_uuid));
 
             $actionFundDisbursement->load([
                 'action.phases',
@@ -313,6 +330,10 @@ class ActionFundDisbursementRepository
      */
     public function update(ActionFundDisbursementRequest $request, ActionFundDisbursement $actionFundDisbursement)
     {
+        if (ActionStatus::blocksFundMovements($actionFundDisbursement->action->status)) {
+            throw new DomainException(__('app/action_fund_disbursement.errors.action_locked'));
+        }
+
         $oldFile = $actionFundDisbursement->attachment?->identifier;
         $newFile = null;
 
@@ -383,6 +404,7 @@ class ActionFundDisbursementRepository
             $actionFundDisbursement->expenseTypes()->sync($validExpenseTypes);
 
             $this->updateActionTotalDisbursementFund($actionFundDisbursement->action_uuid);
+            dispatch(new UpdateActionTotalsJob($actionFundDisbursement->action_uuid));
 
             $actionFundDisbursement->load([
                 'action.phases',
@@ -423,11 +445,19 @@ class ActionFundDisbursementRepository
         DB::beginTransaction();
         try {
 
-            $disbursements = ActionFundDisbursement::with('attachment')->whereIn('id', $ids)->get();
+            $disbursements = ActionFundDisbursement::with('attachment', 'action')->whereIn('id', $ids)->get();
 
             if ($disbursements->isEmpty()) {
                 throw new \RuntimeException(__('app/common.destroy.no_items_deleted'));
             }
+
+            foreach ($disbursements as $disbursement) {
+                if (ActionStatus::blocksFundMovements($disbursement->action->status)) {
+                    throw new DomainException(__('app/action_fund_disbursement.errors.action_locked'));
+                }
+            }
+
+            $actionUuids = $disbursements->pluck('action_uuid')->unique();
 
             foreach ($disbursements as $disbursement) {
                 if ($disbursement->attachment) {
@@ -437,12 +467,17 @@ class ActionFundDisbursementRepository
                 $disbursement->delete();
             }
 
+            foreach ($actionUuids as $uuid) {
+                $this->updateActionTotalDisbursementFund($uuid);
+                dispatch(new UpdateActionTotalsJob($uuid));
+            }
+
             DB::commit();
 
             foreach ($filesToDelete as $filePath) {
                 FileHelper::delete($filePath);
             }
-        } catch (RuntimeException $e) {
+        } catch (DomainException | RuntimeException $e) {
             DB::rollBack();
             throw $e;
         } catch (\Exception $e) {

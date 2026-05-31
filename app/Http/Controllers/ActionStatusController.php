@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exceptions\DomainException;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
 use App\Http\Controllers\Controller;
@@ -48,11 +49,11 @@ class ActionStatusController extends Controller
         $status = $request->input('status');
 
         if (!in_array($status, $validStatuses)) {
-            throw new \Exception(__('app/action.request.invalid_status'));
+            throw new DomainException(__('app/action.request.invalid_status'));
         }
 
         if (!$status) {
-            throw new \Exception(__('app/action.request.status'));
+            throw new DomainException(__('app/action.request.status'));
         }
 
         $result = $this->repository->store($request, $action);

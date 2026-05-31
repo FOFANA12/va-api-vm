@@ -179,8 +179,11 @@ php artisan optimize:clear
 # Lister les routes
 php artisan route:list
 
-# Lancer les queues
+# Lancer un worker en continu (environnement qui le permet)
 php artisan queue:work
+
+# Exécuter directement les calculs et évaluations d'arrière-plan, sans worker
+php artisan maintenance:run-background-calculations
 
 ```
 
@@ -194,7 +197,26 @@ php artisan queue:work
 | `APP_URL_FRONT` | URL du frontend | `http://127.0.0.1:5170` |
 | `SANCTUM_STATEFUL_DOMAINS` | Domaines SPA autorisés | `localhost:5170` |
 | `DB_DATABASE` | Nom de la base MySQL | `va_db` |
+| `QUEUE_CONNECTION` | Exécution des traitements déclenchés par les requêtes sans worker | `sync` |
 | `SESSION_LIFETIME` | Durée de session (minutes) | `600` |
+
+---
+
+## Cron Des Calculs
+
+Lorsque l'hébergement ne permet pas d'exécuter `queue:work` en continu, configurer :
+
+```env
+QUEUE_CONNECTION=sync
+```
+
+Puis programmer une tâche cron chaque minute :
+
+```bash
+cd /chemin/vers/va-mdn-api && php artisan maintenance:run-background-calculations >> storage/logs/cron-calculations.log 2>&1
+```
+
+La commande ne lit pas la table `jobs` et ne nécessite aucun worker. Elle exécute directement les six jobs de calcul et d'évaluation de `app/Jobs` pour les actions, structures et objectifs stratégiques.
 
 ---
 

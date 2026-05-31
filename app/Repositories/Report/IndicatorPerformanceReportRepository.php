@@ -20,7 +20,7 @@ class IndicatorPerformanceReportRepository
         foreach ($indicator->periods as $period) {
             $target = (float) $period->target_value;
 
-            $hasControl = $period->controls && $period->controls->count() > 0;
+            $hasControl = $period->controls !== null;
 
             $achieved = null;
             $variance = null;
@@ -66,12 +66,12 @@ class IndicatorPerformanceReportRepository
     public function getDelayReport(Indicator $indicator): array
     {
         $today = Carbon::today();
-        $startPlanned = $indicator->strategicObjective?->start_date
-            ?  Carbon::parse($indicator->strategicObjective->start_date)
+        $startPlanned = $indicator->start_date
+            ?  Carbon::parse($indicator->start_date)
             : null;
 
-        $endPlanned = $indicator->strategicObjective?->end_date
-            ? Carbon::parse($indicator->strategicObjective->end_date)
+        $endPlanned = $indicator->end_date
+            ? Carbon::parse($indicator->end_date)
             : null;
 
         $actualStart = $indicator->actual_start_date
@@ -102,10 +102,6 @@ class IndicatorPerformanceReportRepository
             ? $actualStart->diffInDays($actualEnd)
             : null;
 
-        $durationVariance = ($endPlanned && $actualEnd)
-            ? $endPlanned->diffInDays($actualEnd, false)
-            : null;
-
         return [
             'planned_start' => $startPlanned ? DateTimeFormatter::formatDate($startPlanned) : null,
             'planned_end' => $endPlanned ? DateTimeFormatter::formatDate($endPlanned) : null,
@@ -116,7 +112,6 @@ class IndicatorPerformanceReportRepository
             'actual_duration_days' => $actualDuration,
             'remaining_days' => $remainingDays,
             'start_delay_days' => $startDelay,
-            'duration_variance_days' => $durationVariance,
         ];
     }
 }

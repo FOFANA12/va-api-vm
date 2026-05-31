@@ -16,6 +16,14 @@ class ActionFundReceipt extends Model
     use  AutoFillable, GeneratesUuid, HasStaticTableName, Author;
     use LogsActivity;
 
+    protected function casts(): array
+    {
+        return [
+            'receipt_date' => 'date',
+            'validity_date' => 'date',
+        ];
+    }
+
     public function getActivitylogOptions(): LogOptions
     {
         return LogOptions::defaults()

@@ -10,6 +10,7 @@ use App\Models\StrategicElement;
 use App\Models\StrategicMap;
 use App\Models\Structure;
 use App\Models\StrategicObjective;
+use App\Models\StrategicObjectiveStatus as ModelsStrategicObjectiveStatus;
 use App\Services\StructureAccessService;
 use App\Support\PriorityLevel;
 use App\Support\RiskLevel;
@@ -69,7 +70,10 @@ class StrategicObjectiveRepository
 
         $allowed = $this->structureAccess->getAccessibleStructureUuids(Auth::user(), true, true);
         if ($allowed !== null) {
-            $query->whereIn('strategic_objectives.structure_uuid', $allowed);
+            $query->where(function ($q) use ($allowed) {
+                $q->whereIn('strategic_objectives.structure_uuid', $allowed)
+                    ->orWhereIn('strategic_objectives.lead_structure_uuid', $allowed);
+            });
         }
 
         // Status filter
@@ -223,6 +227,9 @@ class StrategicObjectiveRepository
      */
     public function store(StrategicObjectiveRequest $request)
     {
+        $statusDate = now();
+        $initialStatus = StrategicObjectiveStatus::DECLARED;
+
         $request->merge([
             'structure_uuid' => $request->input('structure'),
             'strategic_map_uuid' => $request->input('strategic_map'),
@@ -230,46 +237,68 @@ class StrategicObjectiveRepository
             'lead_structure_uuid' => $request->input('lead_structure'),
             'created_by' => Auth::user()?->uuid,
             'updated_by' => Auth::user()?->uuid,
-            'status_changed_at' => now(),
+            'status' => $initialStatus,
+            'status_changed_at' => $statusDate,
             'status_changed_by' => Auth::user()?->uuid,
         ]);
 
-        $strategicObjective = StrategicObjective::create($request->only([
-            'name',
-            'structure_uuid',
-            'lead_structure_uuid',
-            'strategic_map_uuid',
-            'strategic_element_uuid',
-            'start_date',
-            'end_date',
-            'description',
-            'priority',
-            'risk_level',
-            'created_by',
-            'updated_by'
-        ]));
+        DB::beginTransaction();
 
-        $strategicObjective->update([
-            'reference' => ReferenceGenerator::generateStrategicObjectiveReference(
-                $strategicObjective->id,
-                $strategicObjective->structure->abbreviation,
-                $strategicObjective->strategicElement->abbreviation
-            ),
-        ]);
+        try {
+            $strategicObjective = StrategicObjective::create($request->only([
+                'name',
+                'structure_uuid',
+                'lead_structure_uuid',
+                'strategic_map_uuid',
+                'strategic_element_uuid',
+                'start_date',
+                'end_date',
+                'description',
+                'priority',
+                'risk_level',
+                'status',
+                'status_changed_at',
+                'status_changed_by',
+                'created_by',
+                'updated_by'
+            ]));
 
-        $strategicObjective->loadMissing([
-            'structure',
-            'leadStructure',
-            'strategicMap',
-            'strategicElement',
-            'statusChangedBy',
-        ]);
+            ModelsStrategicObjectiveStatus::create([
+                'strategic_objective_uuid' => $strategicObjective->uuid,
+                'strategic_objective_id' => $strategicObjective->id,
+                'status_code' => $initialStatus,
+                'status_date' => $statusDate,
+                'created_by' => Auth::user()?->uuid,
+                'updated_by' => Auth::user()?->uuid,
+            ]);
 
-        $strategicObjective->refresh();
+            $strategicObjective->update([
+                'reference' => ReferenceGenerator::generateStrategicObjectiveReference(
+                    $strategicObjective->id,
+                    $strategicObjective->structure->abbreviation,
+                    $strategicObjective->strategicElement->abbreviation
+                ),
+            ]);
 
-        return (new StrategicObjectiveResource($strategicObjective))->additional([
-            'mode' => $request->input('mode', 'view')
-        ]);
+            $strategicObjective->loadMissing([
+                'structure',
+                'leadStructure',
+                'strategicMap',
+                'strategicElement',
+                'statusChangedBy',
+            ]);
+
+            $strategicObjective->refresh();
+
+            DB::commit();
+
+            return (new StrategicObjectiveResource($strategicObjective))->additional([
+                'mode' => $request->input('mode', 'view')
+            ]);
+        } catch (\Throwable $e) {
+            DB::rollBack();
+            throw $e;
+        }
     }
 
     /**

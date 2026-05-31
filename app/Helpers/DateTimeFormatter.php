@@ -15,6 +15,10 @@ class DateTimeFormatter
      */
     public static function formatDate($date, string $format = 'DD/MM/YYYY'): ?string
     {
+        if (!$date) {
+            return null;
+        }
+
         try {
             $locale = app()->getLocale();
 

@@ -31,7 +31,7 @@ class StructureController extends Controller
             }
         };
 
-        $allStructures = [];
+        $allStructures = [$structure];
         $collectStructures($structure, $allStructures);
         
         $styleArray = [
@@ -173,14 +173,14 @@ class StructureController extends Controller
         $worksheet->getStyle("A3")->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
         $worksheet->getRowDimension(3)->setRowHeight(30);
 
-        // Collect child structures recursively
+        // Collect the selected structure and its child structures recursively.
         $collectStructures = function ($structure, &$result) use (&$collectStructures) {
             foreach ($structure->children as $child) {
                 $result[] = $child;
                 $collectStructures($child, $result);
             }
         };
-        $allStructures = [];
+        $allStructures = [$structure];
         $collectStructures($structure, $allStructures);
 
         // Styles
@@ -228,73 +228,76 @@ class StructureController extends Controller
             $worksheet->getStyle("A{$startRow}")->getAlignment()->setVertical(Alignment::VERTICAL_CENTER);
             $startRow++;
 
-            // --- First summary table ---
-            $headers = [
-                "A" => "Nbr domaines d'action",
-                "B" => "Nbr domaines stratégique",
-                "C" => "Nbr domaines capacitaire",
-                "D" => "Nbr niveau élémentaire",
-                "E" => "Nbr d'actions",
-                "F" => "Nbr d'objectifs",
-                "G" => "Taux de réalisation",
-                "H" => "Indice de réalisation",
-                "I" => "Taux de décaissement",
-                "J" => "Budget prévisionnel",
-                "K" => "Budget acquis",
-                "L" => "Budget consommé",
-                "M" => "Budget disponible",
-                "N" => "Budget à mobiliser",
-            ];
-            foreach ($headers as $col => $label) {
-                $worksheet->setCellValue("{$col}{$startRow}", $label);
-                $worksheet->getStyle("{$col}{$startRow}")->applyFromArray($styleHeaders);
-            }
-            $worksheet->getRowDimension($startRow)->setRowHeight(25);
-            $startRow++;
-
-            // Data row
             $actionPlan = $child->actionPlans()->where('status', true)->first();
-            if ($actionPlan) {
-                $actionIds = $actionPlan->actions->pluck('id');
 
-                $totalActions = $actionIds->count();
+            if ($child->type === 'OPERATIONAL') {
+                // --- First summary table ---
+                $headers = [
+                    "A" => "Nbr domaines d'action",
+                    "B" => "Nbr domaines stratégique",
+                    "C" => "Nbr domaines capacitaire",
+                    "D" => "Nbr niveau élémentaire",
+                    "E" => "Nbr d'actions",
+                    "F" => "Nbr d'objectifs",
+                    "G" => "Taux de réalisation",
+                    "H" => "Indice de réalisation",
+                    "I" => "Taux de décaissement",
+                    "J" => "Budget prévisionnel",
+                    "K" => "Budget acquis",
+                    "L" => "Budget consommé",
+                    "M" => "Budget disponible",
+                    "N" => "Budget à mobiliser",
+                ];
+                foreach ($headers as $col => $label) {
+                    $worksheet->setCellValue("{$col}{$startRow}", $label);
+                    $worksheet->getStyle("{$col}{$startRow}")->applyFromArray($styleHeaders);
+                }
+                $worksheet->getRowDimension($startRow)->setRowHeight(25);
+                $startRow++;
 
-                $actionDomainCount = $actionPlan->actions->pluck('action_domain_uuid')->filter()->unique()->count();
-                $strategicDomainCount = $actionPlan->actions->pluck('strategic_domain_uuid')->filter()->unique()->count();
-                $capabilityDomainCount = $actionPlan->actions->pluck('capability_domain_uuid')->filter()->unique()->count();
-                $elementaryLevelCount = $actionPlan->actions->pluck('elementary_level_uuid')->filter()->unique()->count();
+                // Data row
+                if ($actionPlan) {
+                    $actionIds = $actionPlan->actions->pluck('id');
 
-                $metricsQuery = DB::table('action_metrics')->whereIn('action_id', $actionIds);
-                $totalObjectives = $metricsQuery->avg('aligned_objectives_count');
-                $realizationRate = $metricsQuery->avg('realization_rate');
-                $realizationIndex = $metricsQuery->avg('realization_index');
+                    $totalActions = $actionIds->count();
 
-                $budgetPlanned = $actionPlan->actions->sum('total_budget');
-                $budgetReceived = $actionPlan->actions->sum('total_receipt_fund');
-                $budgetSpent = $actionPlan->actions->sum('total_disbursement_fund');
-                $budgetToMobilize = $budgetPlanned - $budgetReceived;
-                $budgetAvailable = $budgetReceived - $budgetSpent;
-                $disbursementRate = $budgetPlanned > 0 ? ($budgetSpent / $budgetPlanned) * 100 : 0;
+                    $actionDomainCount = $actionPlan->actions->pluck('action_domain_uuid')->filter()->unique()->count();
+                    $strategicDomainCount = $actionPlan->actions->pluck('strategic_domain_uuid')->filter()->unique()->count();
+                    $capabilityDomainCount = $actionPlan->actions->pluck('capability_domain_uuid')->filter()->unique()->count();
+                    $elementaryLevelCount = $actionPlan->actions->pluck('elementary_level_uuid')->filter()->unique()->count();
 
-                $worksheet->setCellValue("A{$startRow}", $actionDomainCount);
-                $worksheet->setCellValue("B{$startRow}", $strategicDomainCount);
-                $worksheet->setCellValue("C{$startRow}", $capabilityDomainCount);
-                $worksheet->setCellValue("D{$startRow}", $elementaryLevelCount);
-                $worksheet->setCellValue("E{$startRow}", $totalActions);
-                $worksheet->setCellValue("F{$startRow}", round($totalObjectives, 2));
-                $worksheet->setCellValue("G{$startRow}", round($realizationRate, 2));
-                $worksheet->setCellValue("H{$startRow}", round($realizationIndex, 2));
-                $worksheet->setCellValue("I{$startRow}", round($disbursementRate, 2));
-                $worksheet->setCellValue("J{$startRow}", $budgetPlanned);
-                $worksheet->setCellValue("K{$startRow}", $budgetReceived);
-                $worksheet->setCellValue("L{$startRow}", $budgetSpent);
-                $worksheet->setCellValue("M{$startRow}", $budgetAvailable);
-                $worksheet->setCellValue("N{$startRow}", $budgetToMobilize);
+                    $metricsQuery = DB::table('action_metrics')->whereIn('action_id', $actionIds);
+                    $totalObjectives = $metricsQuery->avg('aligned_objectives_count');
+                    $realizationRate = $metricsQuery->avg('realization_rate');
+                    $realizationIndex = $metricsQuery->avg('realization_index');
+
+                    $budgetPlanned = $actionPlan->actions->sum('total_budget');
+                    $budgetReceived = $actionPlan->actions->sum('total_receipt_fund');
+                    $budgetSpent = $actionPlan->actions->sum('total_disbursement_fund');
+                    $budgetToMobilize = $budgetPlanned - $budgetReceived;
+                    $budgetAvailable = $budgetReceived - $budgetSpent;
+                    $disbursementRate = $budgetPlanned > 0 ? ($budgetSpent / $budgetPlanned) * 100 : 0;
+
+                    $worksheet->setCellValue("A{$startRow}", $actionDomainCount);
+                    $worksheet->setCellValue("B{$startRow}", $strategicDomainCount);
+                    $worksheet->setCellValue("C{$startRow}", $capabilityDomainCount);
+                    $worksheet->setCellValue("D{$startRow}", $elementaryLevelCount);
+                    $worksheet->setCellValue("E{$startRow}", $totalActions);
+                    $worksheet->setCellValue("F{$startRow}", round($totalObjectives ?? 0, 2));
+                    $worksheet->setCellValue("G{$startRow}", round($realizationRate ?? 0, 2));
+                    $worksheet->setCellValue("H{$startRow}", round($realizationIndex ?? 0, 2));
+                    $worksheet->setCellValue("I{$startRow}", round($disbursementRate, 2));
+                    $worksheet->setCellValue("J{$startRow}", $budgetPlanned);
+                    $worksheet->setCellValue("K{$startRow}", $budgetReceived);
+                    $worksheet->setCellValue("L{$startRow}", $budgetSpent);
+                    $worksheet->setCellValue("M{$startRow}", $budgetAvailable);
+                    $worksheet->setCellValue("N{$startRow}", $budgetToMobilize);
+                }
+                $worksheet->getStyle("A{$startRow}:K{$startRow}")->applyFromArray($styleValues);
+                $worksheet->getRowDimension($startRow)->setRowHeight(22);
+
+                $startRow += 3;
             }
-            $worksheet->getStyle("A{$startRow}:K{$startRow}")->applyFromArray($styleValues);
-            $worksheet->getRowDimension($startRow)->setRowHeight(22);
-
-            $startRow += 3;
 
             // --- Second detailed table ---
             $worksheet->setCellValue("A{$startRow}", "Levier");
@@ -533,29 +536,33 @@ class StructureController extends Controller
 
                 foreach ($actions as $action) {
                     $table->addRow();
-                    $attributionDate = Carbon::parse($action->start_date)->addDays($action->procurementMode->duration);
+                    $attributionDate = $action->start_date && $action->procurementMode?->duration !== null
+                        ? Carbon::parse($action->start_date)->addDays($action->procurementMode->duration)
+                        : null;
 
                     if ($generateDocumentType === 'paa') {
                         $table->addCell(1600)->addText($action->reference, null, ['align' => 'left']);
                         $table->addCell(2400)->addText($action->name, null, ['align' => 'left']);
                         $table->addCell(2000)->addText('', null, ['align' => 'left']);
-                        $table->addCell(1600)->addText('###', null, ['align' => 'left']);
+                        $table->addCell(1600)->addText('', null, ['align' => 'left']);
                         $table->addCell(1600)->addText($action->procurementMode?->name ?? '', null, ['align' => 'left']);
                         $table->addCell(2000)->addText($action->total_budget, null, ['align' => 'right']);
                         $table->addCell(1600)->addText(DateTimeFormatter::formatDate($action->start_date), null, ['align' => 'right']);
-                        $table->addCell(1600)->addText(DateTimeFormatter::formatDate($attributionDate), null, ['align' => 'right']);
+                        $table->addCell(1600)->addText($attributionDate ? DateTimeFormatter::formatDate($attributionDate) : '', null, ['align' => 'right']);
                     } else {
-                        $startServiceDate = Carbon::parse($attributionDate)->addDays(7);
+                        $startServiceDate = $attributionDate
+                            ? Carbon::parse($attributionDate)->addDays(7)
+                            : null;
 
                         $table->addCell(1600)->addText($action->reference, null, ['align' => 'left']);
                         $table->addCell(2400)->addText($action->name, null, ['align' => 'left']);
                         $table->addCell(2000)->addText($action->fundingSources->pluck('name')->implode(', '), null, ['align' => 'left']);
                         $table->addCell(2000)->addText($action->total_budget, null, ['align' => 'right']);
-                        $table->addCell(1600)->addText('###', null, ['align' => 'left']);
+                        $table->addCell(1600)->addText('', null, ['align' => 'left']);
                         $table->addCell(1600)->addText($action->procurementMode?->name ?? '', null, ['align' => 'left']);
                         $table->addCell(1600)->addText(DateTimeFormatter::formatDate($action->start_date), null, ['align' => 'right']);
-                        $table->addCell(1600)->addText(DateTimeFormatter::formatDate($attributionDate), null, ['align' => 'right']);
-                        $table->addCell(1600)->addText(DateTimeFormatter::formatDate($startServiceDate), null, ['align' => 'right']);
+                        $table->addCell(1600)->addText($attributionDate ? DateTimeFormatter::formatDate($attributionDate) : '', null, ['align' => 'right']);
+                        $table->addCell(1600)->addText($startServiceDate ? DateTimeFormatter::formatDate($startServiceDate) : '', null, ['align' => 'right']);
                         $table->addCell(1600)->addText(DateTimeFormatter::formatDate($action->end_date), null, ['align' => 'right']);
                     }
                 }
@@ -582,7 +589,14 @@ class StructureController extends Controller
         $template = new TemplateProcessor(public_path('storage/templates/objective.docx'));
 
         $structures = [];
-        $collect = function ($s) use (&$structures, &$collect) {
+        $visited = [];
+        $collect = function ($s) use (&$structures, &$visited, &$collect) {
+            if (isset($visited[$s->uuid])) {
+                return;
+            }
+
+            $visited[$s->uuid] = true;
+
             if ($s->strategicMaps()->where('status', true)->exists()) {
                 $structures[] = $s;
             }
@@ -649,7 +663,14 @@ class StructureController extends Controller
         $template = new TemplateProcessor(public_path('storage/templates/objective-decision.docx'));
 
         $structures = [];
-        $collect = function ($s) use (&$structures, &$collect) {
+        $visited = [];
+        $collect = function ($s) use (&$structures, &$visited, &$collect) {
+            if (isset($visited[$s->uuid])) {
+                return;
+            }
+
+            $visited[$s->uuid] = true;
+
             if ($s->strategicMaps()->where('status', true)->exists()) {
                 $structures[] = $s;
             }

@@ -37,8 +37,8 @@ class Action extends Model
                 'status',
                 'start_date',
                 'end_date',
-                'budget',
-                'currency_uuid',
+                'total_budget',
+                'currency',
                 'structure_uuid',
                 'action_plan_uuid'
             ])
@@ -60,11 +60,17 @@ class Action extends Model
     protected function casts(): array
     {
         return [
+            'start_date' => 'date',
+            'end_date' => 'date',
+            'actual_start_date' => 'date',
+            'actual_end_date' => 'date',
             'frequency_value' => 'integer',
             'actual_progress_percent' => 'float',
+            'total_budget' => 'float',
+            'total_receipt_fund' => 'float',
+            'total_disbursement_fund' => 'float',
             'realization_rate' => 'float',
             'realization_index' => 'float',
-            'budget' => 'float',
             'is_planned' => 'boolean',
         ];
     }
@@ -180,7 +186,7 @@ class Action extends Model
 
     public function expenseTypes()
     {
-        return $this->belongsToMany(ExpenseType::class, 'action_expense_types', 'action_uuid', 'expense_type_uuid')
+        return $this->belongsToMany(ExpenseType::class, 'action_expense_types', 'action_uuid', 'expense_type_uuid', 'uuid', 'uuid')
             ->withPivot('total')
             ->withTimestamps();
     }

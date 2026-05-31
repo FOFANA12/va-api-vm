@@ -7,7 +7,6 @@ use App\Http\Resources\IndicatorStatusResource;
 use App\Models\Indicator;
 use App\Models\IndicatorStatus as ModelsIndicatorStatus;
 use App\Support\IndicatorStatus;
-use App\Support\StrategicObjectiveStatus;
 use RuntimeException;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -31,8 +30,7 @@ class IndicatorStatusRepository
      */
     public function requirements(Indicator $indicator)
     {
-        $current = $indicator->status;
-        $next = IndicatorStatus::next($current);
+        $next = $this->allowedNextStatuses($indicator);
 
         return [
             'statuses' => collect($next)->map(function ($code) {
@@ -46,6 +44,16 @@ class IndicatorStatusRepository
         ];
     }
 
+    public function allowedNextStatuses(Indicator $indicator): array
+    {
+        $objectiveStatus = $indicator->strategicObjective?->status;
+
+        return array_values(array_filter(
+            IndicatorStatus::manualNext($indicator->status),
+            fn(string $statusCode) => IndicatorStatus::isAllowedForObjectiveStatus($statusCode, $objectiveStatus)
+        ));
+    }
+
     /**
      * Create (record) a new indicator status.
      */
@@ -56,7 +64,19 @@ class IndicatorStatusRepository
             $statusCode = $request->input('status');
             $strategicObjective = $indicator->strategicObjective;
 
-            if ($strategicObjective->status !== StrategicObjectiveStatus::ENGAGED) {
+            if ($statusCode === IndicatorStatus::PLANNED) {
+                throw new DomainException(
+                    __('app/indicator.request.invalid_status')
+                );
+            }
+
+            if (!IndicatorStatus::canTransition($indicator->status, $statusCode)) {
+                throw new DomainException(
+                    __('app/indicator.request.invalid_status')
+                );
+            }
+
+            if (!IndicatorStatus::isAllowedForObjectiveStatus($statusCode, $strategicObjective?->status)) {
                 throw new DomainException(
                     __('app/indicator.document_not_editable_status')
                 );

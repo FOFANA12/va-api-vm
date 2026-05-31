@@ -59,6 +59,8 @@ class IndicatorRepository
                 'strP.name as lead_structure',
                 'str.name as structure',
                 'indicators.reference',
+                'indicators.start_date',
+                'indicators.end_date',
                 'indicators.chart_type',
                 'indicators.initial_value',
                 'indicators.final_target_value',
@@ -241,6 +243,7 @@ class IndicatorRepository
         DB::beginTransaction();
         try {
             $objective = StrategicObjective::where('uuid', $request->input('strategic_objective'))->firstOrFail();
+            $initialStatus = IndicatorStatus::initial();
 
             $request->merge([
                 'structure_uuid' => $request->input('structure'),
@@ -251,6 +254,7 @@ class IndicatorRepository
                 'category_uuid' => $request->input('category'),
                 'created_by' => Auth::user()?->uuid,
                 'updated_by' => Auth::user()?->uuid,
+                'status' => $initialStatus,
                 'status_changed_at' => now(),
                 'status_changed_by' => Auth::user()?->uuid,
             ]);
@@ -264,10 +268,13 @@ class IndicatorRepository
                 'category_uuid',
                 'name',
                 'description',
+                'start_date',
+                'end_date',
                 'chart_type',
                 'unit',
                 'initial_value',
                 'final_target_value',
+                'status',
                 'created_by',
                 'updated_by'
             ]));
@@ -278,7 +285,7 @@ class IndicatorRepository
             $status = ModelsIndicatorStatus::create([
                 'indicator_uuid' => $indicator->uuid,
                 'indicator_id' => $indicator->id,
-                'status_code' => $indicator->status,
+                'status_code' => $initialStatus,
                 'status_date' => now(),
                 'created_by' => Auth::user()?->uuid,
                 'updated_by' => Auth::user()?->uuid,
@@ -346,6 +353,8 @@ class IndicatorRepository
             'category_uuid',
             'name',
             'description',
+            'start_date',
+            'end_date',
             'chart_type',
             'unit',
             'initial_value',

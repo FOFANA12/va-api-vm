@@ -55,6 +55,8 @@ class StrategicObjectiveStatus
         ],
     ];
 
+    public const DRAFT = "draft";
+    public const DECLARED = "declared";
     public const ENGAGED = "engaged";
     public const CLOSED = "closed";
     public const STOPPED = "stopped";

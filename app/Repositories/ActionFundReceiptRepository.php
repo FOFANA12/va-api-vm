@@ -2,6 +2,7 @@
 
 namespace App\Repositories;
 
+use App\Exceptions\DomainException;
 use App\Helpers\ReferenceGenerator;
 use App\Http\Requests\ActionFundReceiptRequest;
 use App\Http\Resources\ActionFundReceiptResource;
@@ -9,6 +10,7 @@ use App\Models\Action;
 use App\Models\ActionFundReceipt;
 use App\Models\Currency;
 use App\Models\FundingSource;
+use App\Support\ActionStatus;
 use App\Services\StructureAccessService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
@@ -57,6 +59,7 @@ class ActionFundReceiptRepository
                 'funding_sources.name as funding_source',
                 'actions.reference as action_reference',
                 'actions.name as action_name',
+                'actions.status as action_status',
                 'actions.id as action_id',
             );
 
@@ -112,10 +115,16 @@ class ActionFundReceiptRepository
             ->get();
 
         if ($mode === 'create') {
-            $actions = Action::where('status', 'in_progress')
+            $actions = Action::where('status', ActionStatus::IN_PROGRESS)
                 ->orderBy('id', 'desc')
                 ->select('uuid', 'name', 'reference', 'currency')
-                ->get();
+                ->get()
+                ->each(function (Action $action) {
+                    $action->setAttribute(
+                        'label',
+                        $action->reference ? "{$action->reference} - {$action->name}" : $action->name
+                    );
+                });
 
             return [
                 'actions' => $actions,
@@ -136,6 +145,12 @@ class ActionFundReceiptRepository
      */
     public function store(ActionFundReceiptRequest $request)
     {
+        $action = Action::where('uuid', $request->input('action'))->firstOrFail();
+
+        if (ActionStatus::blocksFundMovements($action->status)) {
+            throw new DomainException(__('app/action_fund_receipt.errors.action_locked'));
+        }
+
         $request->merge([
             'action_uuid' => $request->input('action'),
             'currency_uuid' => $request->input('currency'),
@@ -193,6 +208,10 @@ class ActionFundReceiptRepository
      */
     public function update(Request $request, ActionFundReceipt $actionFundReceipt)
     {
+        if (ActionStatus::blocksFundMovements($actionFundReceipt->action->status)) {
+            throw new DomainException(__('app/action_fund_receipt.errors.action_locked'));
+        }
+
         $request->merge([
             'funding_source_uuid' => $request->input('funding_source'),
             'currency_uuid' => $request->input('currency'),
@@ -239,10 +258,16 @@ class ActionFundReceiptRepository
 
         DB::beginTransaction();
         try {
-            $receipts = ActionFundReceipt::whereIn('id', $ids)->get();
+            $receipts = ActionFundReceipt::with('action')->whereIn('id', $ids)->get();
 
             if ($receipts->isEmpty()) {
                 throw new \RuntimeException(__('app/common.destroy.no_items_deleted'));
+            }
+
+            foreach ($receipts as $receipt) {
+                if (ActionStatus::blocksFundMovements($receipt->action->status)) {
+                    throw new DomainException(__('app/action_fund_receipt.errors.action_locked'));
+                }
             }
 
             $actionUuids = $receipts->pluck('action_uuid')->unique();
@@ -257,7 +282,7 @@ class ActionFundReceiptRepository
             }
 
             DB::commit();
-        } catch (RuntimeException $e) {
+        } catch (DomainException | RuntimeException $e) {
             DB::rollBack();
             throw $e;
         } catch (\Exception $e) {

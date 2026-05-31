@@ -8,9 +8,11 @@ use App\Jobs\EvaluateStrategicObjectiveJob;
 use App\Models\Indicator;
 use App\Models\IndicatorPeriod;
 use App\Support\FrequencyUnit;
+use App\Support\IndicatorStatus;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Auth;
 use App\Models\IndicatorStatus as ModelsIndicatorStatus;
+use App\Exceptions\DomainException;
 
 class IndicatorPlanningRepository
 {
@@ -36,7 +38,7 @@ class IndicatorPlanningRepository
      */
     public function show(Indicator $indicator)
     {
-        return ['indicator_planning' => new IndicatorPlanningResource($indicator->load(['periods', 'strategicObjective']))];
+        return ['indicator_planning' => new IndicatorPlanningResource($indicator->load('periods'))];
     }
 
     /**
@@ -46,6 +48,13 @@ class IndicatorPlanningRepository
     {
         DB::beginTransaction();
         try {
+            if (!IndicatorStatus::isAllowedForObjectiveStatus(
+                IndicatorStatus::PLANNED,
+                $indicator->strategicObjective?->status
+            )) {
+                throw new DomainException(__('app/indicator.document_not_editable_status'));
+            }
+
             $request->merge([
                 'is_planned' => true,
                 'updated_by' => Auth::user()?->uuid,
@@ -85,23 +94,24 @@ class IndicatorPlanningRepository
                 );
             }
 
-            //Save initial status
-            $status = ModelsIndicatorStatus::create([
-                'indicator_uuid' => $indicator->uuid,
-                'indicator_id' => $indicator->id,
-                'status_code' => 'planned',
-                'status_date' => now(),
-                'created_by' => Auth::user()?->uuid,
-                'updated_by' => Auth::user()?->uuid,
-            ]);
+            if ($indicator->status !== IndicatorStatus::PLANNED) {
+                $status = ModelsIndicatorStatus::create([
+                    'indicator_uuid' => $indicator->uuid,
+                    'indicator_id' => $indicator->id,
+                    'status_code' => IndicatorStatus::PLANNED,
+                    'status_date' => now(),
+                    'created_by' => Auth::user()?->uuid,
+                    'updated_by' => Auth::user()?->uuid,
+                ]);
 
-            $indicator->update([
-                'status' => $status->status_code,
-                'status_changed_at' => $status->status_date,
-                'status_changed_by' => $status->created_by,
-            ]);
+                $indicator->update([
+                    'status' => $status->status_code,
+                    'status_changed_at' => $status->status_date,
+                    'status_changed_by' => $status->created_by,
+                ]);
+            }
 
-            $indicator->load(['periods', 'strategicObjective'])->refresh();
+            $indicator->refresh()->load('periods');
 
             DB::commit();
 

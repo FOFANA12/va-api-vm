@@ -20,7 +20,8 @@ return [
         'start_date_outside' => 'La date de début doit être comprise entre :min et :max.',
         'end_date_outside' => 'La date de fin doit être comprise entre :min et :max.',
         'targets_increasing' => 'Les valeurs cibles doivent être strictement croissantes et sans doublons.',
-        'last_target_must_equal' => 'La dernière valeur cible doit être égale à :value.',
+        'last_target_must_be_greater_or_equal' => 'La dernière valeur cible doit être supérieure ou égale à :value.',
+        'periods_overlap' => 'Les périodes ne doivent pas se chevaucher. La période :line commence avant la fin de la précédente.',
     ],
 
 ];

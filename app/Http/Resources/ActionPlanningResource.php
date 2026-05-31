@@ -22,8 +22,8 @@ class ActionPlanningResource extends JsonResource
     protected function forEdit(): array
     {
         return [
-            'start_date' => $this->start_date,
-            'end_date' => $this->end_date,
+            'start_date' => $this->start_date?->toDateString(),
+            'end_date' => $this->end_date?->toDateString(),
             'budget' => $this->budget,
             'frequency_unit' => $this->frequency_unit,
             'frequency_value' => $this->frequency_value,
@@ -34,8 +34,8 @@ class ActionPlanningResource extends JsonResource
                 $periods->map(fn($period) => [
                     'id' => $period->id,
                     'uuid' => $period->uuid,
-                    'start_date' => $period->start_date,
-                    'end_date' => $period->end_date,
+                    'start_date' => $period->start_date?->toDateString(),
+                    'end_date' => $period->end_date?->toDateString(),
                     'progress_percent' => $period->progress_percent,
                     'actual_progress_percent' => $period->actual_progress_percent,
                 ])->values()
@@ -60,8 +60,8 @@ class ActionPlanningResource extends JsonResource
                 $periods->map(fn($period) => [
                     'id' => $period->id,
                     'uuid' => $period->uuid,
-                    'start_date' => $period->start_date,
-                    'end_date' => $period->end_date,
+                    'start_date' => DateTimeFormatter::formatDate($period->start_date),
+                    'end_date' => DateTimeFormatter::formatDate($period->end_date),
                     'progress_percent' => $period->progress_percent,
                     'actual_progress_percent' => $period->actual_progress_percent,
                 ])->values()

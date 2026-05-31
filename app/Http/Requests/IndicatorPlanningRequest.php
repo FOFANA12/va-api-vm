@@ -58,27 +58,29 @@ class IndicatorPlanningRequest extends FormRequest
 
             if ($indicator && $indicator->strategicObjective) {
                 $objective = $indicator->strategicObjective;
+                $objStart  = $objective->start_date->format('Y-m-d');
+                $objEnd    = $objective->end_date->format('Y-m-d');
 
                 foreach ($periods as $i => $period) {
                     $start = $period['start_date'] ?? null;
                     $end   = $period['end_date'] ?? null;
 
-                    if ($start && ($start < $objective->start_date || $start > $objective->end_date)) {
+                    if ($start && ($start < $objStart || $start > $objEnd)) {
                         $v->errors()->add(
                             "periods.$i.start_date",
                             __('app/indicator_planning.plannings_error.start_date_outside', [
-                                'min' => $objective->start_date,
-                                'max' => $objective->end_date,
+                                'min' => $objStart,
+                                'max' => $objEnd,
                             ]) . ' (' . __('app/common.request.line_number', ['line' => $i + 1]) . ')'
                         );
                     }
 
-                    if ($end && ($end < $objective->start_date || $end > $objective->end_date)) {
+                    if ($end && ($end < $objStart || $end > $objEnd)) {
                         $v->errors()->add(
                             "periods.$i.end_date",
                             __('app/indicator_planning.plannings_error.end_date_outside', [
-                                'min' => $objective->start_date,
-                                'max' => $objective->end_date,
+                                'min' => $objStart,
+                                'max' => $objEnd,
                             ]) . ' (' . __('app/common.request.line_number', ['line' => $i + 1]) . ')'
                         );
                     }
@@ -107,13 +109,28 @@ class IndicatorPlanningRequest extends FormRequest
                 $lastValue = (float) end($periods)['target_value'];
                 $expected = (float) $indicator->final_target_value;
 
-                if (abs($lastValue - $expected) > 0.00001) {
+                if ($lastValue < $expected) {
                     $v->errors()->add(
                         "periods.$lastIndex.target_value",
-                        __('app/indicator_planning.plannings_error.last_target_must_equal', [
+                        __('app/indicator_planning.plannings_error.last_target_must_be_greater_or_equal', [
                             'value' => $expected,
                         ]) . ' (' . __('app/common.request.line_number', ['line' => $lastIndex + 1]) . ')'
                     );
+                }
+            }
+
+            for ($i = 1; $i < count($periods); $i++) {
+                $prevEnd   = $periods[$i - 1]['end_date'] ?? null;
+                $currStart = $periods[$i]['start_date'] ?? null;
+
+                if ($prevEnd && $currStart && $currStart < $prevEnd) {
+                    $v->errors()->add(
+                        "periods.$i.start_date",
+                        __('app/indicator_planning.plannings_error.periods_overlap', [
+                            'line' => $i + 1,
+                        ]) . ' (' . __('app/common.request.line_number', ['line' => $i + 1]) . ')'
+                    );
+                    break;
                 }
             }
         });

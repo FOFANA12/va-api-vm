@@ -55,6 +55,8 @@ class IndicatorSeeder extends Seeder
                 'category_uuid' => $category?->uuid,
                 'name' => $data['name'],
                 'description' => $data['description'],
+                'start_date' => $strategicObjective->start_date,
+                'end_date' => $strategicObjective->end_date,
                 'chart_type' => $data['chart_type'],
                 'frequency_unit' => $data['frequency_unit'],
                 'frequency_value' => $data['frequency_value'],
@@ -68,8 +70,6 @@ class IndicatorSeeder extends Seeder
             $indicator->update([
                 'reference' => ReferenceGenerator::generateIndicatorReference($indicator->id, $strategicObjective->reference),
             ]);
-
-            
         }
     }
 }

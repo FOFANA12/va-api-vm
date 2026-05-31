@@ -39,17 +39,23 @@ class ActionPerformanceReportRepository
             ? round((($spentBudget - $plannedBudget) / $plannedBudget) * 100, 2)
             : -100;
 
-        // Breakdown of disbursements by expense type (from disbursement pivot table)
+        // Breakdown of disbursements by expense type.
+        // Each disbursement's payment_amount is divided equally among its expense types
+        // to avoid double-counting when a single disbursement is tagged with multiple types.
         $disbursementByTypes = DB::table('action_fund_disbursement_expense_types as afdet')
             ->join('action_fund_disbursements as afd', 'afd.uuid', '=', 'afdet.action_fund_disbursement_uuid')
             ->join('expense_types as et', 'afdet.expense_type_uuid', '=', 'et.uuid')
-            ->select('et.name as type', DB::raw('SUM(DISTINCT afd.payment_amount) as total'))
+            ->join(
+                DB::raw('(SELECT action_fund_disbursement_uuid, COUNT(*) as type_count FROM action_fund_disbursement_expense_types GROUP BY action_fund_disbursement_uuid) as type_counts'),
+                'type_counts.action_fund_disbursement_uuid', '=', 'afdet.action_fund_disbursement_uuid'
+            )
+            ->select('et.name as type', DB::raw('SUM(afd.payment_amount / type_counts.type_count) as total'))
             ->where('afd.action_uuid', $action->uuid)
             ->groupBy('et.uuid', 'et.name')
             ->get()->map(function ($row) use ($spentBudget) {
                 return [
                     'type' => $row->type,
-                    'total' => (float) $row->total,
+                    'total' => round((float) $row->total, 2),
                     'percent' => $spentBudget > 0
                         ? round(($row->total / $spentBudget) * 100, 2)
                         : 0,
@@ -81,7 +87,7 @@ class ActionPerformanceReportRepository
         foreach ($action->periods as $period) {
             $planned = (float) $period->progress_percent; // Planned (P)
 
-            $hasControl = $period->controls && $period->controls->count() > 0;
+            $hasControl = $period->controls !== null;
 
             $realized = null;
             $variance = null;
@@ -158,10 +164,6 @@ class ActionPerformanceReportRepository
             ? $actualStart->diffInDays($actualEnd)
             : null;
 
-        $durationVariance = ($endPlanned && $actualEnd)
-            ? $endPlanned->diffInDays($actualEnd, false)
-            : null;
-
         return [
             'planned_start' => $startPlanned ? DateTimeFormatter::formatDate($startPlanned) : null,
             'planned_end' => $endPlanned ? DateTimeFormatter::formatDate($endPlanned) : null,
@@ -172,7 +174,6 @@ class ActionPerformanceReportRepository
             'actual_duration_days' => $actualDuration,
             'remaining_days' => $remainingDays,
             'start_delay_days' => $startDelay,
-            'duration_variance_days' => $durationVariance,
         ];
     }
 }

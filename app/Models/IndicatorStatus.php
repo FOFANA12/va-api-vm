@@ -15,6 +15,7 @@ class IndicatorStatus extends Model
 
     protected $casts = [
         'status_code' => 'string',
+        'status_date' => 'datetime',
     ];
 
     public function indicator()

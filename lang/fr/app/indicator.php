@@ -15,13 +15,16 @@ return [
         'category' => 'catégorie',
         'name' => 'nom',
         'description' => 'description',
+        'start_date' => 'date de démarrage',
+        'end_date' => 'date limite',
         'chart_type' => 'type de graphique',
         'initial_value' => 'valeur initiale',
         'final_target_value' => 'valeur cible finale',
         'unit' => 'unité de mesure',
+        'start_date_outside_objective' => "Date de début hors période de l'objectif stratégique.",
+        'end_date_outside_objective' => "Date de fin hors période de l'objectif stratégique.",
 
         "invalid_status" => "Le statut fourni est invalide.",
-        "invalid_status" => "Le statut fourni est invalide.",
     ],
-    'document_not_editable_status' => 'Modification impossible car l’objectif n\'est plus engagé.',
+    'document_not_editable_status' => 'Modification impossible car le statut de l’objectif ne l’autorise pas.',
 ];

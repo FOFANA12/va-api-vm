@@ -3,6 +3,7 @@
 namespace App\Http\Resources;
 
 use App\Helpers\DateTimeFormatter;
+use App\Support\ActionStatus;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Illuminate\Support\Facades\URL;
@@ -35,6 +36,7 @@ class ActionFundReceiptResource extends JsonResource
                 'reference' => $this->action_reference,
                 'name' => $this->action_name,
                 'id' => $this->action_id,
+                'status' => ActionStatus::get($this->action_status, app()->getLocale()),
             ],
             'export_word_url'  => $this->id
                 ? URL::route('actionFundReceipt.exportToWord', ['actionFundReceipt' => $this->id])
@@ -53,9 +55,10 @@ class ActionFundReceiptResource extends JsonResource
                 'reference' => $this->action->reference,
                 'name' => $this->action->name,
                 'currency' => $this->action->currency,
+                'status' => ActionStatus::get($this->action->status, app()->getLocale()),
             ]),
-            'receipt_date' => $this->receipt_date,
-            'validity_date' => $this->validity_date,
+            'receipt_date' => $this->receipt_date?->toDateString(),
+            'validity_date' => $this->validity_date?->toDateString(),
             'funding_source' => $this->funding_source_uuid,
             'currency' => $this->currency_uuid,
             'exchange_rate' => floatval($this->exchange_rate),
@@ -75,6 +78,7 @@ class ActionFundReceiptResource extends JsonResource
                 'reference' => $this->action->reference,
                 'name' => $this->action->name,
                 'currency' => $this->action->currency,
+                'status' => ActionStatus::get($this->action->status, app()->getLocale()),
             ]),
             'receipt_date' => DateTimeFormatter::formatDate($this->receipt_date),
             'validity_date' => DateTimeFormatter::formatDate($this->validity_date),

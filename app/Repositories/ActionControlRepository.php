@@ -78,11 +78,13 @@ class ActionControlRepository
             throw new \Exception(__('app/action_control.controls_error.previous_not_controlled'));
         }
 
-        $lastControl = ActionControl::whereHas('actionPeriod', function ($q) use ($action) {
-            $q->where('action_uuid', $action->uuid);
-        })
+        $lastControl = ActionControl::whereIn(
+            'action_period_uuid',
+            ActionPeriod::where('action_uuid', $action->uuid)->select('uuid')
+        )
             ->with('controlPhases')
-            ->latest('control_date')
+            ->orderByDesc('control_date')
+            ->orderByDesc('id')
             ->first();
 
         $previousValues = [];
