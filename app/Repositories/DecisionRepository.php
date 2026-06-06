@@ -12,9 +12,7 @@ use App\Helpers\ReferenceGenerator;
 use Illuminate\Support\Facades\Auth;
 use App\Http\Requests\DecisionRequest;
 use App\Http\Resources\DecisionResource;
-use App\Models\Action;
 use App\Models\DecisionStatus;
-use App\Models\StrategicObjective;
 
 class DecisionRepository
 {
@@ -97,32 +95,8 @@ class DecisionRepository
             ];
         });
 
-        $decidableType = $request->get('decidableType');
-        $decidableId   = $request->get('decidableId');
-        $canHaveDecision = false;
-
-
-        if ($decidableType && $decidableId) {
-            switch ($decidableType) {
-                case 'actions':
-                    $action = Action::find($decidableId);
-                    if ($action) {
-                        $canHaveDecision = $action->status === 'in_progress';
-                    }
-                    break;
-
-                case 'strategic_objectives':
-                    $objective = StrategicObjective::find($decidableId);
-                    if ($objective) {
-                        $canHaveDecision = $objective->status === 'engaged';
-                    }
-                    break;
-            }
-        }
-
         return [
             'priority_levels' => $priorityLevels,
-            'can_have_decision' => $canHaveDecision,
         ];
     }
 
